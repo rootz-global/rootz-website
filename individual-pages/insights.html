@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insights - Data Wallets & Digital Names - Rootz</title>
+    <style>
+        :root {
+            --primary: #2d5016;
+            --secondary: #4a7c59;
+            --light: #ffffff;
+            --background: #f8fdf6;
+            --gray: #666666;
+            --dark: #1a2f0a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6; color: #333; background: var(--background);
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        header { background: var(--light); box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 1rem 0; }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .nav-menu { display: flex; list-style: none; gap: 2rem; }
+        .nav-menu a { text-decoration: none; color: #333; font-weight: 500; transition: color 0.3s ease; }
+        .nav-menu a:hover { color: var(--primary); }
+        
+        .hamburger { display: none; flex-direction: column; cursor: pointer; padding: 8px; z-index: 1001; }
+        .hamburger span { width: 25px; height: 3px; background-color: var(--primary); margin: 3px 0; transition: 0.3s; border-radius: 2px; }
+        .hamburger.active span:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); }
+        
+        .nav-menu.mobile-active { display: flex; flex-direction: column; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--light); z-index: 1000; padding-top: 80px; align-items: center; gap: 2rem; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+        .nav-menu.mobile-active.show { transform: translateX(0); }
+        .nav-menu.mobile-active a { font-size: 1.5rem; padding: 10px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease; }
+        .nav-menu.mobile-active a:hover { border-bottom-color: var(--primary); }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--light); padding: 100px 20px; text-align: center;
+        }
+        .hero h1 { font-size: 48px; margin-bottom: 20px; line-height: 1.2; }
+        .hero p { font-size: 20px; max-width: 700px; margin: 0 auto; opacity: 0.9; }
+        
+        .content-section { padding: 80px 20px; }
+        
+        .blog-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px; margin: 40px 0;
+        }
+        
+        .blog-post {
+            background: var(--light); border-radius: 12px; overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); transition: transform 0.3s ease;
+        }
+        .blog-post:hover { transform: translateY(-5px); }
+        
+        .blog-post-image {
+            height: 200px; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex; align-items: center; justify-content: center; color: var(--light);
+            font-size: 18px; font-weight: 600;
+        }
+        
+        .blog-post-content { padding: 30px; }
+        .blog-post-content h3 { font-size: 20px; margin-bottom: 15px; color: var(--primary); }
+        .blog-post-content p { font-size: 16px; color: var(--gray); margin-bottom: 15px; }
+        .blog-post-content small { color: var(--gray); font-size: 14px; }
+        
+        .btn {
+            display: inline-block; background-color: var(--primary); color: var(--light);
+            padding: 14px 32px; border-radius: 6px; text-decoration: none; font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        footer {
+            background: var(--dark); color: var(--light); text-align: center; padding: 40px 20px;
+        }
+        footer p { margin-bottom: 10px; opacity: 0.9; }
+
+        @media (max-width: 768px) { .hamburger { display: flex; } .nav-menu:not(.mobile-active) { display: none; } .hero h1 { font-size: 36px; } .blog-grid { grid-template-columns: 1fr; } }
+        @media (min-width: 769px) { .hamburger { display: none !important; } .nav-menu { display: flex !important; position: static !important; flex-direction: row !important; background: transparent !important; height: auto !important; padding-top: 0 !important; transform: none !important; width: auto !important; } .nav-menu a { font-size: 1rem !important; padding: 0 !important; border-bottom: none !important; } }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="home.html" class="logo">
+                <img src="../images/rootz-logo.png" alt="Rootz Logo">
+            </a>
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="digital-names.html">Digital Names</a></li>
+                <li><a href="data-manufacturing.html">Data Manufacturing</a></li>
+                <li><a href="use-cases.html">Use Cases</a></li>
+                <li><a href="insights.html" style="color: #2d5016;">Insights</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Insights: Data Wallets & Digital Names</h1>
+                <p>The creation of Origin and Ownership - In the Future Everything has a Wallet</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+                <div class="blog-grid">
+                    <article class="blog-post">
+                        <div class="blog-post-image">Featured Innovation</div>
+                        <div class="blog-post-content">
+                            <h3>In the beginning there were Corporate Digital Names</h3>
+                            <p>How Rootz pioneered the revolutionary concept that Corporate Digital Names serve as the DBA genesis, establishing the original origin for all authorized owners and enabling everything digital to have its own wallet.</p>
+                            <small>Published: September 1, 2025</small>
+                        </div>
+                    </article>
+                    
+                    <article class="blog-post">
+                        <div class="blog-post-image">Social Media Wallets</div>
+                        <div class="blog-post-content">
+                            <h3>Data Manufacturing: Creating data with origin</h3>
+                            <p>Deep dive into Rootz's revolutionary Data Manufacturing process where genesis blocks record both ownership and system origin, enabling dynamic control that travels with the data while maintaining immutable proof of authentic creation.</p>
+                            <small>Published: August 28, 2025</small>
+                        </div>
+                    </article>
+                    
+                    <article class="blog-post">
+                        <div class="blog-post-image">IoT Security</div>
+                        <div class="blog-post-content">
+                            <h3>From genesis to control: The Dynamic Access Revolution</h3>
+                            <p>Understanding how Digital Names enable both immutable genesis foundations and dynamic control, where owners can send secure instructions to update any data wallet, product, or system while maintaining the ledger of access.</p>
+                            <small>Published: August 25, 2025</small>
+                        </div>
+                    </article>
+                    
+                    <article class="blog-post">
+                        <div class="blog-post-image">Personal Data</div>
+                        <div class="blog-post-content">
+                            <h3>Personal Data with privacy built in: True Digital Ownership</h3>
+                            <p>Comprehensive analysis of how personal data wallets with Digital Names enable individuals to maintain true ownership and control over their information, with quantum-resistant cryptography ensuring privacy is built into all data, systems, and things.</p>
+                            <small>Published: August 22, 2025</small>
+                        </div>
+                    </article>
+                    
+                    <article class="blog-post">
+                        <div class="blog-post-image">Business Applications</div>
+                        <div class="blog-post-content">
+                            <h3>Corporate Digital Names: Bridging Physical to Digital Realm</h3>
+                            <p>Real-world implementation of Corporate Digital Names using the globally established DBA model to bridge the physical world to the Digital Realm, enabling companies to establish correspondence and authorizations built on a digital-only model.</p>
+                            <small>Published: August 18, 2025</small>
+                        </div>
+                    </article>
+                    
+                    <article class="blog-post">
+                        <div class="blog-post-image">Future Infrastructure</div>
+                        <div class="blog-post-content">
+                            <h3>Safe infrastructure: Building Tomorrow's Digital World</h3>
+                            <p>Exploring how Data Wallets and Digital Names establish the safe infrastructure foundation for a future where every digital interaction has built-in quality and reliability, with privacy built into all data, systems, and things.</p>
+                            <small>Published: August 15, 2025</small>
+                        </div>
+                    </article>
+
+                    <article class="blog-post">
+                        <div class="blog-post-image">Technical Deep Dive</div>
+                        <div class="blog-post-content">
+                            <h3>Genesis Blocks and Data as an Asset: The Technical Foundation</h3>
+                            <p>Technical exploration of how genesis block recording enables universal digital ownership, from the cryptographic mechanisms powering Data Wallets to how data with origin enables the economic recognition of data as an asset.</p>
+                            <small>Published: August 12, 2025</small>
+                        </div>
+                    </article>
+
+                    <article class="blog-post">
+                        <div class="blog-post-image">Global Impact</div>
+                        <div class="blog-post-content">
+                            <h3>From Platforms to Protocols: How Data Wallets Transform Digital Ecosystems</h3>
+                            <p>Analysis of how Data Wallets shift digital interactions from platform-dependent to protocol-based, enabling true interoperability and user sovereignty across all digital services through the ledger of access framework.</p>
+                            <small>Published: August 8, 2025</small>
+                        </div>
+                    </article>
+
+                    <article class="blog-post">
+                        <div class="blog-post-image">Economic Models</div>
+                        <div class="blog-post-content">
+                            <h3>The Data Wallet Economy: New Models of Digital Value Creation</h3>
+                            <p>Exploring how Data Wallets enable new economic models where data with origin becomes a recognizable asset, allowing individuals, creators, and businesses to monetize digital interactions through authentic ownership and verifiable contributions.</p>
+                            <small>Published: August 5, 2025</small>
+                        </div>
+                    </article>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="contact.html" class="btn">Explore Data Wallets</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names</p>
+            <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Everything Has a Wallet</p>
+        </div>
+    </footer>
+    <script>document.addEventListener('DOMContentLoaded', function() { const hamburger = document.getElementById('hamburger'); const navMenu = document.getElementById('nav-menu'); hamburger.addEventListener('click', function() { hamburger.classList.toggle('active'); if (navMenu.classList.contains('mobile-active')) { navMenu.classList.remove('show'); setTimeout(() => { navMenu.classList.remove('mobile-active'); }, 300); } else { navMenu.classList.add('mobile-active'); setTimeout(() => { navMenu.classList.add('show'); }, 10); } }); const navLinks = navMenu.querySelectorAll('a'); navLinks.forEach(link => { link.addEventListener('click', function() { if (window.innerWidth <= 768) { hamburger.classList.remove('active'); navMenu.classList.remove('show'); setTimeout(() => { navMenu.classList.remove('mobile-active'); }, 300); } }); }); window.addEventListener('resize', function() { if (window.innerWidth > 768) { hamburger.classList.remove('active'); navMenu.classList.remove('mobile-active', 'show'); } }); });</script>
+</body>
+</html>

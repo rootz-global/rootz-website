@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Names - how everything gets a wallet - Rootz</title>
+    <style>
+        :root {
+            --primary: #2d5016;
+            --secondary: #4a7c59;
+            --accent: #5d8a66;
+            --light-green: #76a56f;
+            --dark: #1a2f0a;
+            --light: #ffffff;
+            --background: #f8fdf6;
+            --gray: #666666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: var(--background);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: var(--light);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-menu a:hover {
+            color: var(--primary);
+        }
+        
+        /* Hamburger menu styles */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 1001;
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: var(--primary);
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+        
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+        
+        .nav-menu.mobile-active {
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--light);
+            z-index: 1000;
+            padding-top: 80px;
+            align-items: center;
+            gap: 2rem;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .nav-menu.mobile-active.show {
+            transform: translateX(0);
+        }
+        
+        .nav-menu.mobile-active a {
+            font-size: 1.5rem;
+            padding: 10px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        
+        .nav-menu.mobile-active a:hover {
+            border-bottom-color: var(--primary);
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--light);
+            padding: 100px 20px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: var(--light);
+            padding: 14px 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        .content-section {
+            padding: 80px 20px;
+        }
+        
+        .content-section h2 {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary);
+        }
+        
+        .content-section h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .content-section p {
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin: 60px 0;
+        }
+        
+        .feature-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(45, 80, 22, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+        }
+        
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .feature-card p {
+            font-size: 16px;
+            color: var(--gray);
+        }
+        
+        .process-section {
+            background: var(--light);
+            padding: 80px 20px;
+        }
+        
+        .process-step {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+            background: rgba(45, 80, 22, 0.05);
+        }
+        
+        .process-step strong {
+            color: var(--primary);
+            font-size: 18px;
+        }
+        
+        footer {
+            background: var(--dark);
+            color: var(--light);
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        footer p {
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            
+            .nav-menu:not(.mobile-active) {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .hamburger {
+                display: none !important;
+            }
+            
+            .nav-menu {
+                display: flex !important;
+                position: static !important;
+                flex-direction: row !important;
+                background: transparent !important;
+                height: auto !important;
+                padding-top: 0 !important;
+                transform: none !important;
+                width: auto !important;
+            }
+            
+            .nav-menu a {
+                font-size: 1rem !important;
+                padding: 0 !important;
+                border-bottom: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="home.html" class="logo">
+                <img src="../images/rootz-logo.png" alt="Rootz Logo">
+            </a>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="digital-names.html" style="color: #2d5016;">Digital Names</a></li>
+                <li><a href="data-manufacturing.html">Data Manufacturing</a></li>
+                <li><a href="use-cases.html">Use Cases</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Digital Names - how everything gets a wallet</h1>
+                <p>The genesis of for Ownership, Origin, Access, and Reliability for all data, systems and things.</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+                <h2>The creation of Origin and Ownership</h2>
+                <p>Rootz pioneered Digital Names as the genesis of how everything gets a wallet. Unlike traditional identity systems, Digital Names establish the foundational framework that enables all data, systems, and things to have their own cryptographic wallets, providing universal foundations for ownership, origin tracking, access control, and reliability verification.</p>
+                
+                <p>Digital Names represent the foundational breakthrough that enables universal wallet assignment. From the smallest data object to the largest system, from individual things to global infrastructure - everything can now have its own cryptographic wallet with a Digital Name. This genesis innovation creates the bedrock for a world where ownership, origin, access, and reliability are built into everything digital by design.</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Genesis of Ownership</h3>
+                        <p>Every data object, system, and thing gets its own wallet and Digital Name, establishing the foundational ownership framework that works universally across all platforms and technologies.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <h3>Genesis of Origin</h3>
+                        <p>The foundational blockchain recording permanently captures what person, device, or system created each wallet, providing the genesis proof of authentic origin for all things.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <h3>Ledger of access</h3>
+                        <p>Permissions and rights recorded by owners on the data's chain create the dynamic access control framework that governs how data, systems, and things interact across all platforms and applications.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📋</div>
+                        <h3>Universal Foundation</h3>
+                        <p>Digital Names provide the genesis infrastructure that works across everything - the same foundational framework supports data authenticity, system verification, and thing identification universally.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔗</div>
+                        <h3>Quality and reliability</h3>
+                        <p>Cryptographic proof embedded in every wallet creates the foundational trust layer, ensuring all data, systems, and things can be verified as authentic across any context.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔮</div>
+                        <h3>Safe infrastructure</h3>
+                        <p>Built with quantum-resistant cryptography, Digital Names provide the foundational wallet infrastructure for a future where all data, systems, and things have privacy built in.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+                <h2>Dynamic Control: The Owner's Authority</h2>
+                <p>Once established, the genesis foundation enables dynamic control over all wallets, systems, products, and data. The original authority - whether from a corporate DBA or individual Digital Name - can send authenticated instructions to update any connected wallet, product, or system in real-time.</p>
+                
+                <h3>Real-Time Authority in Action</h3>
+                <p>The beauty of the genesis foundation is that data is not static. Authorized owners maintain dynamic control through their Digital Name authority:</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">⚙️</div>
+                        <h3>System Updates</h3>
+                        <p>Send authenticated commands to any business system, instantly updating configurations, permissions, or operational parameters through the genesis authority chain.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📦</div>
+                        <h3>Product Management</h3>
+                        <p>Dynamically update product information, specifications, or access controls by sending instructions from the authorizing Digital Name to the product's wallet.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Data Wallet Control</h3>
+                        <p>Modify, update, or control access to any data wallet by sending authenticated instructions from the original authority source to the target data object.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3>Dynamic Authorization</h3>
+                        <p>Grant, revoke, or modify permissions across the entire ecosystem by issuing commands from the genesis authority to any connected wallet or system.</p>
+                    </div>
+                </div>
+                
+                <p>This dynamic control capability ensures that while the genesis foundation provides immutable proof of origin and authority, the actual management and control of data, systems, and products remains flexible and responsive to authorized owner instructions. The blockchain maintains the permanent record of authority while enabling real-time control and updates.</p>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+                <h2>In the beginning there were Corporate Digital Names</h2>
+                <p>For businesses, a Digital Name functions as a DBA (Doing Business As) that establishes the original origin for all authorized owners within the organization. This corporate Digital Name becomes the foundational root that validates and authorizes all business-created systems, products, and data.</p>
+                
+                <p>When a business establishes its Digital Name, it creates the genesis point for all corporate digital activity. The corporate Digital Name DBA serves as the original origin that cascades authority throughout the entire business ecosystem. From executive decisions to automated systems, from product development to data creation - everything traces back to and derives its authority from this foundational corporate genesis, ensuring that all business-created systems, products, and data carry immutable proof of their authentic corporate origin and authorized ownership.</p>
+        </section>
+
+        <section class="process-section">
+            <div class="container">
+                <h2>How Everything Gets a Wallet: From genesis to control</h2>
+                
+                <div class="process-step">
+                    <strong>DBA Genesis Establishment:</strong> A business first establishes its Digital Name DBA, creating the foundational corporate genesis that serves as the original origin and authority for all subsequent wallets, systems, products, and data.
+                </div>
+                
+                <div class="process-step">
+                    <strong>Genesis Identification:</strong> Any data, system, or thing can receive its own unique wallet and Digital Name, establishing the foundational identity for everything in the digital world.
+                </div>
+                
+                <div class="process-step">
+                    <strong>Genesis Block Creation:</strong> The wallet's genesis transaction permanently records ownership, origin, and foundational context, creating the immutable bedrock for all future interactions.
+                </div>
+                
+                <div class="process-step">
+                    <strong>Dynamic Access:</strong> Foundational access controls are established, defining how data, systems, and things can interact, creating the basic governance layer for everything.
+                </div>
+                
+                <div class="process-step">
+                    <strong>Secure Instructions:</strong> The Digital Name becomes the foundational identifier, enabling universal control and verification for all data, systems, and things across any platform or context.
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="contact.html" class="btn">Create Your Digital Names</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names</p>
+            <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Everything Has a Wallet</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger');
+            const navMenu = document.getElementById('nav-menu');
+            
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('active');
+                
+                if (navMenu.classList.contains('mobile-active')) {
+                    navMenu.classList.remove('show');
+                    setTimeout(() => {
+                        navMenu.classList.remove('mobile-active');
+                    }, 300);
+                } else {
+                    navMenu.classList.add('mobile-active');
+                    setTimeout(() => {
+                        navMenu.classList.add('show');
+                    }, 10);
+                }
+            });
+            
+            const navLinks = navMenu.querySelectorAll('a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        hamburger.classList.remove('active');
+                        navMenu.classList.remove('show');
+                        setTimeout(() => {
+                            navMenu.classList.remove('mobile-active');
+                        }, 300);
+                    }
+                });
+            });
+            
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('mobile-active', 'show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

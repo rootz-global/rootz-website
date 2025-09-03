@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Digital Names - Rootz Global</title>
+    <style>
+        :root {
+            --primary: #2d5016;
+            --secondary: #4a7c59;
+            --accent: #5d8a66;
+            --light-green: #76a56f;
+            --dark: #1a2f0a;
+            --light: #ffffff;
+            --background: #f8fdf6;
+            --gray: #666666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: var(--background);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: var(--light);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-menu a:hover {
+            color: var(--primary);
+        }
+        
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 1001;
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: var(--primary);
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+        
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+        
+        .nav-menu.mobile-active {
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--light);
+            z-index: 1000;
+            padding-top: 80px;
+            align-items: center;
+            gap: 2rem;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .nav-menu.mobile-active.show {
+            transform: translateX(0);
+        }
+        
+        .nav-menu.mobile-active a {
+            font-size: 1.5rem;
+            padding: 10px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        
+        .nav-menu.mobile-active a:hover {
+            border-bottom-color: var(--primary);
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--light);
+            padding: 100px 20px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: var(--light);
+            padding: 14px 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        .content-section {
+            padding: 80px 20px;
+        }
+        
+        .content-section h2 {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary);
+        }
+        
+        .content-section h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .content-section p {
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin: 60px 0;
+        }
+        
+        .feature-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(45, 80, 22, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+        }
+        
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .feature-card p {
+            font-size: 16px;
+            color: var(--gray);
+        }
+        
+        .process-section {
+            background: var(--light);
+            padding: 80px 20px;
+        }
+        
+        .process-step {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+            background: rgba(45, 80, 22, 0.05);
+        }
+        
+        .process-step strong {
+            color: var(--primary);
+            font-size: 18px;
+        }
+        
+        footer {
+            background: var(--dark);
+            color: var(--light);
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        footer p {
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            
+            .nav-menu:not(.mobile-active) {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .hamburger {
+                display: none !important;
+            }
+            
+            .nav-menu {
+                display: flex !important;
+                position: static !important;
+                flex-direction: row !important;
+                background: transparent !important;
+                height: auto !important;
+                padding-top: 0 !important;
+                transform: none !important;
+                width: auto !important;
+            }
+            
+            .nav-menu a {
+                font-size: 1rem !important;
+                padding: 0 !important;
+                border-bottom: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">
+                <img src="../images/rootz-logo.png" alt="Rootz Logo">
+            </a>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#">Home</a></li>
+                <li><a href="#" style="color: #2d5016;">Corporate Digital Names</a></li>
+                <li><a href="#">Data Manufacturing</a></li>
+                <li><a href="#">Use Cases</a></li>
+                <li><a href="#">Insights</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Corporate Digital Names: The Foundation of Corporate Digital Presence</h1>
+                <p>The world's first blockchain-anchored corporate digital names providing mathematical proof of authenticity</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+                <p>Rootz pioneered Corporate Digital Names - revolutionary blockchain-anchored corporate digital names that provide mathematical proof of corporate authenticity. Unlike traditional verification systems, Corporate Digital Names establish a cryptographic foundation that enables global verification without intermediaries.</p>
+                
+                <h3>What Makes Corporate Digital Names Revolutionary?</h3>
+                <p>A Corporate Digital Name transcends traditional business registration by creating a cryptographic foundation that binds corporate legal existence to blockchain-verifiable mathematical proof. This innovation allows companies to establish self-sovereign digital names that carry legal weight and technical authenticity simultaneously.</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📋</div>
+                        <h3>Legal Anchoring</h3>
+                        <p>Using the globally established model of DBA (Doing Business As), Corporate Digital Names provide the legacy infrastructure that bridges the physical world to the Digital Realm enabling a company to establish correspondence and authorizations built on a digital only model.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Mathematical Proof</h3>
+                        <p>Unlike traditional verification, Corporate Digital Names provide cryptographic proof of corporate authenticity that can be verified by any party globally.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <h3>Self-Sovereign Control</h3>
+                        <p>Companies maintain complete custody and control of their Corporate Digital Name, eliminating dependency on third-party certificate authorities.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <h3>Global Foundation</h3>
+                        <p>Built on blockchain infrastructure and the established DBA framework, Corporate Digital Names transcend geographical boundaries while respecting local corporate governance and legal structures worldwide.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔗</div>
+                        <h3>Immutable Authorization</h3>
+                        <p>All corporate authorizations and signatures flow from the Corporate Digital Name, creating auditable chains of authentic corporate action.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔮</div>
+                        <h3>Quantum-Resistant</h3>
+                        <p>Following NIST guidance for post-quantum cryptography, Corporate Digital Names provide future-proof corporate digital foundation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="process-section">
+            <div class="container">
+                <h2>The Corporate Digital Name Creation Process</h2>
+                
+                <div class="process-step">
+                    <strong>Corporate Registration:</strong> Legal corporate entities work with Rootz to generate cryptographic key pairs that become their Corporate Digital Name, properly registered with local corporate authorities.
+                </div>
+                
+                <div class="process-step">
+                    <strong>Blockchain Anchoring:</strong> The Corporate Digital Name public key is anchored on blockchain infrastructure, creating immutable proof of corporate digital existence.
+                </div>
+                
+                <div class="process-step">
+                    <strong>Governance Integration:</strong> Board of directors or partners receive shared control mechanisms aligned with filed governance documents, ensuring proper corporate authorization.
+                </div>
+                
+                <div class="process-step">
+                    <strong>Global Activation:</strong> The Corporate Digital Name becomes immediately verifiable worldwide, enabling instant authentication of corporate digital actions.
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="#" class="btn">Establish Your Corporate Digital Name</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Rootz - Originators of Corporate Digital Names & Data Manufacturing</p>
+            <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Innovation Hub | Global Digital Foundation</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger');
+            const navMenu = document.getElementById('nav-menu');
+            
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('active');
+                
+                if (navMenu.classList.contains('mobile-active')) {
+                    navMenu.classList.remove('show');
+                    setTimeout(() => {
+                        navMenu.classList.remove('mobile-active');
+                    }, 300);
+                } else {
+                    navMenu.classList.add('mobile-active');
+                    setTimeout(() => {
+                        navMenu.classList.add('show');
+                    }, 10);
+                }
+            });
+            
+            const navLinks = navMenu.querySelectorAll('a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        hamburger.classList.remove('active');
+                        navMenu.classList.remove('show');
+                        setTimeout(() => {
+                            navMenu.classList.remove('mobile-active');
+                        }, 300);
+                    }
+                });
+            });
+            
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('mobile-active', 'show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rootz - In the Future Everything has a Wallet</title>
+    <style>
+        :root {
+            --primary: #2d5016;
+            --secondary: #4a7c59;
+            --accent: #5d8a66;
+            --light-green: #76a56f;
+            --dark: #1a2f0a;
+            --light: #ffffff;
+            --background: #f8fdf6;
+            --gray: #666666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: var(--background);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: var(--light);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-menu a:hover {
+            color: var(--primary);
+        }
+        
+        /* Hamburger menu styles */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 1001;
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: var(--primary);
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+        
+        /* Hamburger animation */
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+        
+        /* Mobile navigation overlay */
+        .nav-menu.mobile-active {
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--light);
+            z-index: 1000;
+            padding-top: 80px;
+            align-items: center;
+            gap: 2rem;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .nav-menu.mobile-active.show {
+            transform: translateX(0);
+        }
+        
+        .nav-menu.mobile-active a {
+            font-size: 1.5rem;
+            padding: 10px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        
+        .nav-menu.mobile-active a:hover {
+            border-bottom-color: var(--primary);
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--light);
+            padding: 100px 20px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 24px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--light);
+            color: var(--primary);
+            padding: 14px 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--light);
+            border: 2px solid var(--light);
+        }
+        
+        .innovation-banner {
+            background: var(--primary);
+            color: var(--light);
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        .innovation-banner h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: var(--light);
+        }
+        
+        .innovation-banner p {
+            font-size: 18px;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .dba-display {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .dba-display h4 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+        
+        .dba-address {
+            font-family: monospace;
+            font-size: 20px;
+            font-weight: bold;
+            word-break: break-all;
+        }
+        
+        .content-section {
+            padding: 80px 20px;
+        }
+        
+        .content-section h2 {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary);
+        }
+        
+        .content-section h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .content-section p {
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin: 60px 0;
+        }
+        
+        .feature-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(45, 80, 22, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+        }
+        
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .feature-card p {
+            font-size: 16px;
+            color: var(--gray);
+        }
+        
+        .use-case-preview {
+            background: var(--light);
+            padding: 80px 20px;
+        }
+        
+        .use-case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .use-case-card {
+            background: rgba(45, 80, 22, 0.05);
+            border-radius: 12px;
+            padding: 30px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .use-case-card h4 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .use-case-card p {
+            font-size: 16px;
+            color: var(--gray);
+        }
+        
+        footer {
+            background: var(--dark);
+            color: var(--light);
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        footer p {
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            /* Show hamburger menu on mobile */
+            .hamburger {
+                display: flex;
+            }
+            
+            /* Hide desktop navigation on mobile */
+            .nav-menu:not(.mobile-active) {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero-subtitle {
+                font-size: 20px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Ensure desktop navigation is visible on larger screens */
+        @media (min-width: 769px) {
+            .hamburger {
+                display: none !important;
+            }
+            
+            .nav-menu {
+                display: flex !important;
+                position: static !important;
+                flex-direction: row !important;
+                background: transparent !important;
+                height: auto !important;
+                padding-top: 0 !important;
+                transform: none !important;
+                width: auto !important;
+            }
+            
+            .nav-menu a {
+                font-size: 1rem !important;
+                padding: 0 !important;
+                border-bottom: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="#" class="logo" style="color: #2d5016;">
+                <img src="../images/rootz-logo.png" alt="Rootz Logo">
+            </a>
+            
+            <!-- Hamburger Menu Button -->
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#" style="color: #2d5016;">Home</a></li>
+                <li><a href="#">Digital Names</a></li>
+                <li><a href="#">Data Manufacturing</a></li>
+                <li><a href="#">Use Cases</a></li>
+                <li><a href="#">Insights</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>In the Future Everything has a Wallet</h1>
+                <p class="hero-subtitle">Not an Identity but the foundations for Ownership, Origin, Access, and Reliability</p>
+                <p>Pioneering Digital Names and Data Manufacturing for a world where every device, every piece of data, and every digital interaction carries verifiable proof of authenticity and ownership</p>
+                <a href="#" class="btn">Discover Digital Names</a>
+                <a href="#" class="btn btn-secondary">Explore Data Manufacturing</a>
+            </div>
+        </section>
+
+        <section class="innovation-banner">
+            <div class="container">
+                <h2>World's First Universal Wallet Platform</h2>
+                <p>Rootz originated the revolutionary concept that everything in the digital world should have its own wallet - from social media posts to IoT devices, from data objects to digital identities. We're creating the infrastructure for a future where ownership, origin, access, and reliability are built into everything digital.</p>
+                
+                <div class="dba-display">
+                    <h4>Rootz Corporate Digital Name</h4>
+                    <div class="dba-address">0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+                <h2>The Four Pillars of Digital Ownership</h2>
+                <p>Moving beyond traditional identity verification, Rootz established the fundamental principles that enable everything to have its own wallet and prove its authenticity in the digital world.</p>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">👑</div>
+                        <h3>Ownership</h3>
+                        <p>True digital ownership through cryptographic wallets that enable individuals, organizations, and devices to maintain sovereign control over their digital assets and interactions.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📍</div>
+                        <h3>Origin</h3>
+                        <p>Immutable proof of where data, instructions, or digital assets originated, creating verifiable chains of authenticity that can be trusted globally.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔑</div>
+                        <h3>Access</h3>
+                        <p>Granular, wallet-based access controls that enable precise permission management without requiring centralized authorities or intermediaries.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Reliability</h3>
+                        <p>Mathematical certainty through blockchain verification, ensuring that digital interactions and data can be trusted with cryptographic proof rather than institutional promises.</p>
+                    </div>
+                </div>
+                
+                <h3>Beyond Identity: The Wallet-First Future</h3>
+                <p>Traditional systems focus on "who you are" - Rootz focuses on "what you can prove you own and control." Our Digital Names and Data Manufacturing processes create a foundation where everything digital carries its own verifiable wallet, enabling new models of interaction, command and control, and digital commerce that work for individuals, businesses, social media, and IoT devices alike.</p>
+            </div>
+        </section>
+
+        <section class="use-case-preview">
+            <div class="container">
+                <h2>Everything Gets a Wallet</h2>
+                <p>From social media posts to IoT sensors, from business documents to personal data - the future is built on universal digital ownership through wallets.</p>
+                
+                <div class="use-case-grid">
+                    <div class="use-case-card">
+                        <h4>Social Media</h4>
+                        <p>Every post, message, and interaction has its own wallet with verifiable origin, enabling authentic social connections without platform dependency.</p>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <h4>IoT Command & Control</h4>
+                        <p>Devices with wallets can receive authenticated instructions, execute commands securely, and maintain immutable records of all interactions.</p>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <h4>Business Operations</h4>
+                        <p>Companies establish Digital Names that create verifiable foundations for all business data, communications, and digital transactions.</p>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <h4>Personal Data</h4>
+                        <p>Individual data objects with their own wallets enable true data ownership, granular sharing controls, and monetization opportunities.</p>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <h4>Digital Assets</h4>
+                        <p>Every piece of manufactured data carries proof of creation, ownership history, and access permissions, creating new models of digital commerce.</p>
+                    </div>
+                    
+                    <div class="use-case-card">
+                        <h4>Global Infrastructure</h4>
+                        <p>A universal system where wallets enable trust, verification, and authentic interactions across all digital platforms and devices worldwide.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names</p>
+            <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Everything Has a Wallet</p>
+        </div>
+    </footer>
+    
+    <!-- JavaScript for mobile navigation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger');
+            const navMenu = document.getElementById('nav-menu');
+            
+            hamburger.addEventListener('click', function() {
+                // Toggle hamburger animation
+                hamburger.classList.toggle('active');
+                
+                // Toggle mobile menu
+                if (navMenu.classList.contains('mobile-active')) {
+                    navMenu.classList.remove('show');
+                    setTimeout(() => {
+                        navMenu.classList.remove('mobile-active');
+                    }, 300);
+                } else {
+                    navMenu.classList.add('mobile-active');
+                    setTimeout(() => {
+                        navMenu.classList.add('show');
+                    }, 10);
+                }
+            });
+            
+            // Close menu when clicking on a link (mobile)
+            const navLinks = navMenu.querySelectorAll('a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        hamburger.classList.remove('active');
+                        navMenu.classList.remove('show');
+                        setTimeout(() => {
+                            navMenu.classList.remove('mobile-active');
+                        }, 300);
+                    }
+                });
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('mobile-active', 'show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

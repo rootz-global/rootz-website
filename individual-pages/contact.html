@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Pioneer the Future with Data Wallets - Rootz</title>
+    <style>
+        :root {
+            --primary: #2d5016;
+            --secondary: #4a7c59;
+            --light: #ffffff;
+            --background: #f8fdf6;
+            --gray: #666666;
+            --dark: #1a2f0a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6; color: #333; background: var(--background);
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        header { background: var(--light); box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 1rem 0; }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .nav-menu { display: flex; list-style: none; gap: 2rem; }
+        .nav-menu a { text-decoration: none; color: #333; font-weight: 500; transition: color 0.3s ease; }
+        .nav-menu a:hover { color: var(--primary); }
+        
+        .hamburger { display: none; flex-direction: column; cursor: pointer; padding: 8px; z-index: 1001; }
+        .hamburger span { width: 25px; height: 3px; background-color: var(--primary); margin: 3px 0; transition: 0.3s; border-radius: 2px; }
+        .hamburger.active span:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); }
+        
+        .nav-menu.mobile-active { display: flex; flex-direction: column; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: var(--light); z-index: 1000; padding-top: 80px; align-items: center; gap: 2rem; transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+        .nav-menu.mobile-active.show { transform: translateX(0); }
+        .nav-menu.mobile-active a { font-size: 1.5rem; padding: 10px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease; }
+        .nav-menu.mobile-active a:hover { border-bottom-color: var(--primary); }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--light); padding: 100px 20px; text-align: center;
+        }
+        .hero h1 { font-size: 48px; margin-bottom: 20px; line-height: 1.2; }
+        .hero p { font-size: 20px; max-width: 700px; margin: 0 auto; opacity: 0.9; }
+        
+        .content-section { padding: 80px 20px; }
+        
+        .contact-container {
+            max-width: 1200px; margin: 0 auto; display: grid;
+            grid-template-columns: 1fr 2fr; gap: 60px;
+        }
+        
+        .contact-info {
+            background: var(--light); border-radius: 12px; padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); height: fit-content;
+        }
+        .contact-info h3 { color: var(--primary); margin-bottom: 30px; }
+        
+        .contact-item { margin-bottom: 25px; }
+        .contact-item h4 { font-size: 18px; margin-bottom: 10px; color: var(--secondary); }
+        .contact-item p, .contact-item a { color: var(--gray); text-decoration: none; }
+        .contact-item a:hover { color: var(--primary); }
+        
+        .contact-form {
+            background: var(--light); border-radius: 12px; padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--primary); }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 6px;
+            font-size: 16px; transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--primary); outline: none;
+        }
+        .form-group textarea { min-height: 120px; resize: vertical; }
+        
+        .form-submit {
+            background: var(--primary); color: var(--light); padding: 14px 32px; border: none;
+            border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .form-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        
+        footer {
+            background: var(--dark); color: var(--light); text-align: center; padding: 40px 20px;
+        }
+        footer p { margin-bottom: 10px; opacity: 0.9; }
+        
+        @media (max-width: 768px) { .hamburger { display: flex; } .nav-menu:not(.mobile-active) { display: none; } .hero h1 { font-size: 36px; } .contact-container { grid-template-columns: 1fr; gap: 40px; } }
+        @media (min-width: 769px) { .hamburger { display: none !important; } .nav-menu { display: flex !important; position: static !important; flex-direction: row !important; background: transparent !important; height: auto !important; padding-top: 0 !important; transform: none !important; width: auto !important; } .nav-menu a { font-size: 1rem !important; padding: 0 !important; border-bottom: none !important; } }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="home.html" class="logo">
+                <img src="../images/rootz-logo.png" alt="Rootz Logo">
+            </a>
+            <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="digital-names.html">Digital Names</a></li>
+                <li><a href="data-manufacturing.html">Data Manufacturing</a></li>
+                <li><a href="use-cases.html">Use Cases</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="contact.html" style="color: #2d5016;">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Pioneer the Future with Rootz</h1>
+                <p>Connect with the originators of Data Wallets and Digital Names</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+                <div class="contact-container">
+                    <div class="contact-info">
+                        <h3>Data Wallet Innovation Hub</h3>
+                        
+                        <div class="contact-item">
+                            <h4>Email</h4>
+                            <a href="mailto:innovation@rootz.global">innovation@rootz.global</a>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <h4>Corporate Digital Name</h4>
+                            <p style="font-family: monospace; word-break: break-all;">0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664</p>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <h4>Data Wallet Consultation</h4>
+                            <p>Monday - Friday: 9:00 AM - 6:00 PM EST</p>
+                            <p>Saturday: Corporate Digital Name Implementations by Appointment</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-form">
+                        <h3>Join the Data Wallet Revolution</h3>
+                        <form action="https://formspree.io/f/xblaprda" method="POST">
+                            <div class="form-group">
+                                <label for="name">Contact Name</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="company">Organization/Platform</label>
+                                <input type="text" id="company" name="company" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="service">Data Wallet Interest</label>
+                                <select id="service" name="service">
+                                    <option value="">Select application area...</option>
+                                    <option value="corporate-digital-names">Corporate Digital Names (DBA Genesis)</option>
+                                    <option value="data-manufacturing">Data Manufacturing with Origin</option>
+                                    <option value="genesis-to-control">Genesis to Control Implementation</option>
+                                    <option value="ledger-of-access">Ledger of Access Framework</option>
+                                    <option value="personal-data-privacy">Personal Data with Privacy Built In</option>
+                                    <option value="safe-infrastructure">Safe Infrastructure Development</option>
+                                    <option value="data-as-asset">Data as an Asset Economics</option>
+                                    <option value="partnership">Innovation Partnership</option>
+                                    <option value="research">Research Collaboration</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message">Digital Challenge</label>
+                                <textarea id="message" name="message" placeholder="Describe your need for Data Wallets - whether for Corporate Digital Names (DBA genesis), Data Manufacturing with origin, dynamic access control, privacy built into data/systems/things, or bridging the physical world to the Digital Realm..."></textarea>
+                            </div>
+                            
+                            <!-- Honeypot for spam protection -->
+                            <input type="text" name="_gotcha" style="display:none !important">
+                            
+                            <!-- Custom subject line -->
+                            <input type="hidden" name="_subject" value="New Data Wallet Inquiry from Rootz Contact Form">
+                            
+                            <button type="submit" class="form-submit">Create Your Genesis</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names</p>
+            <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Everything Has a Wallet</p>
+        </div>
+    </footer>
+
+    <script>
+        // Enhanced form submission feedback
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const submitBtn = document.querySelector('.form-submit');
+            const originalBtnText = submitBtn.textContent;
+            
+            form.addEventListener('submit', function() {
+                submitBtn.textContent = 'Creating Your Genesis...';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.7';
+            });
+            
+            // Reset button if form submission fails (user navigates back)
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    submitBtn.textContent = originalBtnText;
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                }
+            });
+        });
+    </script>
+    <script>document.addEventListener('DOMContentLoaded', function() { const hamburger = document.getElementById('hamburger'); const navMenu = document.getElementById('nav-menu'); hamburger.addEventListener('click', function() { hamburger.classList.toggle('active'); if (navMenu.classList.contains('mobile-active')) { navMenu.classList.remove('show'); setTimeout(() => { navMenu.classList.remove('mobile-active'); }, 300); } else { navMenu.classList.add('mobile-active'); setTimeout(() => { navMenu.classList.add('show'); }, 10); } }); const navLinks = navMenu.querySelectorAll('a'); navLinks.forEach(link => { link.addEventListener('click', function() { if (window.innerWidth <= 768) { hamburger.classList.remove('active'); navMenu.classList.remove('show'); setTimeout(() => { navMenu.classList.remove('mobile-active'); }, 300); } }); }); window.addEventListener('resize', function() { if (window.innerWidth > 768) { hamburger.classList.remove('active'); navMenu.classList.remove('mobile-active', 'show'); } }); });</script>
+</body>
+</html>

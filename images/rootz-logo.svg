@@ -1,0 +1,21 @@
+<svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle for the "root" symbol -->
+  <circle cx="20" cy="20" r="16" fill="#2d5016" opacity="0.1"/>
+  
+  <!-- Root system symbol -->
+  <g stroke="#2d5016" stroke-width="2" fill="none">
+    <!-- Main root line -->
+    <path d="M20 12 L20 28"/>
+    <!-- Branch roots -->
+    <path d="M20 18 L14 24"/>
+    <path d="M20 18 L26 24"/>
+    <path d="M20 22 L16 26"/>
+    <path d="M20 22 L24 26"/>
+  </g>
+  
+  <!-- Rootz text -->
+  <text x="45" y="16" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2d5016">Rootz</text>
+  
+  <!-- Subtle tagline -->
+  <text x="45" y="28" font-family="Arial, sans-serif" font-size="8" fill="#4a7c59" opacity="0.8">Everything Has a Wallet</text>
+</svg>

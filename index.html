@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rootz Global - In the Future Everything has a Wallet</title>
+    <meta name="description" content="Rootz Global - In the Future Everything has a Wallet. Not an identity but the foundations for Ownership, Origin, Access, and Reliability. Universal wallets for social media, IoT, personal data, and business operations. DBA: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664">
+    <meta name="keywords" content="Universal Wallets, Digital Names, Data Manufacturing, Everything has a Wallet, Ownership, Origin, Access, Reliability, Social Media Wallets, IoT Wallets, Personal Data, Business Operations, Rootz Global, 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664">
+    
+    <style>
+        :root {
+            --primary: #2d5016;
+            --secondary: #4a7c59;
+            --accent: #5d8a66;
+            --light-green: #76a56f;
+            --dark: #1a2f0a;
+            --light: #ffffff;
+            --background: #f8fdf6;
+            --gray: #666666;
+            --light-gray: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: var(--background);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background: var(--light);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-menu a:hover {
+            color: var(--primary);
+        }
+        
+        /* Main Content */
+        main {
+            margin-top: 80px;
+        }
+        
+        .page {
+            display: none;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--light);
+            padding: 100px 20px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--light);
+            color: var(--primary);
+            padding: 14px 32px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 0 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--light);
+            border: 2px solid var(--light);
+        }
+        
+        /* Content Sections */
+        .content-section {
+            padding: 80px 20px;
+        }
+        
+        .content-section:nth-child(even) {
+            background-color: var(--light);
+        }
+        
+        .content-section h2 {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--primary);
+        }
+        
+        .content-section h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .content-section p {
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        /* Grid Layouts */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin: 60px 0;
+        }
+        
+        .feature-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(45, 80, 22, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+        }
+        
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .feature-card p {
+            font-size: 16px;
+            color: var(--gray);
+        }
+        
+        /* Innovation Highlights */
+        .innovation-banner {
+            background: var(--primary);
+            color: var(--light);
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        .innovation-banner h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: var(--light);
+        }
+        
+        .innovation-banner p {
+            font-size: 18px;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .dba-display {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .dba-display h4 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+        
+        .dba-address {
+            font-family: monospace;
+            font-size: 20px;
+            font-weight: bold;
+            word-break: break-all;
+        }
+        
+        /* Use Cases */
+        .use-case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .use-case-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary);
+        }
+        
+        .use-case-card h4 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .use-case-card p {
+            margin-bottom: 15px;
+        }
+        
+        .use-case-result {
+            background: rgba(45, 80, 22, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Blog Section */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .blog-post {
+            background: var(--light);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .blog-post:hover {
+            transform: translateY(-5px);
+        }
+        
+        .blog-post-image {
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light);
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .blog-post-content {
+            padding: 30px;
+        }
+        
+        .blog-post-content h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .blog-post-content p {
+            font-size: 16px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+        
+        .blog-post-content small {
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        /* Contact Form */
+        .contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 60px;
+        }
+        
+        .contact-info {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+        
+        .contact-info h3 {
+            color: var(--primary);
+            margin-bottom: 30px;
+        }
+        
+        .contact-item {
+            margin-bottom: 25px;
+        }
+        
+        .contact-item h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+        
+        .contact-item p, .contact-item a {
+            color: var(--gray);
+            text-decoration: none;
+        }
+        
+        .contact-item a:hover {
+            color: var(--primary);
+        }
+        
+        .contact-form {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-submit {
+            background: var(--primary);
+            color: var(--light);
+            padding: 14px 32px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .form-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: var(--light);
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        footer p {
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--light);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .content-section {
+                padding: 60px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="#" class="logo" onclick="showPage('home')">
+                <img src="../rootz (1).png" alt="Rootz" style="height: 40px; vertical-align: middle;">
+            </a>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#" onclick="showPage('home')">Home</a></li>
+                <li><a href="#" onclick="showPage('digital-names')">Digital Names</a></li>
+                <li><a href="#" onclick="showPage('data-manufacturing')">Data Manufacturing</a></li>
+                <li><a href="#" onclick="showPage('use-cases')">Use Cases</a></li>
+                <li><a href="#" onclick="showPage('blog')">Insights</a></li>
+                <li><a href="#" onclick="showPage('contact')">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- HOME PAGE -->
+        <div id="home" class="page active">
+            <section class="hero">
+                <div class="container">
+                    <h1>In the Future Everything has a Wallet</h1>
+                    <p>Not an Identity but the foundations for Ownership, Origin, Access, and Reliability</p>
+                    <a href="#" class="btn" onclick="showPage('digital-names')">Discover Digital Names</a>
+                    <a href="#" class="btn btn-secondary" onclick="showPage('data-manufacturing')">Explore Data Manufacturing</a>
+                </div>
+            </section>
+
+            <section class="innovation-banner">
+                <div class="container">
+                    <h2>World's First Universal Wallet Platform</h2>
+                    <p>Rootz Global originated the revolutionary concept that "In the Future Everything has a Wallet" - creating the foundation for universal digital ownership where social media posts, IoT devices, personal data, and business operations all have wallets providing Ownership, Origin, Access, and Reliability.</p>
+                    
+                    <div class="dba-display">
+                        <h4>Rootz Global Digital Name</h4>
+                        <div class="dba-address">0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="container">
+                    <h2>The Four Pillars of Universal Wallets</h2>
+                    <p>Rootz pioneered the revolutionary concept that everything digital should have a wallet - not for identity, but as foundations for Ownership, Origin, Access, and Reliability. What is core to our model is that when a wallet is created, genesis data is recorded in the first blocks on the chain. The first genesis block will always record the ownership of the product or data. In addition, the system that created the data is also recorded as a genesis block.</p>
+                    
+                    <div class="features-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 800px; margin: 40px auto;">
+                        <div class="feature-card">
+                            <div class="feature-icon">🌳</div>
+                            <h3>Ownership</h3>
+                            <p>Every digital object gets its own wallet establishing clear, immutable ownership - from social media posts to IoT sensors to business documents.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🏭</div>
+                            <h3>Origin</h3>
+                            <p>The genesis block records exactly what system, person, or device created each digital object, providing permanent proof of authentic origin.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔗</div>
+                            <h3>Access</h3>
+                            <p>Wallet-based permissions enable granular control over who can view, modify, or interact with each digital object across all platforms.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">⚡</div>
+                            <h3>Reliability</h3>
+                            <p>Cryptographic proof embedded in every wallet ensures the authenticity and integrity of digital objects can always be verified.</p>
+                        </div>
+                    </div>
+                    
+                    <h3>Universal Applications: Everything Gets a Wallet</h3>
+                    <p>From social media posts and IoT device commands to personal documents and business operations - every digital interaction benefits from wallet-based foundations. A social media post with its own wallet can prove authentic authorship. An IoT sensor with a wallet can verify legitimate control commands. Personal data with wallets enables true ownership and portability. Business operations with wallets create auditable chains of authentic corporate action. This universal wallet innovation originated from Rootz Global and represents the infrastructure for the future digital world. Data and products with origin provide a innovative new approach to how every owner manages their infrastructure from individual participants to the largest organizations.</p>
+                    <p style="text-align: center; font-size: 18px; margin: 40px 0;">the future is built on universal digital ownership through wallets.</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin: 40px 0;">
+                        <div style="background: rgba(45, 80, 22, 0.05); border-radius: 12px; padding: 30px; border-left: 4px solid var(--primary);">
+                            <h4 style="font-size: 18px; margin-bottom: 15px; color: var(--primary);">Social Media</h4>
+                            <p style="font-size: 16px; color: var(--gray); margin: 0;">Every post, message, and interaction has its own wallet with verifiable origin, enabling authentic social connections without platform dependency.</p>
+                        </div>
+                        
+                        <div style="background: rgba(45, 80, 22, 0.05); border-radius: 12px; padding: 30px; border-left: 4px solid var(--primary);">
+                            <h4 style="font-size: 18px; margin-bottom: 15px; color: var(--primary);">IoT Command & Control</h4>
+                            <p style="font-size: 16px; color: var(--gray); margin: 0;">Devices with wallets can receive authenticated instructions, execute commands securely, and maintain immutable records of all interactions.</p>
+                        </div>
+                        
+                        <div style="background: rgba(45, 80, 22, 0.05); border-radius: 12px; padding: 30px; border-left: 4px solid var(--primary);">
+                            <h4 style="font-size: 18px; margin-bottom: 15px; color: var(--primary);">Business Operations</h4>
+                            <p style="font-size: 16px; color: var(--gray); margin: 0;">Companies establish Digital Names that create verifiable foundations for all business data, communications, authorizations, and digital transactions.</p>
+                        </div>
+                        
+                        <div style="background: rgba(45, 80, 22, 0.05); border-radius: 12px; padding: 30px; border-left: 4px solid var(--primary);">
+                            <h4 style="font-size: 18px; margin-bottom: 15px; color: var(--primary);">Personal Data</h4>
+                            <p style="font-size: 16px; color: var(--gray); margin: 0;">Individual data objects with their own wallets enable true data ownership, granular sharing controls, and monetization opportunities.</p>
+                        </div>
+                        
+                        <div style="background: rgba(45, 80, 22, 0.05); border-radius: 12px; padding: 30px; border-left: 4px solid var(--primary);">
+                            <h4 style="font-size: 18px; margin-bottom: 15px; color: var(--primary);">Digital Assets</h4>
+                            <p style="font-size: 16px; color: var(--gray); margin: 0;">Every piece of manufactured data carries proof of creation, ownership history, and access permissions, creating new models of digital commerce.</p>
+                        </div>
+                        
+                        <div style="background: rgba(45, 80, 22, 0.05); border-radius: 12px; padding: 30px; border-left: 4px solid var(--primary);">
+                            <h4 style="font-size: 18px; margin-bottom: 15px; color: var(--primary);">Global Infrastructure</h4>
+                            <p style="font-size: 16px; color: var(--gray); margin: 0;">A universal system where wallets enable trust, verification, and authentic interactions across all digital platforms and devices worldwide.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 2px solid rgba(45, 80, 22, 0.1);">
+                        <p style="font-size: 20px; font-weight: 600; color: var(--primary); font-style: italic;">Data with origin enables the economic recognition of Data as an asset.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- DIGITAL NAMES PAGE -->
+        <div id="digital-names" class="page">
+            <section class="hero">
+                <div class="container">
+                    <h1>Digital Names: Universal Wallet Infrastructure</h1>
+                    <p>Revolutionary wallet-based names that provide foundations for Ownership, Origin, Access, and Reliability across all digital interactions</p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="container">
+                    <p>Rootz Global pioneered Digital Names - revolutionary wallet-based naming that enables everything digital to have its own wallet. Unlike traditional identity systems, Digital Names establish cryptographic foundations for universal ownership, origin tracking, access control, and reliability verification.</p>
+                    
+                    <h3>What Makes Digital Names Revolutionary?</h3>
+                    <p>Digital Names transcend traditional naming by enabling every digital object - from social media posts to IoT devices to business documents - to have its own cryptographic wallet. This innovation allows universal digital ownership, authentic origin verification, granular access control, and reliability assurance across all digital interactions.</p>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">⚡</div>
+                            <h3>Universal Ownership</h3>
+                            <p>Every digital object gets its own wallet and name, establishing clear ownership that works across social media, IoT, personal data, and business systems.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🛡️</div>
+                            <h3>Origin Authenticity</h3>
+                            <p>Genesis blocks permanently record what person, device, or system created each digital object, providing immutable proof of authentic origin.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🌐</div>
+                            <h3>Access Control</h3>
+                            <p>Wallet-based permissions enable precise control over who can interact with each digital object, working seamlessly across all platforms and applications.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📋</div>
+                            <h3>Platform Agnostic</h3>
+                            <p>Digital Names work universally - the same wallet infrastructure supports social media authenticity, IoT command verification, and business document integrity.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔗</div>
+                            <h3>Reliability Assurance</h3>
+                            <p>Cryptographic proof embedded in every wallet ensures digital objects can always be verified as authentic and unmodified across any system or platform.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔮</div>
+                            <h3>Future-Proof Infrastructure</h3>
+                            <p>Built with quantum-resistant cryptography, Digital Names provide the universal wallet infrastructure for the future digital world where everything has a wallet.</p>
+                        </div>
+                    </div>
+
+                    <h3>The Universal Wallet Creation Process</h3>
+                    <p><strong>Digital Object Identification:</strong> Any digital object - social media post, IoT device, personal document, or business operation - can receive its own unique wallet and Digital Name.</p>
+                    <p><strong>Genesis Block Recording:</strong> The wallet's first transaction permanently records ownership, origin system, and creation context in immutable blockchain storage.</p>
+                    <p><strong>Permission Framework:</strong> Access controls are established defining who can view, modify, or interact with the digital object across all platforms and systems.</p>
+                    <p><strong>Universal Verification:</strong> The Digital Name becomes immediately verifiable worldwide, enabling instant authentication of ownership, origin, and integrity across any digital platform.</p>
+                    
+                    <div style="text-align: center; margin-top: 40px;">
+                        <a href="#" class="btn" onclick="showPage('contact')">Create Your Digital Names</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- DATA MANUFACTURING PAGE -->
+        <div id="data-manufacturing" class="page">
+            <section class="hero">
+                <div class="container">
+                    <h1>Data Manufacturing: Creating Data with Built-in Origin</h1>
+                    <p>The revolutionary process of manufacturing data objects with immutable origin tracking and ownership binding</p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="container">
+                    <p>Rootz Global pioneered Data Manufacturing - the revolutionary process of creating data objects with built-in origin tracking, ownership binding, and immutable provenance chains. This innovation solves the fundamental challenge of data authenticity in the digital age.</p>
+                    
+                    <h3>The Data Manufacturing Revolution</h3>
+                    <p>Traditional data lacks verifiable origin - you cannot prove where it came from, who created it, or whether it has been tampered with. Rootz's Data Manufacturing process creates data objects that carry immutable proof of:</p>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🏭</div>
+                            <h3>Manufacturing Origin</h3>
+                            <p>Every data object includes cryptographic proof of when, where, and by whom it was manufactured, creating an immutable creation record.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🔐</div>
+                            <h3>Ownership Binding</h3>
+                            <p>Data objects are cryptographically bound to their owners' Digital Roots, creating mathematically provable ownership that travels with the data.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">⛓️</div>
+                            <h3>Provenance Chains</h3>
+                            <p>Complete audit trails track every access, modification, and authorization, creating immutable chains of data provenance.</p>
+                        </div>
+                    </div>
+
+                    <h3>The Manufacturing Process</h3>
+                    <p><strong>Data Object Creation:</strong> New data objects receive unique cryptographic wallets, establishing their digital existence with immutable creation records.</p>
+                    <p><strong>Origin Embedding:</strong> Publisher's Digital Root signature is cryptographically embedded into the data object, creating permanent proof of authentic corporate origin.</p>
+                    <p><strong>Ownership Assignment:</strong> Intended owner's wallet address is recorded as the genesis transaction, establishing clear ownership from creation.</p>
+                    <p><strong>Access Control Manufacturing:</strong> SSL-integrated access controls are manufactured into the data object, enabling granular permission management that travels with the data.</p>
+
+                    <h3>Data Wallets: Self-Sovereign Data Containers</h3>
+                    <p>Each manufactured data object exists within its own Data Wallet - a cryptographic container that provides complete sovereignty over data access and usage.</p>
+                    
+                    <div style="text-align: center; margin-top: 40px;">
+                        <a href="#" class="btn" onclick="showPage('contact')">Start Manufacturing Data</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- USE CASES & PARTNERS PAGE -->
+        <div id="use-cases" class="page">
+            <section class="hero">
+                <div class="container">
+                    <h1>Real-World Applications</h1>
+                    <p>Digital Roots and Data Manufacturing transforming industries worldwide</p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="container">
+                    <h2>Universal Wallet Applications</h2>
+                    
+                    <div class="use-case-grid">
+                        <div class="use-case-card">
+                            <h4>📱 Social Media: Authentic Content Verification</h4>
+                            <p><strong>Challenge:</strong> Social media platforms struggle with fake content and impersonation, unable to verify authentic authorship of posts, images, and videos.</p>
+                            <p><strong>Solution:</strong> Every social media post gets its own wallet with Digital Name, providing cryptographic proof of authentic authorship and enabling users to verify content origin across all platforms.</p>
+                            <div class="use-case-result">Result: 100% authentic content verification and elimination of impersonation</div>
+                        </div>
+                        
+                        <div class="use-case-card">
+                            <h4>🏠 IoT Devices: Secure Command & Control</h4>
+                            <p><strong>Challenge:</strong> Smart home and industrial IoT devices vulnerable to unauthorized commands and spoofing attacks, with no way to verify legitimate control instructions.</p>
+                            <p><strong>Solution:</strong> Every IoT device receives its own wallet with Digital Name, enabling cryptographic verification of legitimate commands and preventing unauthorized access or manipulation.</p>
+                            <div class="use-case-result">Result: Zero successful IoT spoofing attacks and 100% command authenticity</div>
+                        </div>
+                        
+                        <div class="use-case-card">
+                            <h4>👤 Personal Data: True Data Ownership</h4>
+                            <p><strong>Challenge:</strong> Individuals have no real ownership or control over their personal data across platforms, unable to verify how their information is being used or shared.</p>
+                            <p><strong>Solution:</strong> Personal data objects receive their own wallets with Digital Names, enabling individuals to maintain true ownership, control access permissions, and track usage across all platforms.</p>
+                            <div class="use-case-result">Result: Complete personal data sovereignty and portable digital identity</div>
+                        </div>
+                        
+                        <div class="use-case-card">
+                            <h4>🏢 Business Operations: Auditable Corporate Actions</h4>
+                            <p><strong>Challenge:</strong> Enterprise needed verifiable proof of authentic corporate actions and document integrity for compliance and audit requirements across global operations.</p>
+                            <p><strong>Solution:</strong> Business documents and operations receive Digital Names with wallets, creating immutable audit trails and cryptographic proof of authentic corporate authorization chains.</p>
+                            <div class="use-case-result">Result: 100% audit compliance and verifiable corporate action authenticity</div>
+                        </div>
+                    </div>
+
+                    <h3>Join the Universal Wallet Revolution</h3>
+                    <p>Partner with Rootz Global to implement Universal Wallets and Digital Names across your digital ecosystem. From social media platforms and IoT networks to personal data management and business operations - everything benefits from wallet-based foundations for Ownership, Origin, Access, and Reliability.</p>
+                    
+                    <div style="text-align: center; margin-top: 40px;">
+                        <a href="#" class="btn" onclick="showPage('contact')">Partner with Innovation</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- BLOG PAGE -->
+        <div id="blog" class="page">
+            <section class="hero">
+                <div class="container">
+                    <h1>Insights: Universal Wallets & Digital Names</h1>
+                    <p>Explore the revolutionary concept that "In the Future Everything has a Wallet"</p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="container">
+                    <div class="blog-grid">
+                        <article class="blog-post">
+                            <div class="blog-post-image">Featured Innovation</div>
+                            <div class="blog-post-content">
+                                <h3>In the Future Everything has a Wallet: The Universal Digital Revolution</h3>
+                                <p>How Rootz Global pioneered the revolutionary concept that every digital object should have its own wallet, moving beyond identity to universal foundations for Ownership, Origin, Access, and Reliability.</p>
+                                <small>Published: September 1, 2025</small>
+                            </div>
+                        </article>
+                        
+                        <article class="blog-post">
+                            <div class="blog-post-image">Data Manufacturing</div>
+                            <div class="blog-post-content">
+                                <h3>Social Media Wallets: Ending the Era of Fake Content</h3>
+                                <p>Deep dive into how giving every social media post its own wallet with Digital Name enables cryptographic proof of authentic authorship and eliminates impersonation across all platforms.</p>
+                                <small>Published: August 28, 2025</small>
+                            </div>
+                        </article>
+                        
+                        <article class="blog-post">
+                            <div class="blog-post-image">Corporate Foundation</div>
+                            <div class="blog-post-content">
+                                <h3>IoT Device Wallets: Securing the Connected World</h3>
+                                <p>Understanding how giving every IoT device its own wallet and Digital Name prevents spoofing attacks and ensures only legitimate commands are accepted by smart home and industrial systems.</p>
+                                <small>Published: August 25, 2025</small>
+                            </div>
+                        </article>
+                        
+                        <article class="blog-post">
+                            <div class="blog-post-image">Origin Verification</div>
+                            <div class="blog-post-content">
+                                <h3>Personal Data Wallets: True Digital Ownership for Individuals</h3>
+                                <p>Comprehensive analysis of how personal data wallets with Digital Names enable individuals to maintain true ownership and control over their information across all platforms and services.</p>
+                                <small>Published: August 22, 2025</small>
+                            </div>
+                        </article>
+                        
+                        <article class="blog-post">
+                            <div class="blog-post-image">Global Impact</div>
+                            <div class="blog-post-content">
+                                <h3>Business Operation Wallets: Auditable Corporate Actions</h3>
+                                <p>Real-world implementation of Universal Wallets for business documents and operations, demonstrating how Digital Names create immutable audit trails and verifiable corporate authorization chains.</p>
+                                <small>Published: August 18, 2025</small>
+                            </div>
+                        </article>
+                        
+                        <article class="blog-post">
+                            <div class="blog-post-image">Future Foundation</div>
+                            <div class="blog-post-content">
+                                <h3>The Universal Wallet Infrastructure: Building Tomorrow's Digital World</h3>
+                                <p>Exploring how Universal Wallets and Digital Names establish the foundation for a future where every digital interaction has built-in Ownership, Origin, Access, and Reliability.</p>
+                                <small>Published: August 15, 2025</small>
+                            </div>
+                        </article>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 40px;">
+                        <a href="#" class="btn">Explore Universal Wallets</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- CONTACT PAGE -->
+        <div id="contact" class="page">
+            <section class="hero">
+                <div class="container">
+                    <h1>Pioneer the Future with Rootz Global</h1>
+                    <p>Connect with the originators of Universal Wallets and Digital Names</p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <div class="container">
+                    <div class="contact-container">
+                        <div class="contact-info">
+                            <h3>Innovation Headquarters</h3>
+                            
+                            <div class="contact-item">
+                                <h4>Email</h4>
+                                <a href="mailto:innovation@rootz.global">innovation@rootz.global</a>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <h4>Digital Root</h4>
+                                <p style="font-family: monospace; word-break: break-all;">0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664</p>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <h4>Enterprise Line</h4>
+                                <p>+1 (555) ROOTZ-DX</p>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <h4>Innovation Consultation Hours</h4>
+                                <p>Monday - Friday: 9:00 AM - 6:00 PM EST</p>
+                                <p>Saturday: Enterprise Consultations by Appointment</p>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <h4>24/7 Innovation Support</h4>
+                                <p>+1 (555) ROOT-911</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-form">
+                            <h3>Connect with Innovation</h3>
+                            <form onsubmit="handleContactForm(event)">
+                                <div class="form-group">
+                                    <label for="name">Corporate Contact Name</label>
+                                    <input type="text" id="name" name="name" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="email">Corporate Email Address</label>
+                                    <input type="email" id="email" name="email" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="company">Organization/Enterprise</label>
+                                    <input type="text" id="company" name="company" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="service">Innovation Interest</label>
+                                    <select id="service" name="service">
+                                        <option value="">Select innovation area...</option>
+                                        <option value="digital-root">Digital Root Establishment</option>
+                                        <option value="data-manufacturing">Data Manufacturing Implementation</option>
+                                        <option value="origin-verification">Origin Verification Systems</option>
+                                        <option value="enterprise-consulting">Enterprise Digital Foundation Consulting</option>
+                                        <option value="partnership">Innovation Partnership</option>
+                                        <option value="research">Research Collaboration</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="message">Corporate Digital Challenge</label>
+                                    <textarea id="message" name="message" placeholder="Describe your organization's need for Digital Roots, Data Manufacturing, or authentic corporate digital presence..."></textarea>
+                                </div>
+                                
+                                <button type="submit" class="form-submit">Connect with Innovation</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Rootz Global - Originators of Data Wallets & Digital Names</p>
+            <p>Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Innovation Hub | In the Future Everything has a Wallet</p>
+        </div>
+    </footer>
+
+    <script>
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Close mobile menu if open
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.remove('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+        
+        function handleContactForm(event) {
+            event.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+            
+            // Simulate form submission
+            alert('Thank you for connecting with Rootz Global - the originators of Universal Wallets and Digital Names! Our innovation team will contact you within 24 hours to discuss implementing Universal Wallets across your digital ecosystem.');
+            
+            // Reset form
+            event.target.reset();
+        }
+    </script>
+</body>
+</html>

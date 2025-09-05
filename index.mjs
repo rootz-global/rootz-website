@@ -5,9 +5,9 @@ let app = express();
 const root = path.resolve('.');
 
 app.use(express.static(path.join(root, 'static')));
-app.get("/favicon.ico", (req, res) => {
-    res.sendFile(root+'/favicon.ico');
-})
+// app.get("/favicon.ico", (req, res) => {
+//     res.sendFile(root+'/favicon.ico');
+// })
 app.get('/',async (req,res)=>{
     res.sendFile(root+'/index.html');
 });

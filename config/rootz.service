@@ -1,0 +1,16 @@
+[Unit]
+Description=rootz
+
+[Service]
+WorkingDirectory=/opt/rootz-website
+ExecStart=/usr/bin/npm start &
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=rootz
+
+User=ubuntu
+Group=ubuntu
+
+[Install]
+WantedBy=multi-user.target

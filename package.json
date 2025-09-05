@@ -1,0 +1,23 @@
+{
+  "name": "rootz-website",
+  "version": "1.0.0",
+  "description": "This directory contains the complete Rootz Global website files showcasing the revolutionary Digital Roots and Data Manufacturing platform.",
+  "homepage": "https://github.com/rootz-global/rootz-website#readme",
+  "bugs": {
+    "url": "https://github.com/rootz-global/rootz-website/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rootz-global/rootz-website.git"
+  },
+  "license": "MIT",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

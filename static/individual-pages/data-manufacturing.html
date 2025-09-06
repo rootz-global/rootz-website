@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Manufacturing - Creating data with origin - Rootz</title>
+    <title>Data Manufacturing - Creating data with origin - Rivetz</title>
     <style>
         :root {
             --primary: #2d5016;
@@ -32,23 +32,37 @@
             align-items: center;
             text-decoration: none;
             gap: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
         }
         
         .logo img {
             height: 40px;
             width: auto;
+            display: none; /* Hide broken image */
         }
         
         .logo-text {
             font-size: 2rem;
             font-weight: bold;
             color: var(--primary);
+            display: inline;
         }
         .nav-menu { display: flex; list-style: none; gap: 2rem; }
         .nav-menu a { text-decoration: none; color: #333; font-weight: 500; transition: color 0.3s ease; }
         .nav-menu a:hover { color: var(--primary); }
         
-        .hamburger { display: none; flex-direction: column; cursor: pointer; padding: 8px; z-index: 1001; }
+        .hamburger { 
+            display: none; 
+            flex-direction: column; 
+            cursor: pointer; 
+            padding: 8px; 
+            z-index: 1001;
+            background: none;
+            border: none;
+            outline: none;
+        }
         .hamburger span { width: 25px; height: 3px; background-color: var(--primary); margin: 3px 0; transition: 0.3s; border-radius: 2px; }
         .hamburger.active span:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); }
         .hamburger.active span:nth-child(2) { opacity: 0; }
@@ -102,7 +116,12 @@
         }
         footer p { margin-bottom: 10px; opacity: 0.9; }
         
-        @media (max-width: 768px) { .hamburger { display: flex; } .nav-menu:not(.mobile-active) { display: none; } .hero h1 { font-size: 36px; } .features-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { 
+            .hamburger { display: flex !important; } 
+            .nav-menu:not(.mobile-active) { display: none !important; } 
+            .hero h1 { font-size: 36px; } 
+            .features-grid { grid-template-columns: 1fr; } 
+        }
         @media (min-width: 769px) { .hamburger { display: none !important; } .nav-menu { display: flex !important; position: static !important; flex-direction: row !important; background: transparent !important; height: auto !important; padding-top: 0 !important; transform: none !important; width: auto !important; } .nav-menu a { font-size: 1rem !important; padding: 0 !important; border-bottom: none !important; } }
     </style>
 </head>
@@ -110,7 +129,7 @@
     <header>
         <nav class="container">
             <a href="#" class="logo">
-                <img src="../images/rootz-logo.png" alt="Rootz Logo">
+                <span class="logo-text">Rootz</span>
             </a>
             <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
             <ul class="nav-menu" id="nav-menu">
@@ -166,7 +185,7 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names</p>
+            <p>&copy; 2025 Rootz Corp. - Originators of Data Wallets & Digital Names</p>
             <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Everything Has a Wallet</p>
         </div>
     </footer>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Names - how everything gets a wallet - Rootz</title>
+    <title>Digital Names - how everything gets a wallet - Rivetz</title>
     <style>
         :root {
             --primary: #2d5016;
@@ -52,17 +52,22 @@
             align-items: center;
             text-decoration: none;
             gap: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
         }
         
         .logo img {
             height: 40px;
             width: auto;
+            display: none; /* Hide image by default since it's broken */
         }
         
         .logo-text {
             font-size: 2rem;
             font-weight: bold;
             color: var(--primary);
+            display: inline; /* Always show text */
         }
         
         .nav-menu {
@@ -89,6 +94,9 @@
             cursor: pointer;
             padding: 8px;
             z-index: 1001;
+            background: none;
+            border: none;
+            outline: none;
         }
         
         .hamburger span {
@@ -277,11 +285,11 @@
 
         @media (max-width: 768px) {
             .hamburger {
-                display: flex;
+                display: flex !important;
             }
             
             .nav-menu:not(.mobile-active) {
-                display: none;
+                display: none !important;
             }
             
             .hero h1 {
@@ -321,7 +329,7 @@
     <header>
         <nav class="container">
             <a href="home.html" class="logo">
-                <img src="../images/rootz-logo.png" alt="Rootz Logo">
+                <span class="logo-text">Rootz</span>
             </a>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -466,7 +474,7 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names</p>
+            <p>&copy; 2025 Rootz Corp. - Originators of Data Wallets & Digital Names</p>
             <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Everything Has a Wallet</p>
         </div>
     </footer>

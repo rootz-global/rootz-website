@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rootz - In the Future Everything has a Wallet</title>
+    <title>Rivetz - In the Future Everything has a Wallet</title>
     <style>
         :root {
             --primary: #2d5016;
@@ -52,17 +52,22 @@
             align-items: center;
             text-decoration: none;
             gap: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
         }
         
         .logo img {
             height: 40px;
             width: auto;
+            display: none;
         }
         
         .logo-text {
             font-size: 2rem;
             font-weight: bold;
             color: var(--primary);
+            display: inline;
         }
         
         .nav-menu {
@@ -89,6 +94,9 @@
             cursor: pointer;
             padding: 8px;
             z-index: 1001;
+            background: none;
+            border: none;
+            outline: none;
         }
         
         .hamburger span {
@@ -346,14 +354,12 @@
         }
 
         @media (max-width: 768px) {
-            /* Show hamburger menu on mobile */
             .hamburger {
-                display: flex;
+                display: flex !important;
             }
             
-            /* Hide desktop navigation on mobile */
             .nav-menu:not(.mobile-active) {
-                display: none;
+                display: none !important;
             }
             
             .hero h1 {
@@ -402,7 +408,7 @@
     <header>
         <nav class="container">
             <a href="#" class="logo" style="color: #2d5016;">
-                <img src="../images/rootz-logo.png" alt="Rootz Logo">
+                <span class="logo-text">Rootz</span>
             </a>
             
             <!-- Hamburger Menu Button -->
@@ -436,21 +442,21 @@
         </section>
 
         <section class="innovation-banner">
-            <div class="container">
-                <h2>World's First Universal Wallet Platform</h2>
-                <p>Rootz originated the revolutionary concept that everything in the digital world should have its own wallet - from social media posts to IoT devices, from data objects to digital identities. We're creating the infrastructure for a future where ownership, origin, access, and reliability are built into everything digital.</p>
-                
-                <div class="dba-display">
-                    <h4>Rootz Corporate Digital Name</h4>
-                    <div class="dba-address">0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664</div>
-                </div>
-            </div>
+        <div class="container">
+        <h2>World's First Data Wallet Platform</h2>
+        <p>Rivetz originated the revolutionary concept that everything in the digital world should have its own wallet - from social media posts to IoT devices, from data objects to digital identities. We're creating the infrastructure for a future where ownership, origin, access, and reliability are built into everything digital.</p>
+        
+        <div class="dba-display">
+        <h4>Rivetz Corporate Digital Name</h4>
+        <div class="dba-address">0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664</div>
+        </div>
+        </div>
         </section>
 
         <section class="content-section">
             <div class="container">
                 <h2>The Four Pillars of Digital Ownership</h2>
-                <p>Moving beyond traditional identity verification, Rootz established the fundamental principles that enable everything to have its own wallet and prove its authenticity in the digital world.</p>
+                <p>Moving beyond traditional identity verification, Rivetz established the fundamental principles that enable everything to have its own wallet and prove its authenticity in the digital world.</p>
                 
                 <div class="features-grid">
                     <div class="feature-card">
@@ -476,14 +482,14 @@
                 </div>
                 
                 <h3>Beyond Identity: The Wallet-First Future</h3>
-                <p>Traditional systems focus on "who you are" - Rootz focuses on "what you can prove you own and control." Our Digital Names and Data Manufacturing processes create a foundation where everything digital carries its own verifiable wallet, enabling new models of interaction, command and control, and digital commerce that work for individuals, businesses, social media, and IoT devices alike.</p>
+                <p>Traditional systems focus on "who you are" - Rivetz focuses on "what you can prove you own and control." Our Digital Names and Data Manufacturing processes create a foundation where everything digital carries its own verifiable wallet, enabling new models of interaction, command and control, and digital commerce that work for individuals, businesses, social media, and IoT devices alike.</p>
             </div>
         </section>
 
         <section class="use-case-preview">
             <div class="container">
                 <h2>Everything Gets a Wallet</h2>
-                <p>From social media posts to IoT sensors, from business documents to personal data - the future is built on universal digital ownership through wallets.</p>
+                <p>From social media posts to IoT sensors, from business documents to personal data - the future is built on data wallets with verifiable origin through wallets.</p>
                 
                 <div class="use-case-grid">
                     <div class="use-case-card">
@@ -522,7 +528,7 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names</p>
+            <p>&copy; 2025 Rootz Corp. - Originators of Data Wallets & Digital Names</p>
             <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Everything Has a Wallet</p>
         </div>
     </footer>

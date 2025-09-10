@@ -478,7 +478,7 @@
     <script>
         // Configuration
         const CONFIG = {
-            API_BASE_URL: 'http://rootz.global:5000/api',
+            API_BASE_URL: window.location.origin + '/api',
             REQUEST_ID: new URLSearchParams(window.location.search).get('requestId') || 'demo-request-123'
         };
 

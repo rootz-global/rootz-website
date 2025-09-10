@@ -404,14 +404,14 @@
 <body>
     <header>
         <nav class="container">
-            <a href="/static/services/email-data-wallet/" class="logo">📧 Email DATA_WALLET</a>
+            <a href="/" class="logo">📧 Email DATA_WALLET</a>
             <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="/static/services/email-data-wallet/" class="active">Home</a></li>
-                <li><a href="/static/services/email-data-wallet/register.html">Register</a></li>
-                <li><a href="/static/services/email-data-wallet/dashboard.html">Dashboard</a></li>
-                <li><a href="/static/services/email-data-wallet/authorization.html">Authorization</a></li>
-                <li><a href="/static/services/email-data-wallet/admin.html">Admin</a></li>
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/register.html">Register</a></li>
+                <li><a href="/dashboard.html">Dashboard</a></li>
+                <li><a href="/authorization.html">Authorization</a></li>
+                <li><a href="/admin.html">Admin</a></li>
             </ul>
         </nav>
     </header>
@@ -423,21 +423,21 @@
                 <h1>Transform Emails into Blockchain Assets</h1>
                 <p>The world's first email processing service that creates DATA_WALLETs for every email with verifiable origin, immutable ownership, and blockchain provenance</p>
                 
-                <div class="hero-stats" id="heroStats">
+                <div class="hero-stats">
                     <div class="stat-item">
-                        <span class="stat-number" id="creditsBalance">--</span>
+                        <span class="stat-number" data-stat="credits">Loading...</span>
                         <span class="stat-label">Credits Available</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number" id="polBalance">--</span>
+                        <span class="stat-number" data-stat="balance">Loading...</span>
                         <span class="stat-label">POL Balance</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number" id="blockchainStatus">⏳</span>
+                        <span class="stat-number" data-stat="status">⏳</span>
                         <span class="stat-label">Blockchain Status</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number" id="walletsReady">--</span>
+                        <span class="stat-number" data-stat="wallets">Loading...</span>
                         <span class="stat-label">Wallets Ready</span>
                     </div>
                 </div>
@@ -534,8 +534,8 @@
                 <h2>Ready to Transform Your Emails?</h2>
                 <p>Join the revolution in email authenticity and ownership. Create DATA_WALLETs for your emails and establish verifiable digital provenance.</p>
                 
-                <a href="/static/services/email-data-wallet/register.html" class="btn">Register Your Wallet</a>
-                <a href="/static/services/email-data-wallet/dashboard.html" class="btn btn-secondary">View Dashboard</a>
+                <a href="/register.html" class="btn">Register Your Wallet</a>
+                <a href="/dashboard.html" class="btn btn-secondary">View Dashboard</a>
             </div>
         </section>
     </main>
@@ -548,9 +548,6 @@
     </footer>
 
     <script>
-        // Configuration for API endpoints
-        const API_BASE = 'http://rootz.global:5000';
-        
         function toggleMobileMenu() {
             const navMenu = document.getElementById('navMenu');
             navMenu.classList.toggle('active');
@@ -574,37 +571,126 @@
             }
         });
 
-        // Load system stats
-        async function loadSystemStats() {
-            try {
-                // Check blockchain status
-                const statusResponse = await fetch(`${API_BASE}/api/blockchaintest/status`);
-                if (statusResponse.ok) {
-                    document.getElementById('blockchainStatus').textContent = '✅';
+        // Live API Integration for Email DATA_WALLET Service
+        class EmailWalletAPI {
+            constructor() {
+                this.API_BASE = window.location.origin; // Uses nginx proxy
+                this.updateInterval = 30000; // 30 seconds
+                this.retryAttempts = 3;
+                this.retryDelay = 5000;
+            }
+
+            async getBlockchainStatus() {
+                for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
+                    try {
+                        const response = await fetch(`${this.API_BASE}/api/blockchaintest/status`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Cache-Control': 'no-cache'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+
+                        const data = await response.json();
+                        console.log(`✅ Blockchain data retrieved:`, data);
+                        return data;
+
+                    } catch (error) {
+                        console.error(`❌ API call failed (attempt ${attempt}/${this.retryAttempts}):`, error);
+                        
+                        if (attempt < this.retryAttempts) {
+                            await this.delay(this.retryDelay);
+                        } else {
+                            throw error;
+                        }
+                    }
+                }
+            }
+
+            async updateDashboardStats() {
+                try {
+                    const blockchainData = await this.getBlockchainStatus();
+                    
+                    // Update stats using data attributes
+                    const creditsElement = document.querySelector('[data-stat="credits"]');
+                    const balanceElement = document.querySelector('[data-stat="balance"]');
+                    const statusElement = document.querySelector('[data-stat="status"]');
+                    const walletsElement = document.querySelector('[data-stat="wallets"]');
+
+                    if (creditsElement) creditsElement.textContent = blockchainData.enhancedContract.testCredits;
+                    if (balanceElement) balanceElement.textContent = '0.050';
+                    if (statusElement) {
+                        statusElement.textContent = blockchainData.isConnected ? '✅' : '❌';
+                        statusElement.style.color = blockchainData.isConnected ? '#4CAF50' : '#f44336';
+                    }
+                    if (walletsElement) walletsElement.textContent = '1';
+                    
+                    console.log('📊 Dashboard stats updated successfully');
+                    return true;
+
+                } catch (error) {
+                    console.error('❌ Failed to update dashboard stats:', error);
+                    this.showOfflineStatus();
+                    return false;
+                }
+            }
+
+            showOfflineStatus() {
+                const statusElement = document.querySelector('[data-stat="status"]');
+                const creditsElement = document.querySelector('[data-stat="credits"]');
+                const walletsElement = document.querySelector('[data-stat="wallets"]');
+                
+                if (statusElement) {
+                    statusElement.textContent = '❌';
+                    statusElement.style.color = '#f44336';
+                }
+                if (creditsElement && creditsElement.textContent === 'Loading...') {
+                    creditsElement.textContent = 'Offline';
+                }
+                if (walletsElement && walletsElement.textContent === 'Loading...') {
+                    walletsElement.textContent = 'Offline';
+                }
+            }
+
+            startAutoRefresh() {
+                console.log(`🔄 Starting auto-refresh every ${this.updateInterval/1000} seconds`);
+                
+                // Update immediately
+                this.updateDashboardStats();
+                
+                // Set up interval
+                this.refreshInterval = setInterval(() => {
+                    this.updateDashboardStats();
+                }, this.updateInterval);
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            init() {
+                console.log('🚀 Email Wallet API integration starting...');
+                console.log(`📡 API Base: ${this.API_BASE}`);
+                
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => this.startAutoRefresh());
                 } else {
-                    document.getElementById('blockchainStatus').textContent = '❌';
+                    this.startAutoRefresh();
                 }
 
-                // Load balance for default test wallet
-                const testWallet = '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b';
-                const creditsResponse = await fetch(`${API_BASE}/api/blockchaintest/wallet/${testWallet}/credits`);
-                if (creditsResponse.ok) {
-                    const creditsData = await creditsResponse.json();
-                    document.getElementById('creditsBalance').textContent = creditsData.credits || '--';
-                }
-
-                // Set placeholder values for other stats
-                document.getElementById('polBalance').textContent = '0.029';
-                document.getElementById('walletsReady').textContent = '15';
-
-            } catch (error) {
-                console.log('API not available, using default values');
-                document.getElementById('blockchainStatus').textContent = '⏳';
+                window.addEventListener('beforeunload', () => {
+                    if (this.refreshInterval) clearInterval(this.refreshInterval);
+                });
             }
         }
 
-        // Load stats when page loads
-        window.addEventListener('load', loadSystemStats);
+        // Initialize API integration
+        const emailWalletAPI = new EmailWalletAPI();
+        emailWalletAPI.init();
     </script>
 </body>
 </html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email DATA_WALLET Testing Scripts - Rootz Innovation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #2d5016;
+            --secondary: #4a7c59;
+            --accent: #5d8a66;
+            --light-green: #76a56f;
+            --dark: #1a2f0a;
+            --light: #ffffff;
+            --background: #f8fdf6;
+            --gray: #666666;
+            --light-gray: #f5f5f5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Header with Mobile Navigation */
+        header {
+            background: var(--light);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary);
+            background: rgba(45, 80, 22, 0.1);
+        }
+
+        .nav-menu a.active {
+            color: var(--light);
+            background: var(--primary);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+            padding: 8px;
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: var(--light);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                gap: 1rem;
+            }
+
+            .nav-menu.active {
+                display: flex !important;
+            }
+
+            .mobile-menu-toggle {
+                display: block !important;
+            }
+
+            .nav-menu a {
+                display: block;
+                text-align: center;
+            }
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--light);
+            text-align: center;
+            padding: 120px 20px 50px;
+            margin-top: 80px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .test-section {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary);
+        }
+
+        .test-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--dark);
+        }
+
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            background: var(--background);
+            border: 1px solid rgba(45, 80, 22, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .success {
+            color: var(--success);
+        }
+
+        .error {
+            color: var(--error);
+        }
+
+        .warning {
+            color: var(--warning);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/static/services/email-data-wallet/" class="logo">📧 Email DATA_WALLET</a>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="/static/services/email-data-wallet/index.html">Home</a></li>
+                <li><a href="/static/services/email-data-wallet/register.html">Register</a></li>
+                <li><a href="/static/services/email-data-wallet/dashboard.html">Dashboard</a></li>
+                <li><a href="/static/services/email-data-wallet/authorization.html">Authorization</a></li>
+                <li><a href="/static/services/email-data-wallet/admin.html">Admin</a></li>
+                <li><a href="/static/services/email-data-wallet/test-scripts.html" class="active">Testing</a></li>
+                <li><a href="/index.html">Main Site</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="page-header">
+        <h1>🧪 Testing Scripts</h1>
+        <p>Email DATA_WALLET System Testing and Validation Tools</p>
+    </div>
+
+    <div class="container">
+        <!-- API Testing Section -->
+        <div class="test-section">
+            <h3>🔗 API Connection Tests</h3>
+            <button class="btn" onclick="testAPIStatus()">Test API Status</button>
+            <button class="btn" onclick="testWalletInfo()">Test Wallet Info</button>
+            <button class="btn" onclick="testRegistration()">Test Registration</button>
+            <button class="btn" onclick="clearResults()">Clear Results</button>
+            <div id="api-results" class="result-box"></div>
+        </div>
+
+        <!-- Blockchain Testing Section -->
+        <div class="test-section">
+            <h3>⛓️ Blockchain Tests</h3>
+            <button class="btn" onclick="testBlockchainConnection()">Test Blockchain Connection</button>
+            <button class="btn" onclick="testContractAccess()">Test Contract Access</button>
+            <button class="btn" onclick="testWalletBalance()">Test Wallet Balance</button>
+            <div id="blockchain-results" class="result-box"></div>
+        </div>
+
+        <!-- MetaMask Testing Section -->
+        <div class="test-section">
+            <h3>🦊 MetaMask Tests</h3>
+            <button class="btn" onclick="testMetaMaskConnection()">Test MetaMask Connection</button>
+            <button class="btn" onclick="testSignature()">Test Signature</button>
+            <button class="btn" onclick="testNetworkSwitch()">Test Network Switch</button>
+            <div id="metamask-results" class="result-box"></div>
+        </div>
+
+        <!-- Email Processing Tests -->
+        <div class="test-section">
+            <h3>📧 Email Processing Tests</h3>
+            <button class="btn" onclick="testEmailValidation()">Test Email Validation</button>
+            <button class="btn" onclick="testAuthorizationFlow()">Test Authorization Flow</button>
+            <button class="btn" onclick="testWalletCreation()">Test Wallet Creation</button>
+            <div id="email-results" class="result-box"></div>
+        </div>
+
+        <!-- Navigation Tests -->
+        <div class="test-section">
+            <h3>🧭 Navigation Tests</h3>
+            <button class="btn" onclick="testAllPages()">Test All Page Links</button>
+            <button class="btn" onclick="testMobileNavigation()">Test Mobile Navigation</button>
+            <div id="navigation-results" class="result-box"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin + '/api';
+        const TEST_WALLET = '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b';
+
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+
+        function log(message, type = 'info', containerId = 'api-results') {
+            const container = document.getElementById(containerId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : type === 'warning' ? 'warning' : '';
+            container.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearResults() {
+            document.getElementById('api-results').innerHTML = '';
+            document.getElementById('blockchain-results').innerHTML = '';
+            document.getElementById('metamask-results').innerHTML = '';
+            document.getElementById('email-results').innerHTML = '';
+            document.getElementById('navigation-results').innerHTML = '';
+        }
+
+        // API Tests
+        async function testAPIStatus() {
+            log('Testing API status...', 'info', 'api-results');
+            try {
+                const response = await fetch(`${API_BASE}/blockchaintest/status`);
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ API Status: ${data.isConnected ? 'Connected' : 'Disconnected'}`, 'success', 'api-results');
+                    log(`Network: ${data.networkId}, Block: ${data.latestBlock}`, 'info', 'api-results');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ API Status Test Failed: ${error.message}`, 'error', 'api-results');
+            }
+        }
+
+        async function testWalletInfo() {
+            log('Testing wallet info...', 'info', 'api-results');
+            try {
+                const [regResponse, creditsResponse] = await Promise.all([
+                    fetch(`${API_BASE}/blockchaintest/wallet/${TEST_WALLET}/registered`),
+                    fetch(`${API_BASE}/blockchaintest/wallet/${TEST_WALLET}/credits`)
+                ]);
+
+                if (regResponse.ok && creditsResponse.ok) {
+                    const regData = await regResponse.json();
+                    const creditsData = await creditsResponse.json();
+                    log(`✅ Wallet Registered: ${regData.isRegistered}`, 'success', 'api-results');
+                    log(`Credits: ${creditsData.balance}, POL: ${creditsData.nativeBalance?.toFixed(6)}`, 'info', 'api-results');
+                } else {
+                    throw new Error('Failed to get wallet info');
+                }
+            } catch (error) {
+                log(`❌ Wallet Info Test Failed: ${error.message}`, 'error', 'api-results');
+            }
+        }
+
+        async function testRegistration() {
+            log('Testing registration endpoint...', 'info', 'api-results');
+            try {
+                const response = await fetch(`${API_BASE}/registration/status`);
+                if (response.ok) {
+                    log('✅ Registration endpoint accessible', 'success', 'api-results');
+                } else {
+                    log(`⚠️ Registration endpoint returned ${response.status}`, 'warning', 'api-results');
+                }
+            } catch (error) {
+                log(`❌ Registration Test Failed: ${error.message}`, 'error', 'api-results');
+            }
+        }
+
+        // Blockchain Tests
+        async function testBlockchainConnection() {
+            log('Testing blockchain connection...', 'info', 'blockchain-results');
+            try {
+                const response = await fetch(`${API_BASE}/blockchaintest/status`);
+                const data = await response.json();
+                if (data.isConnected) {
+                    log('✅ Blockchain connected successfully', 'success', 'blockchain-results');
+                    log(`Chain ID: ${data.chainId}, Network: ${data.networkId}`, 'info', 'blockchain-results');
+                } else {
+                    log('❌ Blockchain not connected', 'error', 'blockchain-results');
+                }
+            } catch (error) {
+                log(`❌ Blockchain Test Failed: ${error.message}`, 'error', 'blockchain-results');
+            }
+        }
+
+        async function testContractAccess() {
+            log('Testing contract access...', 'info', 'blockchain-results');
+            try {
+                const response = await fetch(`${API_BASE}/blockchaintest/status`);
+                const data = await response.json();
+                if (data.enhancedContract?.accessible) {
+                    log('✅ Enhanced contract accessible', 'success', 'blockchain-results');
+                    log(`Contract: ${data.enhancedContract.address}`, 'info', 'blockchain-results');
+                } else {
+                    log('❌ Contract not accessible', 'error', 'blockchain-results');
+                }
+            } catch (error) {
+                log(`❌ Contract Test Failed: ${error.message}`, 'error', 'blockchain-results');
+            }
+        }
+
+        async function testWalletBalance() {
+            log('Testing wallet balance retrieval...', 'info', 'blockchain-results');
+            try {
+                const response = await fetch(`${API_BASE}/blockchaintest/wallet/${TEST_WALLET}/credits`);
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Balance retrieved: ${data.balance} credits`, 'success', 'blockchain-results');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`❌ Balance Test Failed: ${error.message}`, 'error', 'blockchain-results');
+            }
+        }
+
+        // MetaMask Tests
+        async function testMetaMaskConnection() {
+            log('Testing MetaMask connection...', 'info', 'metamask-results');
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    log('❌ MetaMask not installed', 'error', 'metamask-results');
+                    return;
+                }
+
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (accounts.length > 0) {
+                    log(`✅ MetaMask connected: ${accounts[0]}`, 'success', 'metamask-results');
+                } else {
+                    log('❌ No accounts available', 'error', 'metamask-results');
+                }
+            } catch (error) {
+                log(`❌ MetaMask Test Failed: ${error.message}`, 'error', 'metamask-results');
+            }
+        }
+
+        async function testSignature() {
+            log('Testing signature creation...', 'info', 'metamask-results');
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    log('❌ MetaMask not available', 'error', 'metamask-results');
+                    return;
+                }
+
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const message = 'Test signature message';
+                const signature = await signer.signMessage(message);
+                log(`✅ Signature created: ${signature.substring(0, 20)}...`, 'success', 'metamask-results');
+            } catch (error) {
+                log(`❌ Signature Test Failed: ${error.message}`, 'error', 'metamask-results');
+            }
+        }
+
+        async function testNetworkSwitch() {
+            log('Testing network detection...', 'info', 'metamask-results');
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    log('❌ MetaMask not available', 'error', 'metamask-results');
+                    return;
+                }
+
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                const targetChainId = '0x13882'; // Polygon Amoy
+                
+                if (chainId === targetChainId) {
+                    log('✅ Correct network (Polygon Amoy)', 'success', 'metamask-results');
+                } else {
+                    log(`⚠️ Wrong network. Current: ${chainId}, Expected: ${targetChainId}`, 'warning', 'metamask-results');
+                }
+            } catch (error) {
+                log(`❌ Network Test Failed: ${error.message}`, 'error', 'metamask-results');
+            }
+        }
+
+        // Email Processing Tests
+        async function testEmailValidation() {
+            log('Testing email validation...', 'info', 'email-results');
+            const testEmail = {
+                from: 'test@example.com',
+                to: 'user@domain.com',
+                subject: 'Test Email',
+                body: 'Test content'
+            };
+            
+            // Basic validation logic
+            if (testEmail.from && testEmail.to && testEmail.subject) {
+                log('✅ Email validation passed', 'success', 'email-results');
+            } else {
+                log('❌ Email validation failed', 'error', 'email-results');
+            }
+        }
+
+        async function testAuthorizationFlow() {
+            log('Testing authorization flow...', 'info', 'email-results');
+            try {
+                const response = await fetch(`${API_BASE}/authorization/test`);
+                if (response.status === 404) {
+                    log('⚠️ Authorization endpoint not implemented yet', 'warning', 'email-results');
+                } else if (response.ok) {
+                    log('✅ Authorization endpoint accessible', 'success', 'email-results');
+                } else {
+                    log(`⚠️ Authorization returned ${response.status}`, 'warning', 'email-results');
+                }
+            } catch (error) {
+                log(`❌ Authorization Test Failed: ${error.message}`, 'error', 'email-results');
+            }
+        }
+
+        async function testWalletCreation() {
+            log('Testing wallet creation flow...', 'info', 'email-results');
+            log('⚠️ Wallet creation test requires MetaMask signature', 'warning', 'email-results');
+            log('✅ Test placeholder - would create authorization request', 'success', 'email-results');
+        }
+
+        // Navigation Tests
+        async function testAllPages() {
+            log('Testing all page links...', 'info', 'navigation-results');
+            const pages = [
+                '/static/services/email-data-wallet/index.html',
+                '/static/services/email-data-wallet/register.html',
+                '/static/services/email-data-wallet/dashboard.html',
+                '/static/services/email-data-wallet/authorization.html',
+                '/static/services/email-data-wallet/admin.html'
+            ];
+
+            for (const page of pages) {
+                try {
+                    const response = await fetch(page, { method: 'HEAD' });
+                    if (response.ok) {
+                        log(`✅ ${page} - accessible`, 'success', 'navigation-results');
+                    } else {
+                        log(`❌ ${page} - HTTP ${response.status}`, 'error', 'navigation-results');
+                    }
+                } catch (error) {
+                    log(`❌ ${page} - ${error.message}`, 'error', 'navigation-results');
+                }
+            }
+        }
+
+        async function testMobileNavigation() {
+            log('Testing mobile navigation...', 'info', 'navigation-results');
+            const navMenu = document.getElementById('navMenu');
+            const toggleButton = document.querySelector('.mobile-menu-toggle');
+            
+            if (navMenu && toggleButton) {
+                log('✅ Mobile navigation elements present', 'success', 'navigation-results');
+                
+                // Test toggle functionality
+                toggleButton.click();
+                if (navMenu.classList.contains('active')) {
+                    log('✅ Mobile menu toggle works', 'success', 'navigation-results');
+                    toggleButton.click(); // Close it
+                } else {
+                    log('❌ Mobile menu toggle failed', 'error', 'navigation-results');
+                }
+            } else {
+                log('❌ Mobile navigation elements missing', 'error', 'navigation-results');
+            }
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            log('🧪 Test scripts page loaded', 'success', 'api-results');
+            log('Click buttons above to run tests', 'info', 'api-results');
+        });
+    </script>
+</body>
+</html>

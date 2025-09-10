@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Wallet Authorization Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .step {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .step.current {
+            border-left-color: #ff9800;
+            background: rgba(255, 152, 0, 0.1);
+        }
+        .step.completed {
+            border-left-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+        .step.error {
+            border-left-color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+        }
+        button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .output {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+        .warning { color: #ff9800; }
+        
+        .address-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        h1, h2 {
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .test-data {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Email Wallet Authorization Flow Test</h1>
+    <p style="text-align: center; font-size: 18px;">
+        Real MetaMask signing to understand contract signature validation
+    </p>
+
+    <div class="container">
+        <h2>📋 Test Configuration</h2>
+        <div class="test-data">
+            <p><strong>Network:</strong> Polygon Amoy Testnet</p>
+            <p><strong>Chain ID:</strong> 80002</p>
+            <p><strong>Authorization Contract:</strong> 0x555ba5C1ff253c1D91483b52F1906670608fE9bC</p>
+            <p><strong>Data Wallet Owner:</strong> 0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b</p>
+            <p><strong>Contract Owner:</strong> 0xE2d0E252E7da22901bd1ffDD012Da2c77aC3033a</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="step1" class="step">
+            <h3>Step 1: Connect MetaMask</h3>
+            <p>Connect your wallet and verify you're on Polygon Amoy testnet</p>
+            <button onclick="connectWallet()">Connect MetaMask</button>
+            <div id="wallet-info" class="address-display" style="display: none;"></div>
+        </div>
+
+        <div id="step2" class="step">
+            <h3>Step 2: Create Authorization Request</h3>
+            <p>Create an authorization request as the contract owner</p>
+            <button onclick="createAuthRequest()" disabled id="createBtn">Create Authorization Request</button>
+            <div id="auth-request-output" class="output" style="display: none;"></div>
+        </div>
+
+        <div id="step3" class="step">
+            <h3>Step 3: Sign Authorization (MetaMask)</h3>
+            <p>Sign the authorization using the data wallet owner's MetaMask</p>
+            <button onclick="signAuthorization()" disabled id="signBtn">Sign with MetaMask</button>
+            <div id="sign-output" class="output" style="display: none;"></div>
+        </div>
+
+        <div id="step4" class="step">
+            <h3>Step 4: Submit Authorization</h3>
+            <p>Submit the signed authorization to the contract</p>
+            <button onclick="submitAuthorization()" disabled id="submitBtn">Submit Authorization</button>
+            <div id="submit-output" class="output" style="display: none;"></div>
+        </div>
+
+        <div id="step5" class="step">
+            <h3>Step 5: Process Email Wallet</h3>
+            <p>Process the authorized request to create the email wallet</p>
+            <button onclick="processEmailWallet()" disabled id="processBtn">Process Email Wallet</button>
+            <div id="process-output" class="output" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Debug Information</h2>
+        <div id="debug-output" class="output"></div>
+    </div>
+
+    <script>
+        // Contract configuration
+        const CONFIG = {
+            chainId: 80002,
+            rpcUrl: 'https://rpc-amoy.polygon.technology',
+            contracts: {
+                authorization: '0x555ba5C1ff253c1D91483b52F1906670608fE9bC'
+            },
+            wallets: {
+                dataOwner: '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b',
+                contractOwner: '0xE2d0E252E7da22901bd1ffDD012Da2c77aC3033a'
+            }
+        };
+
+        // Authorization Manager ABI (minimal for testing)
+        const AUTH_ABI = [
+            "function createAuthorizationRequest(address userWallet, string authToken, bytes32 emailHash, bytes32[] attachmentHashes) returns (bytes32 requestId)",
+            "function getRequestFromToken(string authToken) view returns (bytes32)",
+            "function authorizeEmailWalletCreation(bytes32 requestId, bytes signature) returns (bytes32 authorizationTx)",
+            "function processAuthorizedRequest(bytes32 requestId, tuple(string forwardedBy, string originalSender, string messageId, string subject, bytes32 bodyHash, bytes32 emailHash, bytes32 emailHeadersHash, uint256 attachmentCount, string ipfsHash, tuple(bool spfPass, bool dkimValid, bool dmarcPass, string dkimSignature) authResults) emailData, tuple(string originalFilename, string filename, string mimeType, string fileExtension, uint256 fileSize, bytes32 contentHash, string fileSignature, string ipfsHash, uint256 attachmentIndex, string emailSender, string emailSubject, uint256 emailTimestamp)[] attachmentData) returns (tuple(bool success, bytes32 emailWalletId, bytes32[] attachmentWalletIds, uint256 totalCreditsUsed, string errorMessage))",
+            "function owner() view returns (address)"
+        ];
+
+        let provider, signer, contract, currentAccount;
+        let testData = {
+            authToken: '',
+            requestId: '',
+            signature: '',
+            emailHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+        };
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#2196F3',
+                success: '#4CAF50',
+                error: '#f44336',
+                warning: '#ff9800'
+            };
+            
+            const debugOutput = document.getElementById('debug-output');
+            debugOutput.innerHTML += `<span style="color: ${colors[type]}">[${timestamp}] ${message}</span>\n`;
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    throw new Error('MetaMask not detected! Please install MetaMask.');
+                }
+
+                log('Connecting to MetaMask...', 'info');
+                
+                // Request account access
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                // Create provider and signer
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                currentAccount = await signer.getAddress();
+                
+                // Check network
+                const network = await provider.getNetwork();
+                log(`Connected to network: ${network.name} (Chain ID: ${network.chainId})`, 'info');
+                
+                if (network.chainId !== BigInt(CONFIG.chainId)) {
+                    log(`Wrong network! Please switch to Polygon Amoy (Chain ID: ${CONFIG.chainId})`, 'error');
+                    return;
+                }
+                
+                // Initialize contract
+                contract = new ethers.Contract(CONFIG.contracts.authorization, AUTH_ABI, signer);
+                
+                // Display wallet info
+                const balance = await provider.getBalance(currentAccount);
+                const walletInfo = document.getElementById('wallet-info');
+                walletInfo.style.display = 'block';
+                walletInfo.innerHTML = `
+                    <strong>Connected Address:</strong> ${currentAccount}
+                    <br><strong>Balance:</strong> ${ethers.formatEther(balance)} MATIC
+                    <br><strong>Expected Data Owner:</strong> ${CONFIG.wallets.dataOwner}
+                    <br><strong>Is Data Owner:</strong> ${currentAccount.toLowerCase() === CONFIG.wallets.dataOwner.toLowerCase() ? '✅ YES' : '❌ NO'}
+                `;
+                
+                log(`Connected wallet: ${currentAccount}`, 'success');
+                log(`Balance: ${ethers.formatEther(balance)} MATIC`, 'info');
+                
+                // Update step status
+                document.getElementById('step1').classList.add('completed');
+                document.getElementById('createBtn').disabled = false;
+                
+                if (currentAccount.toLowerCase() !== CONFIG.wallets.dataOwner.toLowerCase()) {
+                    log(`⚠️ WARNING: Connected wallet doesn't match expected data owner!`, 'warning');
+                    log(`Expected: ${CONFIG.wallets.dataOwner}`, 'warning');
+                    log(`Connected: ${currentAccount}`, 'warning');
+                }
+                
+            } catch (error) {
+                log(`Failed to connect wallet: ${error.message}`, 'error');
+                document.getElementById('step1').classList.add('error');
+            }
+        }
+
+        async function createAuthRequest() {
+            try {
+                log('Creating authorization request...', 'info');
+                document.getElementById('step2').classList.add('current');
+                
+                // Generate unique auth token
+                testData.authToken = `auth-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                
+                log(`Auth Token: ${testData.authToken}`, 'info');
+                log(`Email Hash: ${testData.emailHash}`, 'info');
+                log(`User Wallet: ${CONFIG.wallets.dataOwner}`, 'info');
+                
+                // Note: This should be called by contract owner, but we'll try with current account
+                log('⚠️ NOTE: This should normally be called by contract owner', 'warning');
+                
+                const tx = await contract.createAuthorizationRequest(
+                    CONFIG.wallets.dataOwner,
+                    testData.authToken,
+                    testData.emailHash,
+                    [] // No attachment hashes
+                );
+                
+                log(`Transaction sent: ${tx.hash}`, 'info');
+                const receipt = await tx.wait();
+                log(`Transaction confirmed in block: ${receipt.blockNumber}`, 'success');
+                
+                // Get request ID
+                testData.requestId = await contract.getRequestFromToken(testData.authToken);
+                log(`Request ID: ${testData.requestId}`, 'success');
+                
+                // Display output
+                const output = document.getElementById('auth-request-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify({
+                    authToken: testData.authToken,
+                    requestId: testData.requestId,
+                    transactionHash: tx.hash,
+                    blockNumber: receipt.blockNumber
+                }, null, 2);
+                
+                // Update step status
+                document.getElementById('step2').classList.remove('current');
+                document.getElementById('step2').classList.add('completed');
+                document.getElementById('signBtn').disabled = false;
+                
+            } catch (error) {
+                log(`Failed to create authorization request: ${error.message}`, 'error');
+                document.getElementById('step2').classList.add('error');
+                
+                if (error.message.includes('only owner')) {
+                    log('❌ Error: Only contract owner can create authorization requests', 'error');
+                    log('💡 This explains why our backend service needs to call this function!', 'warning');
+                }
+            }
+        }
+
+        async function signAuthorization() {
+            try {
+                log('Signing authorization with MetaMask...', 'info');
+                document.getElementById('step3').classList.add('current');
+                
+                if (!testData.requestId) {
+                    throw new Error('No request ID available. Please create authorization request first.');
+                }
+                
+                // Try different signing approaches to see which one works
+                log('🧪 Testing different signature approaches...', 'info');
+                
+                // Approach 1: Sign the requestId directly
+                try {
+                    log('Approach 1: Signing requestId directly', 'info');
+                    const requestIdBytes = ethers.getBytes(testData.requestId);
+                    testData.signature = await signer.signMessage(requestIdBytes);
+                    log(`✅ Direct requestId signature: ${testData.signature.substring(0, 20)}...`, 'success');
+                } catch (error) {
+                    log(`❌ Direct requestId signing failed: ${error.message}`, 'error');
+                    
+                    // Approach 2: Sign a formatted message
+                    log('Approach 2: Signing formatted message', 'info');
+                    const message = `Authorize email wallet creation: ${testData.requestId}`;
+                    testData.signature = await signer.signMessage(message);
+                    log(`✅ Message signature: ${testData.signature.substring(0, 20)}...`, 'success');
+                }
+                
+                // Display signature details
+                const output = document.getElementById('sign-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify({
+                    requestId: testData.requestId,
+                    signature: testData.signature,
+                    signer: currentAccount,
+                    signatureLength: testData.signature.length
+                }, null, 2);
+                
+                // Update step status
+                document.getElementById('step3').classList.remove('current');
+                document.getElementById('step3').classList.add('completed');
+                document.getElementById('submitBtn').disabled = false;
+                
+            } catch (error) {
+                log(`Failed to sign authorization: ${error.message}`, 'error');
+                document.getElementById('step3').classList.add('error');
+            }
+        }
+
+        async function submitAuthorization() {
+            try {
+                log('Submitting authorization to contract...', 'info');
+                document.getElementById('step4').classList.add('current');
+                
+                if (!testData.signature || !testData.requestId) {
+                    throw new Error('Missing signature or request ID');
+                }
+                
+                log(`Submitting requestId: ${testData.requestId}`, 'info');
+                log(`Signature: ${testData.signature.substring(0, 20)}...`, 'info');
+                
+                const tx = await contract.authorizeEmailWalletCreation(
+                    testData.requestId,
+                    testData.signature
+                );
+                
+                log(`Authorization transaction sent: ${tx.hash}`, 'info');
+                const receipt = await tx.wait();
+                log(`Authorization confirmed in block: ${receipt.blockNumber}`, 'success');
+                
+                // Display output
+                const output = document.getElementById('submit-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify({
+                    requestId: testData.requestId,
+                    transactionHash: tx.hash,
+                    blockNumber: receipt.blockNumber,
+                    gasUsed: receipt.gasUsed.toString()
+                }, null, 2);
+                
+                // Update step status
+                document.getElementById('step4').classList.remove('current');
+                document.getElementById('step4').classList.add('completed');
+                document.getElementById('processBtn').disabled = false;
+                
+                log('🎉 Authorization successful! Ready to process email wallet.', 'success');
+                
+            } catch (error) {
+                log(`Failed to submit authorization: ${error.message}`, 'error');
+                document.getElementById('step4').classList.add('error');
+                
+                if (error.message.includes('Invalid signature')) {
+                    log('❌ INVALID SIGNATURE ERROR - This is what we need to fix!', 'error');
+                    log('💡 The contract expects a different signature format', 'warning');
+                    log('🔍 Check the Solidity contract for signature validation logic', 'info');
+                }
+            }
+        }
+
+        async function processEmailWallet() {
+            try {
+                log('Processing email wallet creation...', 'info');
+                document.getElementById('step5').classList.add('current');
+                
+                // Create email data structure
+                const emailData = {
+                    forwardedBy: "web-test",
+                    originalSender: CONFIG.wallets.dataOwner,
+                    messageId: `wallet-${Date.now()}`,
+                    subject: "MetaMask Authorization Test",
+                    bodyHash: testData.emailHash,
+                    emailHash: testData.emailHash,
+                    emailHeadersHash: testData.emailHash,
+                    attachmentCount: 0,
+                    ipfsHash: "QmMetaMaskAuthTest2025",
+                    authResults: {
+                        spfPass: true,
+                        dkimValid: true,
+                        dmarcPass: true,
+                        dkimSignature: "web-test-signature"
+                    }
+                };
+                
+                const attachmentData = [];
+                
+                log('Processing authorized request...', 'info');
+                
+                const tx = await contract.processAuthorizedRequest(
+                    testData.requestId,
+                    emailData,
+                    attachmentData
+                );
+                
+                log(`Processing transaction sent: ${tx.hash}`, 'info');
+                const receipt = await tx.wait();
+                log(`Processing confirmed in block: ${receipt.blockNumber}`, 'success');
+                
+                // Try to extract email wallet ID from events
+                let emailWalletId = 'Unknown';
+                try {
+                    // Look for EmailWalletProcessed event
+                    const processEvent = receipt.logs.find(log => {
+                        try {
+                            const parsed = contract.interface.parseLog(log);
+                            return parsed?.name === 'EmailWalletProcessed';
+                        } catch {
+                            return false;
+                        }
+                    });
+                    
+                    if (processEvent) {
+                        const parsedEvent = contract.interface.parseLog(processEvent);
+                        emailWalletId = parsedEvent?.args.emailWalletId;
+                    }
+                } catch (error) {
+                    log(`Could not extract email wallet ID: ${error.message}`, 'warning');
+                }
+                
+                // Display output
+                const output = document.getElementById('process-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify({
+                    emailWalletId: emailWalletId,
+                    transactionHash: tx.hash,
+                    blockNumber: receipt.blockNumber,
+                    gasUsed: receipt.gasUsed.toString()
+                }, null, 2);
+                
+                // Update step status
+                document.getElementById('step5').classList.remove('current');
+                document.getElementById('step5').classList.add('completed');
+                
+                log('🎉 EMAIL WALLET CREATED SUCCESSFULLY!', 'success');
+                log(`Wallet ID: ${emailWalletId}`, 'success');
+                
+            } catch (error) {
+                log(`Failed to process email wallet: ${error.message}`, 'error');
+                document.getElementById('step5').classList.add('error');
+            }
+        }
+
+        // Initialize page
+        window.addEventListener('load', () => {
+            log('Email Wallet Authorization Test loaded', 'info');
+            log('Please connect MetaMask to begin testing', 'info');
+            
+            if (!window.ethereum) {
+                log('❌ MetaMask not detected! Please install MetaMask.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

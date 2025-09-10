@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Data Wallet Authorization Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1, h2 {
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .portal-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .portal-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .portal-card h3 {
+            margin-bottom: 15px;
+            color: #76a56f;
+        }
+        .portal-card p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #4a7c59, #2d5016);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 165, 111, 0.4);
+        }
+        .info-section {
+            background: rgba(45, 80, 22, 0.1);
+            border: 2px solid #4a7c59;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .feature-list li::before {
+            content: "✅ ";
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Email Data Wallet Authorization Portal</h1>
+        <p style="text-align: center; font-size: 18px; opacity: 0.9;">
+            Access the complete Email Data Wallet Service testing and development tools
+        </p>
+    </div>
+
+    <div class="container">
+        <h2>🧪 Testing Interfaces</h2>
+        <div class="portal-grid">
+            <div class="portal-card">
+                <h3>Authorization Flow</h3>
+                <p>Complete MetaMask authorization testing with real contract interaction</p>
+                <a href="authorization-test.html" class="btn">Launch Test</a>
+            </div>
+            
+            <div class="portal-card">
+                <h3>Complete Flow</h3>
+                <p>End-to-end testing combining backend service with MetaMask signing</p>
+                <a href="complete-flow-test.html" class="btn">Launch Test</a>
+            </div>
+            
+            <div class="portal-card">
+                <h3>Direct Backend</h3>
+                <p>Direct backend service testing with SSL bypass and manual verification</p>
+                <a href="direct-test.html" class="btn">Launch Test</a>
+            </div>
+            
+            <div class="portal-card">
+                <h3>Hybrid Authorization</h3>
+                <p>Combines backend service power with MetaMask signing capabilities</p>
+                <a href="hybrid-authorization-test.html" class="btn">Launch Test</a>
+            </div>
+            
+            <div class="portal-card">
+                <h3>Signature Testing</h3>
+                <p>Find the exact signature format that works with the smart contract</p>
+                <a href="signature-test.html" class="btn">Launch Test</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <h2>📋 Service Features</h2>
+        <ul class="feature-list">
+            <li>Web3 wallet integration and testing</li>
+            <li>Email-to-blockchain data wallet creation</li>
+            <li>MetaMask authorization workflows</li>
+            <li>Attachment processing and verification</li>
+            <li>IPFS storage integration</li>
+            <li>Smart contract interaction testing</li>
+            <li>Multi-signature format validation</li>
+            <li>Backend service health monitoring</li>
+        </ul>
+    </div>
+
+    <div class="info-section">
+        <h2>🔧 Technical Architecture</h2>
+        <p><strong>Network:</strong> Polygon Amoy Testnet (Chain ID: 80002)</p>
+        <p><strong>Authorization Contract:</strong> 0x555ba5C1ff253c1D91483b52F1906670608fE9bC</p>
+        <p><strong>Expected User:</strong> 0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b</p>
+        <p><strong>Backend Services:</strong> Running on localhost with HTTPS/HTTP support</p>
+    </div>
+
+    <div class="container">
+        <h2>📚 Documentation</h2>
+        <p style="text-align: center;">
+            Complete documentation available in the email-data-wallet-service repository including 
+            architecture guides, implementation details, and API documentation.
+        </p>
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="window.history.back()" class="btn">← Back to Services</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signature Format Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            background: #2d2d2d;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #444;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #45a049; }
+        button:disabled { background: #666; cursor: not-allowed; }
+        .output {
+            background: #000;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+        .warning { color: #ff9800; }
+        h1, h2 { text-align: center; }
+        .test-section {
+            border-left: 4px solid #4CAF50;
+            padding-left: 15px;
+            margin: 20px 0;
+        }
+        .important {
+            background: #333;
+            border: 2px solid #ff9800;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Authorization Signature Format Test</h1>
+    
+    <div class="important">
+        <h3>🎯 Goal: Find the exact signature format that works with the contract</h3>
+        <p>We'll test multiple signature approaches and see which one the contract accepts.</p>
+    </div>
+
+    <div class="container">
+        <h2>Step 1: Connect MetaMask</h2>
+        <button onclick="connectWallet()">Connect MetaMask</button>
+        <div id="wallet-info" style="display: none; margin-top: 10px; padding: 10px; background: #333; border-radius: 5px;"></div>
+    </div>
+
+    <div class="container">
+        <h2>Step 2: Generate Test Request ID</h2>
+        <p>We'll generate a mock request ID to test signature formats against.</p>
+        <button onclick="generateTestRequestId()" disabled id="generateBtn">Generate Test Request ID</button>
+        <div id="request-output" class="output" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <h2>Step 3: Test All Signature Formats</h2>
+        <p>Sign the request ID using different methods and test each against the contract.</p>
+        <button onclick="testAllSignatureFormats()" disabled id="testBtn">Test All Signature Formats</button>
+        <div id="signature-output" class="output" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Debug Output</h2>
+        <div id="debug-output" class="output"></div>
+        <button onclick="clearDebug()">Clear Debug</button>
+    </div>
+
+    <script>
+        // Contract configuration
+        const CONFIG = {
+            chainId: 80002,
+            authContract: '0x555ba5C1ff253c1D91483b52F1906670608fE9bC',
+            expectedUser: '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b'
+        };
+
+        // Minimal ABI for testing
+        const AUTH_ABI = [
+            "function authorizeEmailWalletCreation(bytes32 requestId, bytes signature) returns (bytes32)"
+        ];
+
+        let provider, signer, contract, currentAccount;
+        let testRequestId = '';
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#2196F3',
+                success: '#4CAF50', 
+                error: '#f44336',
+                warning: '#ff9800'
+            };
+            
+            const debugOutput = document.getElementById('debug-output');
+            debugOutput.innerHTML += `<span style="color: ${colors[type]}">[${timestamp}] ${message}</span>\n`;
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearDebug() {
+            document.getElementById('debug-output').innerHTML = '';
+        }
+
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    throw new Error('MetaMask not detected!');
+                }
+
+                log('Connecting to MetaMask...', 'info');
+                
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                currentAccount = await signer.getAddress();
+                
+                const network = await provider.getNetwork();
+                log(`Connected to: ${network.name} (Chain ID: ${network.chainId})`, 'info');
+                
+                if (network.chainId !== BigInt(CONFIG.chainId)) {
+                    log(`⚠️ Wrong network! Please switch to Polygon Amoy (${CONFIG.chainId})`, 'warning');
+                    return;
+                }
+                
+                contract = new ethers.Contract(CONFIG.authContract, AUTH_ABI, signer);
+                
+                const balance = await provider.getBalance(currentAccount);
+                
+                const walletInfo = document.getElementById('wallet-info');
+                walletInfo.style.display = 'block';
+                walletInfo.innerHTML = `
+                    <strong>Connected:</strong> ${currentAccount}<br>
+                    <strong>Balance:</strong> ${ethers.formatEther(balance)} MATIC<br>
+                    <strong>Expected:</strong> ${CONFIG.expectedUser}<br>
+                    <strong>Match:</strong> ${currentAccount.toLowerCase() === CONFIG.expectedUser.toLowerCase() ? '✅ YES' : '❌ NO'}
+                `;
+                
+                log(`✅ Connected: ${currentAccount}`, 'success');
+                document.getElementById('generateBtn').disabled = false;
+                
+                if (currentAccount.toLowerCase() !== CONFIG.expectedUser.toLowerCase()) {
+                    log(`⚠️ Connected wallet doesn't match expected user`, 'warning');
+                    log(`Expected: ${CONFIG.expectedUser}`, 'warning');
+                    log(`Connected: ${currentAccount}`, 'warning');
+                }
+                
+            } catch (error) {
+                log(`❌ Connection failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function generateTestRequestId() {
+            try {
+                log('Generating test request ID...', 'info');
+                
+                // Generate a random 32-byte hex string (like a real request ID)
+                testRequestId = '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+                
+                log(`Generated test request ID: ${testRequestId}`, 'success');
+                
+                const output = document.getElementById('request-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify({
+                    requestId: testRequestId,
+                    note: 'This is a mock request ID for signature testing'
+                }, null, 2);
+                
+                document.getElementById('testBtn').disabled = false;
+                
+            } catch (error) {
+                log(`❌ Failed to generate request ID: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAllSignatureFormats() {
+            try {
+                log('🧪 Testing all signature formats...', 'info');
+                
+                if (!testRequestId) {
+                    throw new Error('No test request ID generated');
+                }
+
+                const signatures = {};
+                const results = {};
+
+                // Test 1: Sign requestId as bytes
+                try {
+                    log('Test 1: Signing requestId as bytes...', 'info');
+                    const requestIdBytes = ethers.getBytes(testRequestId);
+                    signatures.requestIdBytes = await signer.signMessage(requestIdBytes);
+                    log(`✅ RequestId bytes signature created: ${signatures.requestIdBytes.substring(0, 20)}...`, 'success');
+                } catch (error) {
+                    log(`❌ RequestId bytes signing failed: ${error.message}`, 'error');
+                }
+
+                // Test 2: Sign requestId as string
+                try {
+                    log('Test 2: Signing requestId as string...', 'info');
+                    signatures.requestIdString = await signer.signMessage(testRequestId);
+                    log(`✅ RequestId string signature created: ${signatures.requestIdString.substring(0, 20)}...`, 'success');
+                } catch (error) {
+                    log(`❌ RequestId string signing failed: ${error.message}`, 'error');
+                }
+
+                // Test 3: Sign formatted message
+                try {
+                    log('Test 3: Signing formatted message...', 'info');
+                    const message = `Authorize email wallet creation: ${testRequestId}`;
+                    signatures.formattedMessage = await signer.signMessage(message);
+                    log(`✅ Formatted message signature created: ${signatures.formattedMessage.substring(0, 20)}...`, 'success');
+                } catch (error) {
+                    log(`❌ Formatted message signing failed: ${error.message}`, 'error');
+                }
+
+                // Test 4: Sign without 0x prefix
+                try {
+                    log('Test 4: Signing without 0x prefix...', 'info');
+                    const requestIdNoPrefix = testRequestId.substring(2);
+                    signatures.requestIdNoPrefix = await signer.signMessage(requestIdNoPrefix);
+                    log(`✅ No prefix signature created: ${signatures.requestIdNoPrefix.substring(0, 20)}...`, 'success');
+                } catch (error) {
+                    log(`❌ No prefix signing failed: ${error.message}`, 'error');
+                }
+
+                // Test 5: Sign requestId as raw hash
+                try {
+                    log('Test 5: Signing as raw hash...', 'info');
+                    const hashMessage = ethers.keccak256(ethers.toUtf8Bytes(testRequestId));
+                    signatures.hashedMessage = await signer.signMessage(hashMessage);
+                    log(`✅ Hashed message signature created: ${signatures.hashedMessage.substring(0, 20)}...`, 'success');
+                } catch (error) {
+                    log(`❌ Hashed message signing failed: ${error.message}`, 'error');
+                }
+
+                log('🔍 Now testing each signature against the contract...', 'info');
+
+                // Test each signature against the contract
+                for (const [approach, signature] of Object.entries(signatures)) {
+                    try {
+                        log(`Testing ${approach} against contract...`, 'info');
+                        
+                        // Try to estimate gas (this validates the signature without executing)
+                        const gasEstimate = await contract.authorizeEmailWalletCreation.estimateGas(
+                            testRequestId,
+                            signature
+                        );
+                        
+                        results[approach] = {
+                            success: true,
+                            gasEstimate: gasEstimate.toString(),
+                            error: null
+                        };
+                        
+                        log(`🎉 ${approach} WORKS! Gas estimate: ${gasEstimate}`, 'success');
+                        
+                    } catch (error) {
+                        results[approach] = {
+                            success: false,
+                            gasEstimate: null,
+                            error: error.message
+                        };
+                        
+                        log(`❌ ${approach} failed: ${error.message}`, 'error');
+                        
+                        if (error.message.includes('Invalid signature')) {
+                            log(`   Contract rejected this signature format`, 'warning');
+                        } else if (error.message.includes('Not request owner')) {
+                            log(`   Signature format might be OK, but wrong permissions`, 'warning');
+                        }
+                    }
+                }
+
+                // Display comprehensive results
+                const output = document.getElementById('signature-output');
+                output.style.display = 'block';
+                
+                const summary = {
+                    testRequestId: testRequestId,
+                    connectedWallet: currentAccount,
+                    signaturesGenerated: Object.keys(signatures).length,
+                    signatures: Object.keys(signatures).reduce((acc, key) => {
+                        acc[key] = signatures[key].substring(0, 20) + '...';
+                        return acc;
+                    }, {}),
+                    contractTestResults: results
+                };
+                
+                output.textContent = JSON.stringify(summary, null, 2);
+
+                // Summary
+                const workingFormats = Object.entries(results).filter(([_, result]) => result.success);
+                const rejectedFormats = Object.entries(results).filter(([_, result]) => !result.success);
+
+                log('📋 SIGNATURE TEST SUMMARY:', 'info');
+                log(`Total signatures tested: ${Object.keys(signatures).length}`, 'info');
+                log(`Working formats: ${workingFormats.length}`, workingFormats.length > 0 ? 'success' : 'warning');
+                log(`Rejected formats: ${rejectedFormats.length}`, 'info');
+
+                if (workingFormats.length > 0) {
+                    log('🎉 WORKING SIGNATURE FORMATS FOUND:', 'success');
+                    workingFormats.forEach(([format, _]) => {
+                        log(`  ✅ ${format}`, 'success');
+                    });
+                    log('Use this format in your backend service!', 'success');
+                } else {
+                    log('❌ No signature formats worked', 'error');
+                    log('This suggests the contract expects a different validation approach', 'warning');
+                    log('Check the contract source code for signature validation logic', 'info');
+                }
+
+                if (rejectedFormats.length > 0) {
+                    log('❌ REJECTED SIGNATURE FORMATS:', 'error');
+                    rejectedFormats.forEach(([format, result]) => {
+                        log(`  ❌ ${format}: ${result.error}`, 'error');
+                    });
+                }
+                
+            } catch (error) {
+                log(`❌ Signature testing failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            log('🔐 Signature Format Test loaded', 'info');
+            log('This will help us find the exact signature format the contract expects', 'info');
+            
+            if (!window.ethereum) {
+                log('❌ MetaMask not detected! Please install MetaMask.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

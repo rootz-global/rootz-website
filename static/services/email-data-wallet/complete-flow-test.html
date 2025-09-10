@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Authorization Flow Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            background: #2d2d2d;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #444;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #45a049; }
+        button:disabled { background: #666; cursor: not-allowed; }
+        .output {
+            background: #000;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+        .warning { color: #ff9800; }
+        h1, h2 { text-align: center; }
+        .step {
+            border-left: 4px solid #4CAF50;
+            padding-left: 15px;
+            margin: 20px 0;
+        }
+        .step.completed { border-left-color: #4CAF50; }
+        .step.current { border-left-color: #ff9800; }
+        .step.error { border-left-color: #f44336; }
+        .discovery {
+            background: #1a4d1a;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔄 Complete Authorization Flow Test</h1>
+    
+    <div class="discovery">
+        <h3>🎉 Discovery: Signatures Work! Problem is Request ID</h3>
+        <p><strong>Previous Test Result:</strong> "Invalid request" (not "Invalid signature")</p>
+        <p><strong>This means:</strong> Signature formats are correct, but we need a real request ID</p>
+        <p><strong>Solution:</strong> Create real authorization request, then test MetaMask signing</p>
+    </div>
+
+    <div class="container">
+        <div class="step" id="step1">
+            <h2>Step 1: Connect MetaMask</h2>
+            <button onclick="connectWallet()">Connect MetaMask</button>
+            <div id="wallet-info" style="display: none; margin-top: 10px; padding: 10px; background: #333; border-radius: 5px;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="step" id="step2">
+            <h2>Step 2: Test Backend Service</h2>
+            <p>First verify our backend service is running and accessible</p>
+            <button onclick="testBackendService()" disabled id="testBackendBtn">Test Backend Connection</button>
+            <div id="backend-output" class="output" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="step" id="step3">
+            <h2>Step 3: Try Direct Wallet Creation</h2>
+            <p>Try creating an email wallet through the backend to understand the flow</p>
+            <button onclick="tryWalletCreation()" disabled id="createWalletBtn">Try Create Email Wallet</button>
+            <div id="wallet-creation-output" class="output" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="step" id="step4">
+            <h2>Step 4: Manual Authorization Flow</h2>
+            <p>If direct creation fails, we'll manually create authorization request and sign it</p>
+            <button onclick="manualAuthFlow()" disabled id="manualAuthBtn">Manual Auth Flow</button>
+            <div id="manual-auth-output" class="output" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Debug Output</h2>
+        <div id="debug-output" class="output"></div>
+        <button onclick="clearDebug()">Clear Debug</button>
+    </div>
+
+    <script>
+        const CONFIG = {
+            chainId: 80002,
+            backendUrl: 'https://localhost:7000', // Changed to HTTPS and correct port
+            authContract: '0x555ba5C1ff253c1D91483b52F1906670608fE9bC',
+            expectedUser: '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b'
+        };
+
+        const AUTH_ABI = [
+            "function authorizeEmailWalletCreation(bytes32 requestId, bytes signature) returns (bytes32)"
+        ];
+
+        let provider, signer, contract, currentAccount;
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#2196F3',
+                success: '#4CAF50', 
+                error: '#f44336',
+                warning: '#ff9800'
+            };
+            
+            const debugOutput = document.getElementById('debug-output');
+            debugOutput.innerHTML += `<span style="color: ${colors[type]}">[${timestamp}] ${message}</span>\n`;
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearDebug() {
+            document.getElementById('debug-output').innerHTML = '';
+        }
+
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    throw new Error('MetaMask not detected!');
+                }
+
+                log('Connecting to MetaMask...', 'info');
+                
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                currentAccount = await signer.getAddress();
+                
+                const network = await provider.getNetwork();
+                log(`Connected to: ${network.name} (Chain ID: ${network.chainId})`, 'info');
+                
+                if (network.chainId !== BigInt(CONFIG.chainId)) {
+                    log(`Wrong network! Please switch to Polygon Amoy (${CONFIG.chainId})`, 'warning');
+                    return;
+                }
+                
+                contract = new ethers.Contract(CONFIG.authContract, AUTH_ABI, signer);
+                
+                const balance = await provider.getBalance(currentAccount);
+                
+                const walletInfo = document.getElementById('wallet-info');
+                walletInfo.style.display = 'block';
+                walletInfo.innerHTML = `
+                    <strong>Connected:</strong> ${currentAccount}<br>
+                    <strong>Balance:</strong> ${ethers.formatEther(balance)} MATIC<br>
+                    <strong>Expected:</strong> ${CONFIG.expectedUser}<br>
+                    <strong>Match:</strong> ${currentAccount.toLowerCase() === CONFIG.expectedUser.toLowerCase() ? '✅ YES' : '❌ NO'}
+                `;
+                
+                log(`Connected: ${currentAccount}`, 'success');
+                document.getElementById('step1').classList.add('completed');
+                document.getElementById('testBackendBtn').disabled = false;
+                
+            } catch (error) {
+                log(`Connection failed: ${error.message}`, 'error');
+                document.getElementById('step1').classList.add('error');
+            }
+        }
+
+        async function testBackendService() {
+            try {
+                log('Testing backend service connection...', 'info');
+                document.getElementById('step2').classList.add('current');
+
+                // First, let's try to detect which backend URL works
+                const possibleUrls = [
+                    'https://localhost:7000',  // EmailProcessingService (HTTPS)
+                    'http://localhost:3001',   // data-wallet-service (HTTP)
+                    'https://localhost:3001'   // data-wallet-service (HTTPS)
+                ];
+
+                let workingUrl = null;
+                let healthData = null;
+
+                for (const url of possibleUrls) {
+                    try {
+                        log(`Trying ${url}/api/health...`, 'info');
+                        const healthResponse = await fetch(`${url}/api/health`);
+                        if (healthResponse.ok) {
+                            healthData = await healthResponse.json();
+                            workingUrl = url;
+                            CONFIG.backendUrl = url; // Update config
+                            log(`✅ Found working backend at ${url}`, 'success');
+                            break;
+                        }
+                    } catch (error) {
+                        log(`❌ ${url} failed: ${error.message}`, 'warning');
+                        if (error.message.includes('certificate') || error.message.includes('SSL')) {
+                            log(`   SSL/Certificate issue detected`, 'warning');
+                        }
+                    }
+                }
+
+                if (!workingUrl) {
+                    throw new Error('No working backend service found');
+                }
+                
+                log('Backend service is running!', 'success');
+                log(`URL: ${workingUrl}`, 'info');
+                log(`Connected: ${healthData.connected}`, 'info');
+                if (healthData.blockNumber) {
+                    log(`Block: ${healthData.blockNumber}`, 'info');
+                }
+                
+                const output = document.getElementById('backend-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify({
+                    workingUrl: workingUrl,
+                    ...healthData
+                }, null, 2);
+                
+                document.getElementById('step2').classList.remove('current');
+                document.getElementById('step2').classList.add('completed');
+                document.getElementById('createWalletBtn').disabled = false;
+                
+            } catch (error) {
+                log(`Backend test failed: ${error.message}`, 'error');
+                document.getElementById('step2').classList.add('error');
+                
+                // Provide helpful instructions
+                log('🔧 TROUBLESHOOTING:', 'warning');
+                log('1. Make sure your backend service is running', 'info');
+                log('2. If using HTTPS, visit the URL directly in browser first', 'info');
+                log('3. Accept the self-signed certificate warning', 'info');
+                log('4. Then refresh this page and try again', 'info');
+                
+                const output = document.getElementById('backend-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify({
+                    error: error.message,
+                    possibleCauses: [
+                        'Backend service not running',
+                        'SSL certificate not accepted',
+                        'Wrong port or URL',
+                        'CORS issues'
+                    ],
+                    solutions: [
+                        'Start your backend service',
+                        'Visit https://localhost:7000 directly and accept certificate',
+                        'Check if service is on different port',
+                        'Try the manual steps below'
+                    ]
+                }, null, 2);
+                
+                // Enable manual auth flow as backup
+                document.getElementById('manualAuthBtn').disabled = false;
+            }
+        }
+
+        async function tryWalletCreation() {
+            try {
+                log('Attempting wallet creation through backend...', 'info');
+                document.getElementById('step3').classList.add('current');
+
+                const walletPayload = {
+                    walletType: "EMAIL",
+                    ownerAddress: currentAccount,
+                    dataHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+                    ipfsHash: "QmCompleteFlowTest2025",
+                    dataSize: 2048
+                };
+
+                log('Sending wallet creation request...', 'info');
+                log(`Payload: ${JSON.stringify(walletPayload, null, 2)}`, 'info');
+
+                const response = await fetch(`${CONFIG.backendUrl}/api/wallets/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(walletPayload)
+                });
+
+                const result = await response.json();
+                
+                const output = document.getElementById('wallet-creation-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify(result, null, 2);
+
+                if (result.success) {
+                    log('🎉 Wallet creation successful!', 'success');
+                    log(`Wallet ID: ${result.walletId}`, 'success');
+                    document.getElementById('step3').classList.remove('current');
+                    document.getElementById('step3').classList.add('completed');
+                } else {
+                    log(`Wallet creation failed: ${result.error}`, 'error');
+                    document.getElementById('step3').classList.remove('current');
+                    document.getElementById('step3').classList.add('error');
+                    document.getElementById('manualAuthBtn').disabled = false;
+                    
+                    if (result.error && result.error.includes('Invalid signature')) {
+                        log('Got "Invalid signature" - this is what we can fix with MetaMask!', 'warning');
+                    }
+                    if (result.error && result.error.includes('Invalid request')) {
+                        log('Got "Invalid request" - need to understand the authorization flow', 'warning');
+                    }
+                }
+                
+            } catch (error) {
+                log(`Wallet creation error: ${error.message}`, 'error');
+                document.getElementById('step3').classList.add('error');
+                document.getElementById('manualAuthBtn').disabled = false;
+            }
+        }
+
+        async function manualAuthFlow() {
+            try {
+                log('Starting manual authorization flow...', 'info');
+                document.getElementById('step4').classList.add('current');
+
+                log('Manual flow would involve:', 'info');
+                log('1. Backend creates authorization request (as contract owner)', 'info');
+                log('2. Backend returns request ID and auth token', 'info');
+                log('3. Frontend (this page) signs with MetaMask', 'info');
+                log('4. Frontend submits signature to contract', 'info');
+                log('5. Backend processes the authorized request', 'info');
+
+                log('For now, this demonstrates the complete flow architecture', 'warning');
+                log('Next step: Implement the manual authorization endpoints', 'info');
+
+                const output = document.getElementById('manual-auth-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify({
+                    note: "Manual authorization flow would be implemented here",
+                    nextSteps: [
+                        "Add backend endpoint: POST /api/auth/create-request",
+                        "Add backend endpoint: GET /api/auth/request/:token",
+                        "Add frontend MetaMask signing",
+                        "Add backend endpoint: POST /api/auth/process-request"
+                    ]
+                }, null, 2);
+
+                document.getElementById('step4').classList.remove('current');
+                document.getElementById('step4').classList.add('completed');
+                
+            } catch (error) {
+                log(`Manual auth flow error: ${error.message}`, 'error');
+                document.getElementById('step4').classList.add('error');
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            log('Complete Authorization Flow Test loaded', 'info');
+            log('This tests the real backend + MetaMask flow', 'info');
+            
+            if (!window.ethereum) {
+                log('MetaMask not detected!', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

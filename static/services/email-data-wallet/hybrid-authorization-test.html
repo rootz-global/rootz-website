@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hybrid Authorization Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .step {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .step.current {
+            border-left-color: #ff9800;
+            background: rgba(255, 152, 0, 0.1);
+        }
+        .step.completed {
+            border-left-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+        .step.error {
+            border-left-color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+        }
+        button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .output {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+        .warning { color: #ff9800; }
+        
+        .address-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        h1, h2 {
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .test-data {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .hybrid-info {
+            background: rgba(255, 152, 0, 0.1);
+            border: 2px solid #ff9800;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔄 Hybrid Authorization Test</h1>
+    <p style="text-align: center; font-size: 18px;">
+        Backend Service + MetaMask Signing = Complete Authorization Flow
+    </p>
+
+    <div class="hybrid-info">
+        <h2>🎯 Hybrid Approach</h2>
+        <p><strong>Backend Service (Contract Owner):</strong> Creates authorization requests, processes results</p>
+        <p><strong>MetaMask (User):</strong> Signs authorization with user's private key</p>
+        <p><strong>Result:</strong> Real-world authorization flow with proper permissions</p>
+    </div>
+
+    <div class="container">
+        <h2>📋 Test Configuration</h2>
+        <div class="test-data">
+            <p><strong>Backend Service:</strong> http://localhost:3001</p>
+            <p><strong>Data Wallet Service API:</strong> Running on your local machine</p>
+            <p><strong>Expected User Address:</strong> 0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b</p>
+            <p><strong>Test Payload:</strong> Same as Swagger test</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="step1" class="step">
+            <h3>Step 1: Connect MetaMask</h3>
+            <p>Connect your wallet as the Data Wallet Owner</p>
+            <button onclick="connectWallet()">Connect MetaMask</button>
+            <div id="wallet-info" class="address-display" style="display: none;"></div>
+        </div>
+
+        <div id="step2" class="step">
+            <h3>Step 2: Create Authorization Request (Backend)</h3>
+            <p>Use backend service to create authorization request (as contract owner)</p>
+            <button onclick="createAuthRequestViaBackend()" disabled id="createBtn">Create via Backend API</button>
+            <div id="auth-request-output" class="output" style="display: none;"></div>
+        </div>
+
+        <div id="step3" class="step">
+            <h3>Step 3: Get Request ID (Backend)</h3>
+            <p>Retrieve the request ID from the backend service</p>
+            <button onclick="getRequestId()" disabled id="getRequestBtn">Get Request ID</button>
+            <div id="request-id-output" class="output" style="display: none;"></div>
+        </div>
+
+        <div id="step4" class="step">
+            <h3>Step 4: Sign Authorization (MetaMask)</h3>
+            <p>Sign the authorization using MetaMask with different approaches</p>
+            <button onclick="signWithMetaMask()" disabled id="signBtn">Sign with MetaMask</button>
+            <div id="sign-output" class="output" style="display: none;"></div>
+        </div>
+
+        <div id="step5" class="step">
+            <h3>Step 5: Submit Signature (Direct Contract)</h3>
+            <p>Submit the MetaMask signature directly to the contract</p>
+            <button onclick="submitSignatureToContract()" disabled id="submitBtn">Submit to Contract</button>
+            <div id="submit-output" class="output" style="display: none;"></div>
+        </div>
+
+        <div id="step6" class="step">
+            <h3>Step 6: Complete via Backend</h3>
+            <p>Let backend service complete the email wallet creation</p>
+            <button onclick="completeViaBackend()" disabled id="completeBtn">Complete via Backend</button>
+            <div id="complete-output" class="output" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Debug Information</h2>
+        <div id="debug-output" class="output"></div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            chainId: 80002,
+            backendUrl: 'http://localhost:3001',
+            contracts: {
+                authorization: '0x555ba5C1ff253c1D91483b52F1906670608fE9bC'
+            },
+            wallets: {
+                dataOwner: '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b'
+            }
+        };
+
+        // Authorization Manager ABI (minimal)
+        const AUTH_ABI = [
+            "function authorizeEmailWalletCreation(bytes32 requestId, bytes signature) returns (bytes32 authorizationTx)",
+            "function getRequestFromToken(string authToken) view returns (bytes32)"
+        ];
+
+        let provider, signer, contract, currentAccount;
+        let testData = {
+            authToken: '',
+            requestId: '',
+            signature: '',
+            backendResponse: null
+        };
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#2196F3',
+                success: '#4CAF50',
+                error: '#f44336',
+                warning: '#ff9800'
+            };
+            
+            const debugOutput = document.getElementById('debug-output');
+            debugOutput.innerHTML += `<span style="color: ${colors[type]}">[${timestamp}] ${message}</span>\n`;
+            debugOutput.scrollTop = debugOutput.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    throw new Error('MetaMask not detected! Please install MetaMask.');
+                }
+
+                log('Connecting to MetaMask...', 'info');
+                
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                currentAccount = await signer.getAddress();
+                
+                const network = await provider.getNetwork();
+                log(`Connected to network: ${network.name} (Chain ID: ${network.chainId})`, 'info');
+                
+                if (network.chainId !== BigInt(CONFIG.chainId)) {
+                    log(`Wrong network! Please switch to Polygon Amoy (Chain ID: ${CONFIG.chainId})`, 'error');
+                    return;
+                }
+                
+                contract = new ethers.Contract(CONFIG.contracts.authorization, AUTH_ABI, signer);
+                
+                const balance = await provider.getBalance(currentAccount);
+                const walletInfo = document.getElementById('wallet-info');
+                walletInfo.style.display = 'block';
+                walletInfo.innerHTML = `
+                    <strong>Connected:</strong> ${currentAccount}
+                    <br><strong>Balance:</strong> ${ethers.formatEther(balance)} MATIC
+                    <br><strong>Expected:</strong> ${CONFIG.wallets.dataOwner}
+                    <br><strong>Match:</strong> ${currentAccount.toLowerCase() === CONFIG.wallets.dataOwner.toLowerCase() ? '✅ YES' : '❌ NO'}
+                `;
+                
+                log(`Connected: ${currentAccount}`, 'success');
+                
+                document.getElementById('step1').classList.add('completed');
+                document.getElementById('createBtn').disabled = false;
+                
+                if (currentAccount.toLowerCase() !== CONFIG.wallets.dataOwner.toLowerCase()) {
+                    log(`⚠️ WARNING: Connected wallet doesn't match expected!`, 'warning');
+                }
+                
+            } catch (error) {
+                log(`Failed to connect: ${error.message}`, 'error');
+                document.getElementById('step1').classList.add('error');
+            }
+        }
+
+        async function createAuthRequestViaBackend() {
+            try {
+                log('Creating authorization request via backend...', 'info');
+                document.getElementById('step2').classList.add('current');
+
+                // This simulates what our backend service should do
+                // For now, we'll mock this since we don't have the exact API endpoint
+                log('🔧 MOCK: Backend creates authorization request as contract owner', 'warning');
+                
+                testData.authToken = `auth-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                testData.backendResponse = {
+                    success: true,
+                    authToken: testData.authToken,
+                    message: 'Authorization request created by backend service'
+                };
+
+                const output = document.getElementById('auth-request-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify(testData.backendResponse, null, 2);
+
+                document.getElementById('step2').classList.remove('current');
+                document.getElementById('step2').classList.add('completed');
+                document.getElementById('getRequestBtn').disabled = false;
+
+                log('✅ Mock: Authorization request created', 'success');
+                
+            } catch (error) {
+                log(`Failed to create via backend: ${error.message}`, 'error');
+                document.getElementById('step2').classList.add('error');
+            }
+        }
+
+        async function getRequestId() {
+            try {
+                log('Getting request ID...', 'info');
+                document.getElementById('step3').classList.add('current');
+
+                if (!testData.authToken) {
+                    throw new Error('No auth token available');
+                }
+
+                // In real implementation, backend would provide this
+                // For testing, we'll simulate a request ID
+                testData.requestId = '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+                
+                log(`Mock Request ID: ${testData.requestId}`, 'info');
+
+                const output = document.getElementById('request-id-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify({
+                    authToken: testData.authToken,
+                    requestId: testData.requestId,
+                    note: 'Mock request ID for signature testing'
+                }, null, 2);
+
+                document.getElementById('step3').classList.remove('current');
+                document.getElementById('step3').classList.add('completed');
+                document.getElementById('signBtn').disabled = false;
+
+                log('✅ Request ID obtained', 'success');
+                
+            } catch (error) {
+                log(`Failed to get request ID: ${error.message}`, 'error');
+                document.getElementById('step3').classList.add('error');
+            }
+        }
+
+        async function signWithMetaMask() {
+            try {
+                log('Signing with MetaMask - Testing multiple approaches...', 'info');
+                document.getElementById('step4').classList.add('current');
+
+                const signatures = {};
+
+                // Approach 1: Sign requestId directly (bytes)
+                try {
+                    log('Approach 1: Signing requestId as bytes', 'info');
+                    const requestIdBytes = ethers.getBytes(testData.requestId);
+                    signatures.requestIdBytes = await signer.signMessage(requestIdBytes);
+                    log(`✅ RequestId bytes signature: ${signatures.requestIdBytes.substring(0, 20)}...`, 'success');
+                } catch (error) {
+                    log(`❌ RequestId bytes failed: ${error.message}`, 'error');
+                }
+
+                // Approach 2: Sign requestId as string
+                try {
+                    log('Approach 2: Signing requestId as string', 'info');
+                    signatures.requestIdString = await signer.signMessage(testData.requestId);
+                    log(`✅ RequestId string signature: ${signatures.requestIdString.substring(0, 20)}...`, 'success');
+                } catch (error) {
+                    log(`❌ RequestId string failed: ${error.message}`, 'error');
+                }
+
+                // Approach 3: Sign formatted message
+                try {
+                    log('Approach 3: Signing formatted message', 'info');
+                    const message = `Authorize email wallet creation: ${testData.requestId}`;
+                    signatures.formattedMessage = await signer.signMessage(message);
+                    log(`✅ Formatted message signature: ${signatures.formattedMessage.substring(0, 20)}...`, 'success');
+                } catch (error) {
+                    log(`❌ Formatted message failed: ${error.message}`, 'error');
+                }
+
+                // Approach 4: Sign requestId without 0x prefix
+                try {
+                    log('Approach 4: Signing requestId without 0x prefix', 'info');
+                    const requestIdNoPx = testData.requestId.substring(2);
+                    signatures.requestIdNoPrefix = await signer.signMessage(requestIdNoPx);
+                    log(`✅ No prefix signature: ${signatures.requestIdNoPrefix.substring(0, 20)}...`, 'success');
+                } catch (error) {
+                    log(`❌ No prefix failed: ${error.message}`, 'error');
+                }
+
+                // Store the first successful signature as default
+                testData.signature = signatures.requestIdBytes || 
+                                   signatures.requestIdString || 
+                                   signatures.formattedMessage || 
+                                   signatures.requestIdNoPrefix;
+
+                testData.allSignatures = signatures;
+
+                const output = document.getElementById('sign-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify({
+                    requestId: testData.requestId,
+                    signer: currentAccount,
+                    allSignatures: Object.keys(signatures).reduce((acc, key) => {
+                        acc[key] = signatures[key].substring(0, 20) + '...';
+                        return acc;
+                    }, {}),
+                    selectedSignature: testData.signature.substring(0, 20) + '...'
+                }, null, 2);
+
+                document.getElementById('step4').classList.remove('current');
+                document.getElementById('step4').classList.add('completed');
+                document.getElementById('submitBtn').disabled = false;
+
+                log(`🎉 MetaMask signing complete! Got ${Object.keys(signatures).length} signatures`, 'success');
+                
+            } catch (error) {
+                log(`Failed to sign with MetaMask: ${error.message}`, 'error');
+                document.getElementById('step4').classList.add('error');
+            }
+        }
+
+        async function submitSignatureToContract() {
+            try {
+                log('Testing signature submission to contract...', 'info');
+                document.getElementById('step5').classList.add('current');
+
+                if (!testData.signature || !testData.requestId) {
+                    throw new Error('Missing signature or request ID');
+                }
+
+                // Test each signature approach
+                const signatures = testData.allSignatures;
+                let workingSignature = null;
+                let workingApproach = null;
+
+                for (const [approach, signature] of Object.entries(signatures)) {
+                    try {
+                        log(`Testing ${approach} signature...`, 'info');
+                        
+                        // Try to estimate gas first (this will reveal signature validation issues)
+                        const gasEstimate = await contract.authorizeEmailWalletCreation.estimateGas(
+                            testData.requestId,
+                            signature
+                        );
+                        
+                        log(`✅ ${approach} signature valid! Gas estimate: ${gasEstimate}`, 'success');
+                        workingSignature = signature;
+                        workingApproach = approach;
+                        break;
+                        
+                    } catch (error) {
+                        log(`❌ ${approach} signature failed: ${error.message}`, 'error');
+                        
+                        if (error.message.includes('Invalid signature')) {
+                            log(`🔍 ${approach}: Contract rejected this signature format`, 'warning');
+                        }
+                    }
+                }
+
+                if (workingSignature) {
+                    log(`🎉 FOUND WORKING SIGNATURE FORMAT: ${workingApproach}`, 'success');
+                    
+                    // Actually submit the transaction
+                    const tx = await contract.authorizeEmailWalletCreation(
+                        testData.requestId,
+                        workingSignature
+                    );
+                    
+                    log(`Transaction sent: ${tx.hash}`, 'info');
+                    const receipt = await tx.wait();
+                    log(`Transaction confirmed: ${receipt.blockNumber}`, 'success');
+                    
+                    testData.workingSignature = workingSignature;
+                    testData.workingApproach = workingApproach;
+                } else {
+                    throw new Error('No signature format worked with the contract');
+                }
+
+                const output = document.getElementById('submit-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify({
+                    workingApproach: workingApproach,
+                    workingSignature: workingSignature?.substring(0, 20) + '...',
+                    requestId: testData.requestId,
+                    transactionHash: workingSignature ? 'Success' : 'Failed'
+                }, null, 2);
+
+                document.getElementById('step5').classList.remove('current');
+                document.getElementById('step5').classList.add('completed');
+                document.getElementById('completeBtn').disabled = false;
+                
+            } catch (error) {
+                log(`Signature submission failed: ${error.message}`, 'error');
+                document.getElementById('step5').classList.add('error');
+                
+                // Log detailed analysis
+                log('🔍 SIGNATURE ANALYSIS:', 'warning');
+                log('This tells us exactly what signature format the contract expects!', 'info');
+                log('We can now update our backend service with the correct format.', 'info');
+            }
+        }
+
+        async function completeViaBackend() {
+            try {
+                log('Completing email wallet creation via backend...', 'info');
+                document.getElementById('step6').classList.add('current');
+
+                log('🔧 In real implementation, backend would:', 'info');
+                log('1. Process the authorized request', 'info');
+                log('2. Create the email wallet', 'info');
+                log('3. Return the wallet ID', 'info');
+
+                const mockResult = {
+                    success: true,
+                    emailWalletId: '0x' + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join(''),
+                    workingSignatureFormat: testData.workingApproach || 'unknown',
+                    message: 'Email wallet created successfully!'
+                };
+
+                const output = document.getElementById('complete-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify(mockResult, null, 2);
+
+                document.getElementById('step6').classList.remove('current');
+                document.getElementById('step6').classList.add('completed');
+
+                log('🎉 HYBRID FLOW COMPLETE!', 'success');
+                log(`Working signature format: ${testData.workingApproach || 'Need to test more'}`, 'success');
+                
+            } catch (error) {
+                log(`Backend completion failed: ${error.message}`, 'error');
+                document.getElementById('step6').classList.add('error');
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            log('Hybrid Authorization Test loaded', 'info');
+            log('This combines backend service power with MetaMask signing', 'info');
+            
+            if (!window.ethereum) {
+                log('❌ MetaMask not detected!', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

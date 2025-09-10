@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Backend Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            background: #2d2d2d;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #444;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #45a049; }
+        .output {
+            background: #000;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+        .manual-steps {
+            background: #333;
+            border: 2px solid #ff9800;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        h1, h2 { text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Direct Backend Test - SSL Bypass</h1>
+    
+    <div class="manual-steps">
+        <h3>SSL Issue Solution: Manual Testing</h3>
+        <p>Since SSL is causing issues, let's test your backend manually:</p>
+        <ol>
+            <li><strong>Open a new tab</strong> and visit: <a href="https://localhost:7000/api/health" target="_blank">https://localhost:7000/api/health</a></li>
+            <li><strong>Copy the response</strong> and paste it in the text area below</li>
+            <li><strong>Test wallet creation</strong> by visiting: <a href="https://localhost:7000/api-docs" target="_blank">https://localhost:7000/api-docs</a></li>
+            <li><strong>Use the exact payload</strong> shown below in Swagger</li>
+        </ol>
+    </div>
+
+    <div class="container">
+        <h2>Backend Health Check Response</h2>
+        <p>Paste the JSON response from https://localhost:7000/api/health here:</p>
+        <textarea id="healthResponse" rows="10" style="width: 100%; background: #000; color: #fff; border: 1px solid #666; padding: 10px; font-family: monospace;"></textarea>
+        <button onclick="analyzeHealth()">Analyze Health Response</button>
+        <div id="healthAnalysis" class="output" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <h2>Wallet Creation Test Payload</h2>
+        <p>Use this exact payload in Swagger at: <a href="https://localhost:7000/api-docs" target="_blank">https://localhost:7000/api-docs</a></p>
+        <div class="output">
+POST /api/wallets/create
+
+{
+  "walletType": "EMAIL",
+  "ownerAddress": "0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b",
+  "dataHash": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+  "ipfsHash": "QmDirectTestWallet2025",
+  "dataSize": 2048
+}
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Wallet Creation Response</h2>
+        <p>Paste the response from the wallet creation API call here:</p>
+        <textarea id="walletResponse" rows="10" style="width: 100%; background: #000; color: #fff; border: 1px solid #666; padding: 10px; font-family: monospace;"></textarea>
+        <button onclick="analyzeWalletResponse()">Analyze Wallet Response</button>
+        <div id="walletAnalysis" class="output" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <h2>Next Steps Based on Results</h2>
+        <div id="nextSteps" class="output" style="display: none;"></div>
+    </div>
+
+    <script>
+        function analyzeHealth() {
+            const healthText = document.getElementById('healthResponse').value.trim();
+            const analysis = document.getElementById('healthAnalysis');
+            
+            if (!healthText) {
+                analysis.innerHTML = 'Please paste the health response first.';
+                analysis.style.display = 'block';
+                return;
+            }
+
+            try {
+                const healthData = JSON.parse(healthText);
+                
+                let analysisText = 'HEALTH CHECK ANALYSIS:\n\n';
+                analysisText += `Connected: ${healthData.connected || 'Unknown'}\n`;
+                analysisText += `Network: ${healthData.networkName || 'Unknown'}\n`;
+                analysisText += `Block Number: ${healthData.blockNumber || 'Unknown'}\n`;
+                analysisText += `Wallet Balance: ${healthData.walletBalance || 'Unknown'}\n`;
+                
+                if (healthData.registrationStatus) {
+                    analysisText += `\nREGISTRATION STATUS:\n`;
+                    analysisText += `Registered: ${healthData.registrationStatus.isRegistered}\n`;
+                    analysisText += `Credit Balance: ${healthData.registrationStatus.creditBalance || 'Unknown'}\n`;
+                    analysisText += `Active: ${healthData.registrationStatus.isActive || 'Unknown'}\n`;
+                }
+
+                if (healthData.contractOwnership) {
+                    analysisText += `\nCONTRACT OWNERSHIP:\n`;
+                    analysisText += `Email Wallet Owner: ${healthData.contractOwnership.emailWalletOwner}\n`;
+                    analysisText += `Auth Owner: ${healthData.contractOwnership.authOwner}\n`;
+                    analysisText += `Our Wallet: ${healthData.contractOwnership.ourWallet}\n`;
+                }
+
+                analysisText += `\n✅ Backend service is working!`;
+                analysisText += `\n📋 Now test wallet creation using the payload above.`;
+                
+                analysis.innerHTML = analysisText;
+                analysis.style.display = 'block';
+                
+            } catch (error) {
+                analysis.innerHTML = `❌ Error parsing JSON: ${error.message}\n\nMake sure you copied valid JSON from the health endpoint.`;
+                analysis.style.display = 'block';
+            }
+        }
+
+        function analyzeWalletResponse() {
+            const walletText = document.getElementById('walletResponse').value.trim();
+            const analysis = document.getElementById('walletAnalysis');
+            const nextSteps = document.getElementById('nextSteps');
+            
+            if (!walletText) {
+                analysis.innerHTML = 'Please paste the wallet creation response first.';
+                analysis.style.display = 'block';
+                return;
+            }
+
+            try {
+                const walletData = JSON.parse(walletText);
+                
+                let analysisText = 'WALLET CREATION ANALYSIS:\n\n';
+                
+                if (walletData.success) {
+                    analysisText += '🎉 SUCCESS! Wallet created successfully!\n';
+                    analysisText += `Wallet ID: ${walletData.walletId}\n`;
+                    analysisText += `Transaction Hash: ${walletData.transactionHash || 'Not provided'}\n`;
+                    
+                    nextSteps.innerHTML = `🎉 CONGRATULATIONS!\n\nYour email wallet authorization flow is working correctly!\n\nThe wallet was created successfully, which means:\n✅ Backend service is working\n✅ Authorization flow is working\n✅ Signature validation is working\n✅ Contract integration is working\n\nYour MVP is ready for the next development phase!`;
+                    
+                } else {
+                    analysisText += '❌ FAILED: Wallet creation failed\n';
+                    analysisText += `Error: ${walletData.error}\n`;
+                    
+                    // Analyze the specific error
+                    if (walletData.error.includes('Invalid signature')) {
+                        analysisText += '\n🔍 SIGNATURE ISSUE:\n';
+                        analysisText += 'The error is still "Invalid signature".\n';
+                        analysisText += 'This means our backend signature creation needs fixing.\n';
+                        
+                        nextSteps.innerHTML = `🔧 NEXT STEPS - SIGNATURE FIX:\n\n1. The backend authorization flow has signature issues\n2. We know from our MetaMask tests that signatures work\n3. Need to fix the backend signature creation method\n4. Apply the working signature format from our tests\n\nThe signature format that works is likely one of:\n- Sign requestId as bytes\n- Sign requestId as string\n- Sign formatted message\n\nWe need to update the backend service with the correct signing method.`;
+                        
+                    } else if (walletData.error.includes('Invalid request')) {
+                        analysisText += '\n🔍 REQUEST ISSUE:\n';
+                        analysisText += 'The error is "Invalid request".\n';
+                        analysisText += 'This means the request ID doesn\'t exist in the contract.\n';
+                        
+                        nextSteps.innerHTML = `🔧 NEXT STEPS - REQUEST FLOW:\n\n1. Backend creates authorization requests correctly\n2. But the request IDs aren't being found by the contract\n3. This suggests a timing or flow issue\n4. Need to debug the authorization request creation\n\nPossible fixes:\n- Ensure request is created before authorization\n- Check request ID generation and storage\n- Verify contract state between request creation and authorization`;
+                        
+                    } else {
+                        analysisText += '\n🔍 OTHER ISSUE:\n';
+                        analysisText += 'Different type of error encountered.\n';
+                        
+                        nextSteps.innerHTML = `🔧 NEXT STEPS - DEBUG:\n\nError: ${walletData.error}\n\nThis error needs specific investigation.\nPlease share this error message so we can determine the next steps.`;
+                    }
+                }
+                
+                analysis.innerHTML = analysisText;
+                analysis.style.display = 'block';
+                nextSteps.style.display = 'block';
+                
+            } catch (error) {
+                analysis.innerHTML = `❌ Error parsing JSON: ${error.message}\n\nResponse might not be valid JSON or might be an HTML error page.`;
+                analysis.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -385,14 +385,14 @@
 <body>
     <header>
         <nav>
-            <a href="/services/email-data-wallet/" class="logo">📧 Email DATA_WALLET</a>
+            <a href="/static/services/email-data-wallet/" class="logo">📧 Email DATA_WALLET</a>
             <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="/services/email-data-wallet/">Home</a></li>
-                <li><a href="/services/email-data-wallet/register.html">Register</a></li>
-                <li><a href="/services/email-data-wallet/dashboard.html">Dashboard</a></li>
-                <li><a href="/services/email-data-wallet/authorization.html" class="active">Authorization</a></li>
-                <li><a href="/services/email-data-wallet/admin.html">Admin</a></li>
+                <li><a href="/static/services/email-data-wallet/">Home</a></li>
+                <li><a href="/static/services/email-data-wallet/register.html">Register</a></li>
+                <li><a href="/static/services/email-data-wallet/dashboard.html">Dashboard</a></li>
+                <li><a href="/static/services/email-data-wallet/authorization.html" class="active">Authorization</a></li>
+                <li><a href="/static/services/email-data-wallet/admin.html">Admin</a></li>
             </ul>
         </nav>
     </header>
@@ -465,7 +465,7 @@
                 Your EMAIL_WALLET has been created and will be available shortly with full blockchain provenance.
                 <br><br>
                 <strong>Transaction Hash:</strong> <span id="txHash"></span><br>
-                <a href="/services/email-data-wallet/dashboard.html" style="color: var(--primary); text-decoration: none; font-weight: bold;">→ View Dashboard</a>
+                <a href="/static/services/email-data-wallet/dashboard.html" style="color: var(--primary); text-decoration: none; font-weight: bold;">→ View Dashboard</a>
             </div>
 
             <div class="error-message" id="errorDiv">
@@ -609,7 +609,7 @@
 
         function denyAuthorization() {
             if (confirm('Are you sure you want to deny this authorization? The EMAIL_WALLET will not be created.')) {
-                window.location.href = '/services/email-data-wallet/dashboard.html';
+                window.location.href = '/static/services/email-data-wallet/dashboard.html';
             }
         }
 

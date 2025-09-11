@@ -305,8 +305,9 @@
                     // For testing, simulate the service creation
                     log('⚠️ API endpoint not available, simulating service behavior...', 'warning', 'SERVICE');
                     
-                    // Simulate successful request creation
-                    testData.requestId = `0x${Math.random().toString(16).padStart(64, '0')}`;
+                    // Simulate successful request creation - generate valid 64-char hex
+                    const randomHex = Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+                    testData.requestId = `0x${randomHex}`;
                     
                     const simulatedResult = {
                         success: true,

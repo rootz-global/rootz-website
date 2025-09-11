@@ -105,7 +105,7 @@
 <body>
     <h1>🚀 Email Wallet Authorization Flow Test</h1>
     <p style="text-align: center; font-size: 18px;">
-        Real MetaMask signing to understand contract signature validation
+        Real MetaMask signing to test contract signature validation - UPDATED FOR FIXED CONTRACT
     </p>
 
     <div class="container">
@@ -113,7 +113,7 @@
         <div class="test-data">
             <p><strong>Network:</strong> Polygon Amoy Testnet</p>
             <p><strong>Chain ID:</strong> 80002</p>
-            <p><strong>Authorization Contract:</strong> 0x555ba5C1ff253c1D91483b52F1906670608fE9bC</p>
+            <p><strong>Authorization Contract:</strong> 0xcC2a65A8870289B1d33bA741069cC2CEEA219573 (FIXED)</p>
             <p><strong>Data Wallet Owner:</strong> 0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b</p>
             <p><strong>Contract Owner:</strong> 0xE2d0E252E7da22901bd1ffDD012Da2c77aC3033a</p>
         </div>
@@ -135,21 +135,33 @@
         </div>
 
         <div id="step3" class="step">
-            <h3>Step 3: Sign Authorization (MetaMask)</h3>
-            <p>Sign the authorization using the data wallet owner's MetaMask</p>
-            <button onclick="signAuthorization()" disabled id="signBtn">Sign with MetaMask</button>
-            <div id="sign-output" class="output" style="display: none;"></div>
+            <h3>Step 3: Switch to Data Owner Wallet</h3>
+            <p>⚠️ IMPORTANT: Switch MetaMask to the DATA OWNER wallet for authorization</p>
+            <div class="address-display">
+                <strong>Required Wallet:</strong> 0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b<br>
+                <strong>Why:</strong> Only the request owner can authorize their own email wallet
+            </div>
+            <button onclick="checkDataOwnerWallet()" id="checkWalletBtn" disabled>Check Current Wallet</button>
+            <button onclick="promptWalletSwitch()" id="switchWalletBtn" disabled>Instructions to Switch</button>
+            <div id="wallet-check-output" class="output" style="display: none;"></div>
         </div>
 
         <div id="step4" class="step">
-            <h3>Step 4: Submit Authorization</h3>
+            <h3>Step 4: Sign Authorization (Data Owner)</h3>
+            <p>Sign the authorization using the data wallet owner's MetaMask</p>
+            <button onclick="signAuthorization()" disabled id="signBtn">Sign with Data Owner Wallet</button>
+            <div id="sign-output" class="output" style="display: none;"></div>
+        </div>
+
+        <div id="step5" class="step">
+            <h3>Step 5: Submit Authorization</h3>
             <p>Submit the signed authorization to the contract</p>
             <button onclick="submitAuthorization()" disabled id="submitBtn">Submit Authorization</button>
             <div id="submit-output" class="output" style="display: none;"></div>
         </div>
 
-        <div id="step5" class="step">
-            <h3>Step 5: Process Email Wallet</h3>
+        <div id="step6" class="step">
+            <h3>Step 6: Process Email Wallet</h3>
             <p>Process the authorized request to create the email wallet</p>
             <button onclick="processEmailWallet()" disabled id="processBtn">Process Email Wallet</button>
             <div id="process-output" class="output" style="display: none;"></div>
@@ -167,7 +179,7 @@
             chainId: 80002,
             rpcUrl: 'https://rpc-amoy.polygon.technology',
             contracts: {
-                authorization: '0x555ba5C1ff253c1D91483b52F1906670608fE9bC'
+                authorization: '0xcC2a65A8870289B1d33bA741069cC2CEEA219573'  // Updated fixed contract
             },
             wallets: {
                 dataOwner: '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b',
@@ -308,7 +320,8 @@
                 // Update step status
                 document.getElementById('step2').classList.remove('current');
                 document.getElementById('step2').classList.add('completed');
-                document.getElementById('signBtn').disabled = false;
+                document.getElementById('checkWalletBtn').disabled = false;
+                document.getElementById('switchWalletBtn').disabled = false;
                 
             } catch (error) {
                 log(`Failed to create authorization request: ${error.message}`, 'error');
@@ -321,10 +334,70 @@
             }
         }
 
+        async function checkDataOwnerWallet() {
+            try {
+                log('Checking current wallet...', 'info');
+                document.getElementById('step3').classList.add('current');
+                
+                // Get current account
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length === 0) {
+                    throw new Error('No wallet connected');
+                }
+                
+                currentAccount = accounts[0];
+                const isDataOwner = currentAccount.toLowerCase() === CONFIG.wallets.dataOwner.toLowerCase();
+                
+                const output = document.getElementById('wallet-check-output');
+                output.style.display = 'block';
+                output.innerHTML = `
+                    <div class="${isDataOwner ? 'success' : 'error'}">
+                        Current Wallet: ${currentAccount}
+                        Required Wallet: ${CONFIG.wallets.dataOwner}
+                        Status: ${isDataOwner ? '✅ CORRECT WALLET' : '❌ WRONG WALLET'}
+                    </div>
+                `;
+                
+                if (isDataOwner) {
+                    log('✅ Correct wallet connected! Ready to sign authorization.', 'success');
+                    document.getElementById('step3').classList.remove('current');
+                    document.getElementById('step3').classList.add('completed');
+                    document.getElementById('signBtn').disabled = false;
+                    
+                    // Update provider and contract with current wallet
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    signer = await provider.getSigner();
+                    contract = new ethers.Contract(CONFIG.contracts.authorization, AUTH_ABI, signer);
+                } else {
+                    log('❌ Wrong wallet connected. Please switch to data owner wallet.', 'error');
+                    log(`Current: ${currentAccount}`, 'error');
+                    log(`Required: ${CONFIG.wallets.dataOwner}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`Failed to check wallet: ${error.message}`, 'error');
+                document.getElementById('step3').classList.add('error');
+            }
+        }
+        
+        function promptWalletSwitch() {
+            log('📝 HOW TO SWITCH WALLETS IN METAMASK:', 'warning');
+            log('1. Click the MetaMask extension icon', 'info');
+            log('2. Click the account selector at the top', 'info');
+            log('3. Select or import the data owner wallet:', 'info');
+            log(`   ${CONFIG.wallets.dataOwner}`, 'info');
+            log('4. Once switched, click "Check Current Wallet" again', 'info');
+            log('', 'info');
+            log('💡 TIP: If you don\'t have the data owner wallet:', 'warning');
+            log('   - This is a test wallet for demonstration', 'info');
+            log('   - In production, users would have their own wallets', 'info');
+            log('   - For testing, you can create a test wallet or use the current one', 'info');
+        }
+
         async function signAuthorization() {
             try {
                 log('Signing authorization with MetaMask...', 'info');
-                document.getElementById('step3').classList.add('current');
+                document.getElementById('step4').classList.add('current');
                 
                 if (!testData.requestId) {
                     throw new Error('No request ID available. Please create authorization request first.');
@@ -360,20 +433,20 @@
                 }, null, 2);
                 
                 // Update step status
-                document.getElementById('step3').classList.remove('current');
-                document.getElementById('step3').classList.add('completed');
+                document.getElementById('step4').classList.remove('current');
+                document.getElementById('step4').classList.add('completed');
                 document.getElementById('submitBtn').disabled = false;
                 
             } catch (error) {
                 log(`Failed to sign authorization: ${error.message}`, 'error');
-                document.getElementById('step3').classList.add('error');
+                document.getElementById('step4').classList.add('error');
             }
         }
 
         async function submitAuthorization() {
             try {
                 log('Submitting authorization to contract...', 'info');
-                document.getElementById('step4').classList.add('current');
+                document.getElementById('step5').classList.add('current');
                 
                 if (!testData.signature || !testData.requestId) {
                     throw new Error('Missing signature or request ID');
@@ -402,15 +475,15 @@
                 }, null, 2);
                 
                 // Update step status
-                document.getElementById('step4').classList.remove('current');
-                document.getElementById('step4').classList.add('completed');
+                document.getElementById('step5').classList.remove('current');
+                document.getElementById('step5').classList.add('completed');
                 document.getElementById('processBtn').disabled = false;
                 
                 log('🎉 Authorization successful! Ready to process email wallet.', 'success');
                 
             } catch (error) {
                 log(`Failed to submit authorization: ${error.message}`, 'error');
-                document.getElementById('step4').classList.add('error');
+                document.getElementById('step5').classList.add('error');
                 
                 if (error.message.includes('Invalid signature')) {
                     log('❌ INVALID SIGNATURE ERROR - This is what we need to fix!', 'error');
@@ -423,7 +496,7 @@
         async function processEmailWallet() {
             try {
                 log('Processing email wallet creation...', 'info');
-                document.getElementById('step5').classList.add('current');
+                document.getElementById('step6').classList.add('current');
                 
                 // Create email data structure
                 const emailData = {
@@ -490,21 +563,21 @@
                 }, null, 2);
                 
                 // Update step status
-                document.getElementById('step5').classList.remove('current');
-                document.getElementById('step5').classList.add('completed');
+                document.getElementById('step6').classList.remove('current');
+                document.getElementById('step6').classList.add('completed');
                 
                 log('🎉 EMAIL WALLET CREATED SUCCESSFULLY!', 'success');
                 log(`Wallet ID: ${emailWalletId}`, 'success');
                 
             } catch (error) {
                 log(`Failed to process email wallet: ${error.message}`, 'error');
-                document.getElementById('step5').classList.add('error');
+                document.getElementById('step6').classList.add('error');
             }
         }
 
         // Initialize page
         window.addEventListener('load', () => {
-            log('Email Wallet Authorization Test loaded', 'info');
+            log('Email Wallet Authorization Test loaded - UPDATED FOR FIXED CONTRACT', 'info');
             log('Please connect MetaMask to begin testing', 'info');
             
             if (!window.ethereum) {

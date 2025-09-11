@@ -595,7 +595,7 @@
 
     <script>
         // Configuration
-        const API_BASE = window.location.origin; // Uses nginx proxy
+        const API_BASE = window.location.origin + ':5000/api'; // Direct API connection
         const WALLET_ADDRESS = '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b';
 
         // State management
@@ -659,7 +659,7 @@
         // Update blockchain status
         async function updateBlockchainStatus() {
             try {
-                const response = await fetch(`${API_BASE}/api/blockchaintest/status`, {
+                const response = await fetch(`${API_BASE}/blockchaintest/status`, {
                     method: 'GET',
                     headers: { 'Accept': 'application/json' }
                 });
@@ -683,8 +683,8 @@
         async function updateWalletInfo() {
             try {
                 const [registrationResponse, creditsResponse] = await Promise.all([
-                    fetch(`${API_BASE}/api/blockchaintest/wallet/${WALLET_ADDRESS}/registered`),
-                    fetch(`${API_BASE}/api/blockchaintest/wallet/${WALLET_ADDRESS}/credits`)
+                    fetch(`${API_BASE}/blockchaintest/wallet/${WALLET_ADDRESS}/registered`),
+                    fetch(`${API_BASE}/blockchaintest/wallet/${WALLET_ADDRESS}/credits`)
                 ]);
 
                 if (registrationResponse.ok) {

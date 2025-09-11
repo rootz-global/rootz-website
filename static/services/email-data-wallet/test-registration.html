@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Testing - Email Wallet Test Suite</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #2d5016;
+            --secondary: #4a7c59;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --light: #ffffff;
+            --background: #f8fdf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary);
+        }
+
+        .test-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+        }
+
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn.success {
+            background: var(--success);
+        }
+
+        .btn.warning {
+            background: var(--warning);
+        }
+
+        .btn.secondary {
+            background: var(--secondary);
+        }
+
+        .result-box {
+            background: #1e1e1e;
+            color: #00ff00;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--primary);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-card {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #9ca3af;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-indicator.connected { background: var(--success); }
+        .status-indicator.error { background: var(--error); }
+        .status-indicator.warning { background: var(--warning); }
+
+        .success { color: var(--success); }
+        .error { color: var(--error); }
+        .warning { color: var(--warning); }
+        .info { color: #3b82f6; }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            color: white;
+            background: var(--secondary);
+        }
+
+        .progress-bar {
+            background: #e5e7eb;
+            border-radius: 10px;
+            padding: 3px;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            background: var(--primary);
+            height: 8px;
+            border-radius: 8px;
+            transition: width 0.3s ease;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="navigation">
+            <a href="test-dashboard.html" class="nav-btn">← Dashboard</a>
+            <h2>📋 Registration Testing</h2>
+            <a href="test-authorization.html" class="nav-btn">Authorization Tests →</a>
+        </div>
+
+        <div class="header">
+            <h1>👤 Registration Flow Testing</h1>
+            <p>Test user registration, wallet connection, and system preparation</p>
+            
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Current Status Overview -->
+        <div class="status-grid">
+            <div class="status-card">
+                <div id="metamask-status" class="status-indicator"></div>
+                <strong>MetaMask</strong>
+                <div id="metamask-info">Checking...</div>
+            </div>
+            <div class="status-card">
+                <div id="network-status" class="status-indicator"></div>
+                <strong>Network</strong>
+                <div id="network-info">Checking...</div>
+            </div>
+            <div class="status-card">
+                <div id="registration-status" class="status-indicator"></div>
+                <strong>Registration</strong>
+                <div id="registration-info">Checking...</div>
+            </div>
+            <div class="status-card">
+                <div id="credits-status" class="status-indicator"></div>
+                <strong>Credits</strong>
+                <div id="credits-info">Checking...</div>
+            </div>
+        </div>
+
+        <!-- Test Step 1: MetaMask Connection -->
+        <div class="test-section">
+            <h3>🦊 Step 1: MetaMask Connection</h3>
+            <p>Connect MetaMask wallet and verify network settings</p>
+            
+            <button class="btn" onclick="connectMetaMask()">Connect MetaMask</button>
+            <button class="btn secondary" onclick="checkNetwork()">Check Network</button>
+            <button class="btn warning" onclick="switchToAmoy()">Switch to Polygon Amoy</button>
+            
+            <div class="input-group">
+                <label>Connected Wallet:</label>
+                <input type="text" id="connected-wallet" readonly placeholder="No wallet connected">
+            </div>
+            
+            <div id="metamask-results" class="result-box"></div>
+        </div>
+
+        <!-- Test Step 2: Registration Check -->
+        <div class="test-section">
+            <h3>📝 Step 2: Registration Status</h3>
+            <p>Check if wallet is registered and verify registration details</p>
+            
+            <button class="btn" onclick="checkRegistration()">Check Registration</button>
+            <button class="btn secondary" onclick="simulateRegistration()">Simulate Registration</button>
+            <button class="btn warning" onclick="testRegistrationAPI()">Test Registration API</button>
+            
+            <div id="registration-results" class="result-box"></div>
+        </div>
+
+        <!-- Test Step 3: Credit Balance -->
+        <div class="test-section">
+            <h3>💰 Step 3: Credit Management</h3>
+            <p>Check credit balance and test credit operations</p>
+            
+            <button class="btn" onclick="checkCredits()">Check Credits</button>
+            <button class="btn secondary" onclick="checkPOLBalance()">Check POL Balance</button>
+            <button class="btn success" onclick="simulateCreditDeposit()">Simulate Deposit</button>
+            
+            <div class="input-group">
+                <label>Current Credits:</label>
+                <input type="text" id="current-credits" readonly placeholder="Not checked">
+            </div>
+            
+            <div class="input-group">
+                <label>POL Balance:</label>
+                <input type="text" id="pol-balance" readonly placeholder="Not checked">
+            </div>
+            
+            <div id="credits-results" class="result-box"></div>
+        </div>
+
+        <!-- Test Step 4: System Readiness -->
+        <div class="test-section">
+            <h3>✅ Step 4: System Readiness Check</h3>
+            <p>Verify all systems are ready for wallet creation testing</p>
+            
+            <button class="btn success" onclick="runReadinessCheck()">Run Full Readiness Check</button>
+            <button class="btn warning" onclick="exportResults()">Export Test Results</button>
+            
+            <div id="readiness-results" class="result-box"></div>
+        </div>
+
+        <!-- Final Status and Navigation -->
+        <div class="test-section">
+            <h3>🚀 Next Steps</h3>
+            <p id="next-steps-info">Complete the tests above to proceed</p>
+            
+            <button id="proceed-btn" class="btn success" onclick="proceedToAuthorization()" disabled>
+                Proceed to Authorization Testing
+            </button>
+            <button class="btn secondary" onclick="retestAll()">Retest All</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin + '/api';
+        const TEST_WALLET = '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b';
+        let currentWallet = null;
+        let testProgress = 0;
+
+        function log(message, type = 'info', containerId = 'metamask-results') {
+            const container = document.getElementById(containerId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            container.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateStatus(elementId, status, message) {
+            const indicator = document.getElementById(elementId);
+            const info = document.getElementById(elementId.replace('-status', '-info'));
+            
+            indicator.className = `status-indicator ${status}`;
+            info.textContent = message;
+        }
+
+        function updateProgress(percentage) {
+            testProgress = percentage;
+            document.getElementById('progress-fill').style.width = `${percentage}%`;
+            
+            if (percentage >= 100) {
+                document.getElementById('proceed-btn').disabled = false;
+                document.getElementById('next-steps-info').textContent = 
+                    '✅ All tests passed! Ready to proceed to authorization testing.';
+            }
+        }
+
+        async function connectMetaMask() {
+            log('🔄 Connecting to MetaMask...', 'info', 'metamask-results');
+            
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    throw new Error('MetaMask not installed');
+                }
+
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (accounts.length > 0) {
+                    currentWallet = accounts[0];
+                    document.getElementById('connected-wallet').value = currentWallet;
+                    updateStatus('metamask-status', 'connected', `Connected: ${currentWallet.substring(0, 8)}...`);
+                    log(`✅ MetaMask connected: ${currentWallet}`, 'success', 'metamask-results');
+                    updateProgress(25);
+                    
+                    // Auto-check network
+                    await checkNetwork();
+                } else {
+                    throw new Error('No accounts available');
+                }
+            } catch (error) {
+                updateStatus('metamask-status', 'error', 'Connection failed');
+                log(`❌ MetaMask connection failed: ${error.message}`, 'error', 'metamask-results');
+            }
+        }
+
+        async function checkNetwork() {
+            log('🔄 Checking network configuration...', 'info', 'metamask-results');
+            
+            try {
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                const targetChainId = '0x13882'; // Polygon Amoy
+                
+                if (chainId === targetChainId) {
+                    updateStatus('network-status', 'connected', 'Polygon Amoy');
+                    log('✅ Correct network: Polygon Amoy', 'success', 'metamask-results');
+                    updateProgress(Math.max(testProgress, 50));
+                } else {
+                    updateStatus('network-status', 'warning', `Wrong network: ${chainId}`);
+                    log(`⚠️ Wrong network. Current: ${chainId}, Expected: ${targetChainId}`, 'warning', 'metamask-results');
+                }
+            } catch (error) {
+                updateStatus('network-status', 'error', 'Check failed');
+                log(`❌ Network check failed: ${error.message}`, 'error', 'metamask-results');
+            }
+        }
+
+        async function switchToAmoy() {
+            log('🔄 Switching to Polygon Amoy...', 'info', 'metamask-results');
+            
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x13882' }],
+                });
+                log('✅ Switched to Polygon Amoy', 'success', 'metamask-results');
+                await checkNetwork();
+            } catch (error) {
+                if (error.code === 4902) {
+                    log('⚠️ Polygon Amoy not added to MetaMask', 'warning', 'metamask-results');
+                } else {
+                    log(`❌ Network switch failed: ${error.message}`, 'error', 'metamask-results');
+                }
+            }
+        }
+
+        async function checkRegistration() {
+            if (!currentWallet) {
+                log('❌ Connect MetaMask first', 'error', 'registration-results');
+                return;
+            }
+
+            log('🔄 Checking registration status...', 'info', 'registration-results');
+            
+            try {
+                const response = await fetch(`${API_BASE}/blockchaintest/wallet/${currentWallet}/registered`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.isRegistered) {
+                        updateStatus('registration-status', 'connected', 'Registered');
+                        log(`✅ Wallet is registered`, 'success', 'registration-results');
+                        updateProgress(Math.max(testProgress, 75));
+                    } else {
+                        updateStatus('registration-status', 'warning', 'Not registered');
+                        log(`⚠️ Wallet not registered`, 'warning', 'registration-results');
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('registration-status', 'error', 'Check failed');
+                log(`❌ Registration check failed: ${error.message}`, 'error', 'registration-results');
+            }
+        }
+
+        async function simulateRegistration() {
+            log('🔄 Simulating registration process...', 'info', 'registration-results');
+            log('📝 Registration would involve:', 'info', 'registration-results');
+            log('  • MetaMask signature for identity verification', 'info', 'registration-results');
+            log('  • Blockchain transaction to register wallet', 'info', 'registration-results');
+            log('  • Initial credit allocation', 'info', 'registration-results');
+            log('✅ Registration simulation complete', 'success', 'registration-results');
+        }
+
+        async function testRegistrationAPI() {
+            log('🔄 Testing registration API endpoints...', 'info', 'registration-results');
+            
+            try {
+                const response = await fetch(`${API_BASE}/registration/status`);
+                if (response.ok) {
+                    log('✅ Registration API accessible', 'success', 'registration-results');
+                } else {
+                    log(`⚠️ Registration API returned ${response.status}`, 'warning', 'registration-results');
+                }
+            } catch (error) {
+                log(`❌ Registration API test failed: ${error.message}`, 'error', 'registration-results');
+            }
+        }
+
+        async function checkCredits() {
+            if (!currentWallet) {
+                log('❌ Connect MetaMask first', 'error', 'credits-results');
+                return;
+            }
+
+            log('🔄 Checking credit balance...', 'info', 'credits-results');
+            
+            try {
+                const response = await fetch(`${API_BASE}/blockchaintest/wallet/${currentWallet}/credits`);
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('current-credits').value = `${data.balance} credits`;
+                    updateStatus('credits-status', 'connected', `${data.balance} credits`);
+                    log(`✅ Credits: ${data.balance}`, 'success', 'credits-results');
+                    
+                    if (data.balance >= 4) {
+                        log('✅ Sufficient credits for wallet creation (needs 4)', 'success', 'credits-results');
+                        updateProgress(100);
+                    } else {
+                        log(`⚠️ Insufficient credits. Have: ${data.balance}, Need: 4`, 'warning', 'credits-results');
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('credits-status', 'error', 'Check failed');
+                log(`❌ Credit check failed: ${error.message}`, 'error', 'credits-results');
+            }
+        }
+
+        async function checkPOLBalance() {
+            if (!currentWallet) {
+                log('❌ Connect MetaMask first', 'error', 'credits-results');
+                return;
+            }
+
+            log('🔄 Checking POL balance...', 'info', 'credits-results');
+            
+            try {
+                const response = await fetch(`${API_BASE}/blockchaintest/wallet/${currentWallet}/credits`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.nativeBalance !== undefined) {
+                        document.getElementById('pol-balance').value = `${data.nativeBalance?.toFixed(6)} POL`;
+                        log(`✅ POL Balance: ${data.nativeBalance?.toFixed(6)} POL`, 'success', 'credits-results');
+                        
+                        if (data.nativeBalance > 0.001) {
+                            log('✅ Sufficient POL for gas fees', 'success', 'credits-results');
+                        } else {
+                            log('⚠️ Low POL balance - may need more for gas', 'warning', 'credits-results');
+                        }
+                    }
+                }
+            } catch (error) {
+                log(`❌ POL balance check failed: ${error.message}`, 'error', 'credits-results');
+            }
+        }
+
+        async function simulateCreditDeposit() {
+            log('🔄 Simulating credit deposit...', 'info', 'credits-results');
+            log('💰 Credit deposit would involve:', 'info', 'credits-results');
+            log('  • MetaMask transaction approval', 'info', 'credits-results');
+            log('  • POL payment to contract', 'info', 'credits-results');
+            log('  • Credit balance update', 'info', 'credits-results');
+            log('✅ Credit deposit simulation complete', 'success', 'credits-results');
+        }
+
+        async function runReadinessCheck() {
+            log('🔄 Running comprehensive readiness check...', 'info', 'readiness-results');
+            
+            const checks = [
+                { name: 'MetaMask Connection', check: () => currentWallet !== null },
+                { name: 'Polygon Amoy Network', check: async () => {
+                    try {
+                        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                        return chainId === '0x13882';
+                    } catch { return false; }
+                }},
+                { name: 'API Connectivity', check: async () => {
+                    try {
+                        const response = await fetch(`${API_BASE}/blockchaintest/status`);
+                        return response.ok;
+                    } catch { return false; }
+                }},
+                { name: 'Wallet Registration', check: async () => {
+                    try {
+                        const response = await fetch(`${API_BASE}/blockchaintest/wallet/${currentWallet}/registered`);
+                        const data = await response.json();
+                        return data.isRegistered;
+                    } catch { return false; }
+                }},
+                { name: 'Sufficient Credits', check: async () => {
+                    try {
+                        const response = await fetch(`${API_BASE}/blockchaintest/wallet/${currentWallet}/credits`);
+                        const data = await response.json();
+                        return data.balance >= 4;
+                    } catch { return false; }
+                }}
+            ];
+
+            let passedChecks = 0;
+            for (const checkItem of checks) {
+                try {
+                    const result = await checkItem.check();
+                    if (result) {
+                        log(`✅ ${checkItem.name}: PASSED`, 'success', 'readiness-results');
+                        passedChecks++;
+                    } else {
+                        log(`❌ ${checkItem.name}: FAILED`, 'error', 'readiness-results');
+                    }
+                } catch (error) {
+                    log(`❌ ${checkItem.name}: ERROR - ${error.message}`, 'error', 'readiness-results');
+                }
+            }
+
+            log(`\n📊 Readiness Summary: ${passedChecks}/${checks.length} checks passed`, 
+                passedChecks === checks.length ? 'success' : 'warning', 'readiness-results');
+
+            if (passedChecks === checks.length) {
+                log('🎉 System is ready for authorization testing!', 'success', 'readiness-results');
+                updateProgress(100);
+            } else {
+                log('⚠️ Some checks failed. Review and retry.', 'warning', 'readiness-results');
+            }
+        }
+
+        function exportResults() {
+            const results = {
+                timestamp: new Date().toISOString(),
+                wallet: currentWallet,
+                progress: testProgress,
+                metamaskResults: document.getElementById('metamask-results').textContent,
+                registrationResults: document.getElementById('registration-results').textContent,
+                creditsResults: document.getElementById('credits-results').textContent,
+                readinessResults: document.getElementById('readiness-results').textContent
+            };
+
+            const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `registration-test-results-${new Date().toISOString().slice(0, 19)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function retestAll() {
+            if (currentWallet) {
+                checkRegistration();
+                checkCredits();
+                runReadinessCheck();
+            } else {
+                alert('Connect MetaMask first');
+            }
+        }
+
+        function proceedToAuthorization() {
+            if (testProgress >= 100) {
+                window.location.href = 'test-authorization.html';
+            } else {
+                alert('Complete all tests first');
+            }
+        }
+
+        // Auto-start basic checks on page load
+        window.addEventListener('load', () => {
+            log('🚀 Registration testing page loaded', 'success', 'metamask-results');
+            
+            // Try to connect if MetaMask is available
+            if (typeof window.ethereum !== 'undefined') {
+                window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+                    if (accounts.length > 0) {
+                        currentWallet = accounts[0];
+                        document.getElementById('connected-wallet').value = currentWallet;
+                        updateStatus('metamask-status', 'connected', `Connected: ${currentWallet.substring(0, 8)}...`);
+                        checkNetwork();
+                        checkRegistration();
+                        checkCredits();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

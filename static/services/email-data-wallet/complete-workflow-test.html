@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email DATA_WALLET - Complete Production Workflow</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #2d5016 0%, #4a7c59 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .step {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+            position: relative;
+        }
+        .step.registration {
+            border-left-color: #673ab7;
+            background: rgba(103, 58, 183, 0.1);
+        }
+        .step.email {
+            border-left-color: #9c27b0;
+            background: rgba(156, 39, 176, 0.1);
+        }
+        .step.authorization {
+            border-left-color: #2196F3;
+            background: rgba(33, 150, 243, 0.1);
+        }
+        .step.generation {
+            border-left-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+        .step.completed {
+            border-left-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.15);
+        }
+        .step.current {
+            border-left-color: #e91e63;
+            background: rgba(233, 30, 99, 0.1);
+            box-shadow: 0 0 20px rgba(233, 30, 99, 0.3);
+        }
+        .step.pending {
+            border-left-color: #607d8b;
+            background: rgba(96, 125, 139, 0.1);
+        }
+        
+        .role-indicator {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .role-registration { background: #673ab7; color: white; }
+        .role-email { background: #9c27b0; color: white; }
+        .role-authorization { background: #2196F3; color: white; }
+        .role-generation { background: #4CAF50; color: white; }
+        
+        button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+        button.registration-btn { background: linear-gradient(45deg, #673ab7, #512da8); }
+        button.email-btn { background: linear-gradient(45deg, #9c27b0, #7b1fa2); }
+        button.authorization-btn { background: linear-gradient(45deg, #2196F3, #1976D2); }
+        button.generation-btn { background: linear-gradient(45deg, #4CAF50, #388e3c); }
+        button:hover { transform: translateY(-2px); }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .email-preview {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            border: 1px solid #9c27b0;
+        }
+        
+        .output {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+        .warning { color: #ff9800; }
+        
+        h1, h2 { text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        
+        .workflow-overview {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .notification-box {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid #2196F3;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .timing-info {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .user-info {
+            background: rgba(103, 58, 183, 0.2);
+            border: 1px solid #673ab7;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>📧 Email DATA_WALLET - Complete Production Workflow</h1>
+    <p style="text-align: center; font-size: 18px;">
+        Complete workflow: Registration → Email Forward → Authorization → Wallet Generation
+    </p>
+
+    <div class="container">
+        <h2>📋 Production Workflow Overview</h2>
+        <div class="workflow-overview">
+            <p><strong>1. REGISTRATION:</strong> User registers wallet and deposits credits</p>
+            <p><strong>2. EMAIL FORWARD:</strong> User forwards email to system for processing</p>
+            <p><strong>3. AUTHORIZATION:</strong> User authorizes DATA_WALLET creation via MetaMask</p>
+            <p><strong>4. GENERATION:</strong> System creates immutable blockchain DATA_WALLET</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Step 1: Registration -->
+        <div id="step1" class="step registration">
+            <div class="timing-info">~2 minutes</div>
+            <h3><span class="role-indicator role-registration">REGISTRATION</span>Step 1: User Registration & Credit Deposit</h3>
+            <p>User registers their wallet and deposits credits for DATA_WALLET creation</p>
+            
+            <button class="registration-btn" onclick="startRegistration()">Connect Wallet & Register</button>
+            <button class="registration-btn" onclick="checkRegistrationStatus()" disabled id="checkRegBtn">Check Registration Status</button>
+            
+            <div id="registration-output" class="output" style="display: none;"></div>
+            
+            <div class="user-info" id="user-info" style="display: none;">
+                <strong>Registered User:</strong> <span id="user-address"></span><br>
+                <strong>Credits Available:</strong> <span id="user-credits"></span><br>
+                <strong>Status:</strong> <span id="user-status"></span>
+            </div>
+        </div>
+
+        <!-- Step 2: Email Forwarding -->
+        <div id="step2" class="step email pending">
+            <div class="timing-info">~30 seconds</div>
+            <h3><span class="role-indicator role-email">EMAIL</span>Step 2: User Forwards Email to System</h3>
+            <p>User forwards email to DATA_WALLET processing address for blockchain storage</p>
+            
+            <div class="email-preview">
+                <strong>Forward To:</strong> process@rootz.global<br>
+                <strong>Sample Email:</strong><br>
+                From: sender@company.com<br>
+                To: user@domain.com<br>
+                Subject: Important Contract Document<br>
+                Date: Wed, 10 Sep 2025 15:30:00 +0000<br>
+                <br>
+                [Email content and attachments will be processed for blockchain storage]
+            </div>
+            
+            <button class="email-btn" onclick="simulateEmailForward()" disabled id="forwardBtn">Simulate Email Forward</button>
+            <button class="email-btn" onclick="processIncomingEmail()" disabled id="processBtn">System: Process Email</button>
+            
+            <div id="email-output" class="output" style="display: none;"></div>
+        </div>
+
+        <!-- Step 3: Authorization -->
+        <div id="step3" class="step authorization pending">
+            <div class="timing-info">~1 minute</div>
+            <h3><span class="role-indicator role-authorization">AUTHORIZATION</span>Step 3: User Authorizes DATA_WALLET Creation</h3>
+            <p>User receives authorization request and signs with MetaMask to approve DATA_WALLET creation</p>
+            
+            <div class="notification-box" id="auth-notification" style="display: none;">
+                <strong>📧 Authorization Request Received</strong><br>
+                Email from: <span id="email-sender"></span><br>
+                Subject: <span id="email-subject"></span><br>
+                Cost: <span id="wallet-cost"></span> credits<br>
+                <em>Sign with MetaMask to authorize permanent blockchain storage</em>
+            </div>
+            
+            <button class="authorization-btn" onclick="checkAuthorizationRequest()" disabled id="checkAuthBtn">Check Authorization Request</button>
+            <button class="authorization-btn" onclick="signAuthorization()" disabled id="signBtn">Sign Authorization with MetaMask</button>
+            
+            <div id="authorization-output" class="output" style="display: none;"></div>
+        </div>
+
+        <!-- Step 4: Wallet Generation -->
+        <div id="step4" class="step generation pending">
+            <div class="timing-info">~30 seconds</div>
+            <h3><span class="role-indicator role-generation">GENERATION</span>Step 4: System Generates DATA_WALLET</h3>
+            <p>System processes authorized request and creates immutable blockchain DATA_WALLET</p>
+            
+            <button class="generation-btn" onclick="generateDataWallet()" disabled id="generateBtn">System: Generate DATA_WALLET</button>
+            <button class="generation-btn" onclick="verifyDataWallet()" disabled id="verifyBtn">Verify DATA_WALLET Creation</button>
+            
+            <div id="generation-output" class="output" style="display: none;"></div>
+            
+            <div class="notification-box" id="completion-notification" style="display: none;">
+                <strong>🎉 DATA_WALLET Created Successfully!</strong><br>
+                Wallet ID: <span id="wallet-id"></span><br>
+                IPFS Hash: <span id="ipfs-hash"></span><br>
+                Blockchain TX: <span id="blockchain-tx"></span><br>
+                <em>Your email is now permanently stored on the blockchain</em>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔍 Production Workflow Log</h2>
+        <div id="workflow-log" class="output"></div>
+        <button onclick="clearLog()" style="background: #666;">Clear Log</button>
+        <button onclick="exportWorkflowResults()" style="background: #666;">Export Results</button>
+        <button onclick="resetWorkflow()" style="background: #d32f2f;">Reset Workflow</button>
+    </div>
+
+    <script>
+        const CONFIG = {
+            apiBase: window.location.origin + '/api',
+            expectedDataOwner: '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b',
+            contractAddress: '0xcC2a65A8870289B1d33bA741069cC2CEEA219573',
+            processingEmail: 'process@rootz.global'
+        };
+
+        let workflowState = {
+            step: 1,
+            userAccount: null,
+            registered: false,
+            creditsAvailable: 0,
+            emailData: null,
+            authRequest: null,
+            userSignature: null,
+            dataWalletId: null
+        };
+
+        function log(message, type = 'info', step = '') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#ffffff',
+                success: '#4CAF50',
+                error: '#f44336',
+                warning: '#ff9800'
+            };
+            
+            const stepPrefix = step ? `[STEP ${step}] ` : '';
+            const logContainer = document.getElementById('workflow-log');
+            logContainer.innerHTML += `<span style="color: ${colors[type]}">[${timestamp}] ${stepPrefix}${message}</span>\n`;
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        async function startRegistration() {
+            try {
+                if (!window.ethereum) {
+                    throw new Error('MetaMask not detected!');
+                }
+
+                log('Starting user registration...', 'info', '1');
+                document.getElementById('step1').classList.add('current');
+                
+                // Connect wallet
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                workflowState.userAccount = accounts[0];
+                
+                log(`Connected wallet: ${workflowState.userAccount}`, 'success', '1');
+                
+                // Check if correct wallet
+                const isCorrectWallet = workflowState.userAccount.toLowerCase() === CONFIG.expectedDataOwner.toLowerCase();
+                if (!isCorrectWallet) {
+                    log(`⚠️ Using different wallet than expected test wallet`, 'warning', '1');
+                    log(`Expected: ${CONFIG.expectedDataOwner}`, 'info', '1');
+                    log(`Connected: ${workflowState.userAccount}`, 'info', '1');
+                }
+                
+                // Simulate registration check via API
+                log('Checking registration status via API...', 'info', '1');
+                
+                // In production, this would call: GET /api/registration/status?wallet=${userAccount}
+                const registrationResult = {
+                    isRegistered: true, // Simulate registered user
+                    credits: 50,
+                    registrationDate: new Date().toISOString(),
+                    walletAddress: workflowState.userAccount
+                };
+                
+                workflowState.registered = registrationResult.isRegistered;
+                workflowState.creditsAvailable = registrationResult.credits;
+                
+                // Update UI
+                document.getElementById('user-info').style.display = 'block';
+                document.getElementById('user-address').textContent = workflowState.userAccount;
+                document.getElementById('user-credits').textContent = `${workflowState.creditsAvailable} credits`;
+                document.getElementById('user-status').textContent = workflowState.registered ? '✅ Registered' : '❌ Not Registered';
+                
+                const output = document.getElementById('registration-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify(registrationResult, null, 2);
+                
+                log(`✅ Registration confirmed: ${workflowState.creditsAvailable} credits available`, 'success', '1');
+                
+                // Enable next step
+                document.getElementById('step1').classList.remove('current');
+                document.getElementById('step1').classList.add('completed');
+                document.getElementById('step2').classList.remove('pending');
+                document.getElementById('forwardBtn').disabled = false;
+                document.getElementById('checkRegBtn').disabled = false;
+                
+                workflowState.step = 2;
+                
+            } catch (error) {
+                log(`Registration failed: ${error.message}`, 'error', '1');
+                document.getElementById('step1').classList.add('error');
+            }
+        }
+
+        async function checkRegistrationStatus() {
+            log('Checking current registration status...', 'info', '1');
+            log(`Wallet: ${workflowState.userAccount}`, 'info', '1');
+            log(`Registered: ${workflowState.registered}`, 'info', '1');
+            log(`Credits: ${workflowState.creditsAvailable}`, 'info', '1');
+        }
+
+        async function simulateEmailForward() {
+            try {
+                log('User forwarding email to system...', 'info', '2');
+                document.getElementById('step2').classList.add('current');
+                
+                // Simulate user forwarding email to process@rootz.global
+                const emailData = {
+                    from: 'sender@company.com',
+                    to: CONFIG.processingEmail,
+                    originalTo: workflowState.userAccount,
+                    subject: 'Important Contract Document',
+                    date: new Date().toISOString(),
+                    messageId: `<${Date.now()}@company.com>`,
+                    bodyText: 'This is an important contract document that needs blockchain verification.',
+                    attachments: [
+                        { filename: 'contract.pdf', size: 245760, type: 'application/pdf' }
+                    ],
+                    headers: {
+                        'DKIM-Signature': 'v=1; a=rsa-sha256; d=company.com; ...',
+                        'SPF': 'pass',
+                        'DMARC': 'pass'
+                    }
+                };
+                
+                workflowState.emailData = emailData;
+                
+                const output = document.getElementById('email-output');
+                output.style.display = 'block';
+                output.textContent = `Email forwarded to: ${CONFIG.processingEmail}\n\n` + JSON.stringify(emailData, null, 2);
+                
+                log(`✅ Email forwarded: ${emailData.subject}`, 'success', '2');
+                log(`From: ${emailData.from}`, 'info', '2');
+                log(`Attachments: ${emailData.attachments.length}`, 'info', '2');
+                
+                // Enable processing
+                document.getElementById('processBtn').disabled = false;
+                
+            } catch (error) {
+                log(`Email forwarding failed: ${error.message}`, 'error', '2');
+            }
+        }
+
+        async function processIncomingEmail() {
+            try {
+                log('System processing incoming email...', 'info', '2');
+                
+                // Simulate system processing the email
+                log('Parsing email content and attachments...', 'info', '2');
+                log('Validating DKIM, SPF, DMARC...', 'info', '2');
+                log('Calculating required credits...', 'info', '2');
+                
+                // Calculate costs
+                const emailCost = 4; // 3 for email + 1 for processing
+                const attachmentCost = workflowState.emailData.attachments.length * 2;
+                const totalCost = emailCost + attachmentCost;
+                
+                log(`Email processing cost: ${emailCost} credits`, 'info', '2');
+                log(`Attachment cost: ${attachmentCost} credits`, 'info', '2');
+                log(`Total cost: ${totalCost} credits`, 'info', '2');
+                
+                if (totalCost > workflowState.creditsAvailable) {
+                    throw new Error(`Insufficient credits. Need: ${totalCost}, Have: ${workflowState.creditsAvailable}`);
+                }
+                
+                // Create authorization request
+                const authRequest = {
+                    requestId: `0x${Math.random().toString(16).padStart(64, '0')}`,
+                    userWallet: workflowState.userAccount,
+                    emailHash: `0x${Math.random().toString(16).padStart(64, '0')}`,
+                    authToken: `auth-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    creditCost: totalCost,
+                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours
+                    status: 'pending_authorization'
+                };
+                
+                workflowState.authRequest = authRequest;
+                
+                log(`✅ Authorization request created: ${authRequest.requestId}`, 'success', '2');
+                log('📧 User notification sent for authorization', 'info', '2');
+                
+                // Update authorization notification
+                document.getElementById('auth-notification').style.display = 'block';
+                document.getElementById('email-sender').textContent = workflowState.emailData.from;
+                document.getElementById('email-subject').textContent = workflowState.emailData.subject;
+                document.getElementById('wallet-cost').textContent = totalCost;
+                
+                // Enable authorization step
+                document.getElementById('step2').classList.remove('current');
+                document.getElementById('step2').classList.add('completed');
+                document.getElementById('step3').classList.remove('pending');
+                document.getElementById('checkAuthBtn').disabled = false;
+                
+                workflowState.step = 3;
+                
+            } catch (error) {
+                log(`Email processing failed: ${error.message}`, 'error', '2');
+            }
+        }
+
+        async function checkAuthorizationRequest() {
+            try {
+                log('Checking authorization request...', 'info', '3');
+                document.getElementById('step3').classList.add('current');
+                
+                if (!workflowState.authRequest) {
+                    throw new Error('No authorization request found');
+                }
+                
+                const output = document.getElementById('authorization-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify(workflowState.authRequest, null, 2);
+                
+                log(`Request ID: ${workflowState.authRequest.requestId}`, 'info', '3');
+                log(`Cost: ${workflowState.authRequest.creditCost} credits`, 'info', '3');
+                log(`Expires: ${workflowState.authRequest.expiresAt}`, 'info', '3');
+                
+                // Enable signing
+                document.getElementById('signBtn').disabled = false;
+                
+            } catch (error) {
+                log(`Authorization check failed: ${error.message}`, 'error', '3');
+            }
+        }
+
+        async function signAuthorization() {
+            try {
+                log('User signing authorization with MetaMask...', 'info', '3');
+                
+                if (!workflowState.authRequest) {
+                    throw new Error('No authorization request to sign');
+                }
+                
+                // Create provider and signer
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                
+                // Sign the request ID
+                log(`Signing request ID: ${workflowState.authRequest.requestId}`, 'info', '3');
+                const requestIdBytes = ethers.getBytes(workflowState.authRequest.requestId);
+                workflowState.userSignature = await signer.signMessage(requestIdBytes);
+                
+                log(`✅ Signature created: ${workflowState.userSignature.substring(0, 20)}...`, 'success', '3');
+                
+                // Update authorization request status
+                workflowState.authRequest.status = 'authorized';
+                workflowState.authRequest.signature = workflowState.userSignature;
+                workflowState.authRequest.authorizedAt = new Date().toISOString();
+                
+                const output = document.getElementById('authorization-output');
+                output.textContent = JSON.stringify(workflowState.authRequest, null, 2);
+                
+                log('📤 Signature submitted to system for processing', 'info', '3');
+                
+                // Enable wallet generation
+                document.getElementById('step3').classList.remove('current');
+                document.getElementById('step3').classList.add('completed');
+                document.getElementById('step4').classList.remove('pending');
+                document.getElementById('generateBtn').disabled = false;
+                
+                workflowState.step = 4;
+                
+            } catch (error) {
+                log(`Authorization signing failed: ${error.message}`, 'error', '3');
+            }
+        }
+
+        async function generateDataWallet() {
+            try {
+                log('System generating DATA_WALLET...', 'info', '4');
+                document.getElementById('step4').classList.add('current');
+                
+                if (!workflowState.authRequest || workflowState.authRequest.status !== 'authorized') {
+                    throw new Error('Authorization required before wallet generation');
+                }
+                
+                log('Processing authorized request...', 'info', '4');
+                log('Creating blockchain transactions...', 'info', '4');
+                log('Storing email data on IPFS...', 'info', '4');
+                log('Generating immutable DATA_WALLET...', 'info', '4');
+                
+                // Simulate wallet creation
+                const walletResult = {
+                    success: true,
+                    dataWalletId: `0x${Math.random().toString(16).padStart(64, '0')}`,
+                    ipfsHash: `Qm${Math.random().toString(36).toUpperCase().substr(2, 44)}`,
+                    blockchainTx: `0x${Math.random().toString(16).padStart(64, '0')}`,
+                    creditsUsed: workflowState.authRequest.creditCost,
+                    createdAt: new Date().toISOString(),
+                    emailData: {
+                        from: workflowState.emailData.from,
+                        subject: workflowState.emailData.subject,
+                        attachmentCount: workflowState.emailData.attachments.length
+                    }
+                };
+                
+                workflowState.dataWalletId = walletResult.dataWalletId;
+                
+                const output = document.getElementById('generation-output');
+                output.style.display = 'block';
+                output.textContent = JSON.stringify(walletResult, null, 2);
+                
+                log(`✅ DATA_WALLET created: ${walletResult.dataWalletId}`, 'success', '4');
+                log(`IPFS Hash: ${walletResult.ipfsHash}`, 'success', '4');
+                log(`Blockchain TX: ${walletResult.blockchainTx}`, 'success', '4');
+                
+                // Update completion notification
+                document.getElementById('completion-notification').style.display = 'block';
+                document.getElementById('wallet-id').textContent = walletResult.dataWalletId;
+                document.getElementById('ipfs-hash').textContent = walletResult.ipfsHash;
+                document.getElementById('blockchain-tx').textContent = walletResult.blockchainTx;
+                
+                // Enable verification
+                document.getElementById('verifyBtn').disabled = false;
+                
+                // Update credits
+                workflowState.creditsAvailable -= walletResult.creditsUsed;
+                document.getElementById('user-credits').textContent = `${workflowState.creditsAvailable} credits`;
+                
+            } catch (error) {
+                log(`DATA_WALLET generation failed: ${error.message}`, 'error', '4');
+            }
+        }
+
+        async function verifyDataWallet() {
+            try {
+                log('Verifying DATA_WALLET creation...', 'info', '4');
+                
+                if (!workflowState.dataWalletId) {
+                    throw new Error('No DATA_WALLET to verify');
+                }
+                
+                log('Checking blockchain record...', 'info', '4');
+                log('Verifying IPFS storage...', 'info', '4');
+                log('Validating ownership...', 'info', '4');
+                
+                // Simulate verification
+                const verification = {
+                    dataWalletExists: true,
+                    ipfsAccessible: true,
+                    ownershipValid: true,
+                    immutable: true,
+                    verifiedAt: new Date().toISOString()
+                };
+                
+                log(`✅ DATA_WALLET verification complete`, 'success', '4');
+                log(`Blockchain record: ${verification.dataWalletExists ? 'Found' : 'Not Found'}`, 'success', '4');
+                log(`IPFS storage: ${verification.ipfsAccessible ? 'Accessible' : 'Not Accessible'}`, 'success', '4');
+                log(`Ownership: ${verification.ownershipValid ? 'Valid' : 'Invalid'}`, 'success', '4');
+                
+                // Complete workflow
+                document.getElementById('step4').classList.remove('current');
+                document.getElementById('step4').classList.add('completed');
+                
+                log('🎉 COMPLETE EMAIL DATA_WALLET WORKFLOW SUCCESSFUL!', 'success', 'COMPLETE');
+                
+            } catch (error) {
+                log(`DATA_WALLET verification failed: ${error.message}`, 'error', '4');
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('workflow-log').innerHTML = '';
+            log('Workflow log cleared', 'info');
+        }
+
+        function exportWorkflowResults() {
+            const results = {
+                timestamp: new Date().toISOString(),
+                workflowState: workflowState,
+                log: document.getElementById('workflow-log').textContent
+            };
+            
+            const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `email-datawallet-workflow-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            log('Workflow results exported', 'success');
+        }
+
+        function resetWorkflow() {
+            if (confirm('Reset the entire workflow? This will clear all progress.')) {
+                workflowState = {
+                    step: 1,
+                    userAccount: null,
+                    registered: false,
+                    creditsAvailable: 0,
+                    emailData: null,
+                    authRequest: null,
+                    userSignature: null,
+                    dataWalletId: null
+                };
+                
+                // Reset UI
+                document.querySelectorAll('.step').forEach(step => {
+                    step.classList.remove('current', 'completed', 'error');
+                    if (step.id !== 'step1') step.classList.add('pending');
+                });
+                
+                document.querySelectorAll('button').forEach(btn => {
+                    if (btn.onclick.toString().includes('startRegistration')) {
+                        btn.disabled = false;
+                    } else {
+                        btn.disabled = true;
+                    }
+                });
+                
+                document.querySelectorAll('.output').forEach(output => {
+                    output.style.display = 'none';
+                });
+                
+                document.getElementById('user-info').style.display = 'none';
+                document.getElementById('auth-notification').style.display = 'none';
+                document.getElementById('completion-notification').style.display = 'none';
+                
+                clearLog();
+                log('Workflow reset to beginning', 'info');
+            }
+        }
+
+        // Initialize page
+        window.addEventListener('load', () => {
+            log('📧 Email DATA_WALLET Production Workflow loaded', 'info');
+            log('Ready to begin complete workflow from registration to wallet creation', 'info');
+            
+            if (!window.ethereum) {
+                log('❌ MetaMask not detected! Please install MetaMask.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

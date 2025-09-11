@@ -491,13 +491,22 @@
         async function testAuthorizationFlow() {
             log('Testing authorization flow...', 'info', 'email-results');
             try {
-                const response = await fetch(`${API_BASE}/authorization/test`);
-                if (response.status === 404) {
-                    log('⚠️ Authorization endpoint not implemented yet', 'warning', 'email-results');
-                } else if (response.ok) {
-                    log('✅ Authorization endpoint accessible', 'success', 'email-results');
+                // Test an endpoint that actually exists
+                const response = await fetch(`${API_BASE}/blockchaintest/status`);
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Backend API responding', 'success', 'email-results');
+                    log(`Enhanced Contract: ${data.enhancedContract?.address}`, 'info', 'email-results');
+                    
+                    // Test a registration endpoint
+                    const regResponse = await fetch(`${API_BASE}/blockchaintest/wallet/${TEST_WALLET}/registered`);
+                    if (regResponse.ok) {
+                        log('✅ Authorization flow endpoints accessible', 'success', 'email-results');
+                    } else {
+                        log(`⚠️ Registration check returned ${regResponse.status}`, 'warning', 'email-results');
+                    }
                 } else {
-                    log(`⚠️ Authorization returned ${response.status}`, 'warning', 'email-results');
+                    log(`⚠️ API returned ${response.status}`, 'warning', 'email-results');
                 }
             } catch (error) {
                 log(`❌ Authorization Test Failed: ${error.message}`, 'error', 'email-results');

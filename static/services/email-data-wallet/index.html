@@ -573,10 +573,10 @@
             }
         });
 
-        // Live API Integration for Email DATA_WALLET Service
+        // Live API Integration - FIXED FOR PORT 8000 AND .rootz ENDPOINTS
         class EmailWalletAPI {
             constructor() {
-                this.API_BASE = 'http://rootz.global:8000/.rootz'; // Use SKS Rootz Platform API
+                this.API_BASE = 'http://rootz.global:8000/.rootz'; // CORRECT: SKS Platform on port 8000
                 this.updateInterval = 30000; // 30 seconds
                 this.retryAttempts = 3;
                 this.retryDelay = 5000;
@@ -585,7 +585,7 @@
             async getBlockchainStatus() {
                 for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
                     try {
-                        // Use the working balance endpoint that returns credits
+                        // CORRECT: Use working balance endpoint 
                         const response = await fetch(`${this.API_BASE}/email-wallet/balance/0x107c5655ce50ab9744fc36a4e9935e30d4923d0b`, {
                             method: 'GET',
                             headers: {
@@ -625,7 +625,7 @@
                     const statusElement = document.querySelector('[data-stat="status"]');
                     const walletsElement = document.querySelector('[data-stat="wallets"]');
 
-                    // Parse credits from API response: {success: true, data: {credits: 110}}
+                    // CORRECT: Parse credits from API response: {success: true, data: {credits: 110}}
                     if (creditsElement && balanceData.success && balanceData.data) {
                         creditsElement.textContent = balanceData.data.credits || '0';
                     }

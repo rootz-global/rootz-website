@@ -544,6 +544,7 @@
                 <li><a href="/static/individual-pages/data-manufacturing.html">Data Manufacturing</a></li>
                 <li><a href="/static/individual-pages/use-cases.html">Use Cases</a></li>
                 <li><a href="/static/individual-pages/insights.html">Insights</a></li>
+                <li><a href="/static/services/">Services</a></li>
                 <li><a href="/static/individual-pages/video.html">Featured Video</a></li>
                 <li><a href="/static/individual-pages/faq.html">FAQ</a></li>
                 <li><a href="/static/individual-pages/contact.html">Contact</a></li>
@@ -759,7 +760,9 @@
                 const balanceResponse = await fetch(`${API_BASE}/email-wallet/balance/${currentAccount}`);
                 if (balanceResponse.ok) {
                     const balanceData = await balanceResponse.json();
-                    document.getElementById('creditBalance').textContent = balanceData.credits || '0';
+                    // FIXED: API returns { "success": true, "data": { "credits": 110 } }
+                    const credits = (balanceData.success && balanceData.data) ? balanceData.data.credits : balanceData.credits;
+                    document.getElementById('creditBalance').textContent = credits || '0';
                 }
 
                 // Load proposals

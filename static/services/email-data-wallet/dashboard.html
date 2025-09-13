@@ -595,7 +595,7 @@
 
     <script>
         // Configuration - FIXED to use correct port 8000
-        const API_BASE = 'http://localhost:8000/.rootz'; // Use SKS Rootz Platform API
+        const API_BASE = 'http://rootz.global:8000/.rootz'; // Use SKS Rootz Platform API
         const WALLET_ADDRESS = '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b';
 
         // State management
@@ -659,7 +659,7 @@
         // Update blockchain status
         async function updateBlockchainStatus() {
             try {
-                const response = await fetch(`${API_BASE}/blockchaintest/status`, {
+                const response = await fetch(`${API_BASE}/status`, {
                     method: 'GET',
                     headers: { 'Accept': 'application/json' }
                 });

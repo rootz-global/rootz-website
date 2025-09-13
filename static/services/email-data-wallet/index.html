@@ -576,7 +576,7 @@
         // Live API Integration for Email DATA_WALLET Service
         class EmailWalletAPI {
             constructor() {
-                this.API_BASE = window.location.origin + ':5000/api'; // Direct API connection
+                this.API_BASE = 'http://rootz.global:8000/.rootz'; // Use SKS Rootz Platform API
                 this.updateInterval = 30000; // 30 seconds
                 this.retryAttempts = 3;
                 this.retryDelay = 5000;
@@ -585,7 +585,8 @@
             async getBlockchainStatus() {
                 for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
                     try {
-                        const response = await fetch(`${this.API_BASE}/api/blockchaintest/status`, {
+                        // Use the working balance endpoint that returns credits
+                        const response = await fetch(`${this.API_BASE}/email-wallet/balance/0x107c5655ce50ab9744fc36a4e9935e30d4923d0b`, {
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -615,19 +616,24 @@
 
             async updateDashboardStats() {
                 try {
-                    const blockchainData = await this.getBlockchainStatus();
+                    const balanceData = await this.getBlockchainStatus();
+                    console.log('Balance API Response:', balanceData);
                     
-                    // Update stats using data attributes
+                    // Update stats using the correct response structure
                     const creditsElement = document.querySelector('[data-stat="credits"]');
                     const balanceElement = document.querySelector('[data-stat="balance"]');
                     const statusElement = document.querySelector('[data-stat="status"]');
                     const walletsElement = document.querySelector('[data-stat="wallets"]');
 
-                    if (creditsElement) creditsElement.textContent = blockchainData.enhancedContract.testCredits;
+                    // Parse credits from API response: {success: true, data: {credits: 110}}
+                    if (creditsElement && balanceData.success && balanceData.data) {
+                        creditsElement.textContent = balanceData.data.credits || '0';
+                    }
                     if (balanceElement) balanceElement.textContent = '0.050';
                     if (statusElement) {
-                        statusElement.textContent = blockchainData.isConnected ? '✅' : '❌';
-                        statusElement.style.color = blockchainData.isConnected ? '#4CAF50' : '#f44336';
+                        const isConnected = balanceData.success || false;
+                        statusElement.textContent = isConnected ? '✅' : '❌';
+                        statusElement.style.color = isConnected ? '#4CAF50' : '#f44336';
                     }
                     if (walletsElement) walletsElement.textContent = '1';
                     

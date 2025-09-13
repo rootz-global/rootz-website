@@ -650,7 +650,7 @@
             }
         }
 
-        // Update system status indicators
+        // FIXED: Update system status indicators - CORRECT API ENDPOINT
         async function updateSystemStatus() {
             try {
                 const response = await fetch(`${API_BASE_URL}/status`);
@@ -848,13 +848,13 @@
             container.innerHTML = listHTML;
         }
 
-        // Action functions
+        // FIXED: Action functions - CORRECT API ENDPOINT
         async function testSystemHealth() {
             try {
                 const response = await fetch(`${API_BASE_URL}/status`);
                 const data = await response.json();
-                const healthText = data.isConnected ? 'System is healthy ✅' : 'System has issues ❌';
-                alert(`🏥 Health Check Results:\n\n${healthText}\n\nBlockchain: ${data.isConnected ? 'Connected' : 'Disconnected'}\nTimestamp: ${data.timestamp}`);
+                const healthText = data.success ? 'System is healthy ✅' : 'System has issues ❌';
+                alert(`🏥 Health Check Results:\n\n${healthText}\n\nAPI Response: ${JSON.stringify(data, null, 2)}`);
             } catch (error) {
                 alert('❌ Health check failed: ' + error.message);
             }

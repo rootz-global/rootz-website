@@ -760,9 +760,14 @@
                 const balanceResponse = await fetch(`${API_BASE}/email-wallet/balance/${currentAccount}`);
                 if (balanceResponse.ok) {
                     const balanceData = await balanceResponse.json();
+                    console.log('API Response:', balanceData); // Debug logging
+                    
                     // FIXED: API returns { "success": true, "data": { "credits": 110 } }
                     const credits = (balanceData.success && balanceData.data) ? balanceData.data.credits : balanceData.credits;
+                    console.log('Parsed credits:', credits); // Debug logging
                     document.getElementById('creditBalance').textContent = credits || '0';
+                } else {
+                    console.error('Balance API failed:', balanceResponse.status);
                 }
 
                 // Load proposals

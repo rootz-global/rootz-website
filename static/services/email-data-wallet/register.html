@@ -321,7 +321,7 @@
 
     <script>
         const CONFIG = {
-            API_BASE_URL: window.location.origin + ':5000/api'
+            API_BASE_URL: 'http://rootz.global:8000/.rootz'
         };
 
         let provider = null;
@@ -400,7 +400,7 @@
                     displayName: nameInput.value
                 };
 
-                const response = await fetch(`${CONFIG.API_BASE_URL}/registration/register`, {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/email-wallet/register`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

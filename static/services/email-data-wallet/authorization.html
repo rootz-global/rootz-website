@@ -480,8 +480,8 @@
     <script>
         // Configuration
         const CONFIG = {
-            API_BASE_URL: window.location.origin + ':5000/api',
-            REQUEST_ID: new URLSearchParams(window.location.search).get('requestId') || 'demo-request-123'
+            API_BASE_URL: window.location.origin + ':8000/.rootz/email-processing',
+            REQUEST_ID: new URLSearchParams(window.location.search).get('request') || new URLSearchParams(window.location.search).get('requestId') || 'demo-request-123'
         };
 
         let provider = null;
@@ -536,7 +536,7 @@
 
         async function loadAuthorizationRequest() {
             try {
-                const response = await fetch(`${CONFIG.API_BASE_URL}/authorization/requests/${CONFIG.REQUEST_ID}`);
+                const response = await fetch(`${CONFIG.API_BASE_URL}/authorization-requests/${CONFIG.REQUEST_ID}`);
                 
                 if (response.ok) {
                     const requestData = await response.json();
@@ -580,7 +580,7 @@
                 const signature = await signer.signMessage(message);
                 console.log('Signature received:', signature);
 
-                const authResponse = await fetch(`${CONFIG.API_BASE_URL}/authorization/authorize`, {
+                const authResponse = await fetch(`${CONFIG.API_BASE_URL}/authorize`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -588,7 +588,7 @@
                     body: JSON.stringify({
                         requestId: CONFIG.REQUEST_ID,
                         signature: signature,
-                        walletAddress: userAddress
+                        userAddress: userAddress
                     })
                 });
 

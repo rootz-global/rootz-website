@@ -594,8 +594,8 @@
     </div>
 
     <script>
-        // Configuration
-        const API_BASE = window.location.origin + ':5000/api'; // Direct API connection
+        // Configuration - FIXED to use correct port 8000
+        const API_BASE = 'http://localhost:8000/.rootz'; // Use SKS Rootz Platform API
         const WALLET_ADDRESS = '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b';
 
         // State management
@@ -682,22 +682,32 @@
         // Update wallet information
         async function updateWalletInfo() {
             try {
-                const [registrationResponse, creditsResponse] = await Promise.all([
-                    fetch(`${API_BASE}/blockchaintest/wallet/${WALLET_ADDRESS}/registered`),
-                    fetch(`${API_BASE}/blockchaintest/wallet/${WALLET_ADDRESS}/credits`)
-                ]);
-
-                if (registrationResponse.ok) {
-                    const regData = await registrationResponse.json();
-                    document.getElementById('wallet-status').textContent = 
-                        regData.isRegistered ? 'Registered' : 'Not Registered';
-                }
-
-                if (creditsResponse.ok) {
-                    const creditsData = await creditsResponse.json();
-                    document.getElementById('wallet-credits').textContent = creditsData.balance;
-                    document.getElementById('matic-balance').textContent = 
-                        `${creditsData.nativeBalance.toFixed(6)} POL`;
+                // Use the working API endpoint that returns all wallet info
+                const response = await fetch(`${API_BASE}/email-wallet/balance/${WALLET_ADDRESS}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('API Response:', data); // Debug logging
+                    
+                    // FIXED: API returns { "success": true, "data": { "credits": 110, "isRegistered": true, "address": "..." } }
+                    if (data.success && data.data) {
+                        // Update registration status
+                        document.getElementById('wallet-status').textContent = 
+                            data.data.isRegistered ? 'Registered' : 'Not Registered';
+                        
+                        // Update credits
+                        document.getElementById('wallet-credits').textContent = data.data.credits;
+                        
+                        // Update POL balance if available
+                        if (data.data.nativeBalance !== undefined) {
+                            document.getElementById('matic-balance').textContent = 
+                                `${data.data.nativeBalance.toFixed(6)} POL`;
+                        }
+                    } else {
+                        console.error('Invalid API response structure:', data);
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
                 }
             } catch (error) {
                 console.error('Wallet info error:', error);

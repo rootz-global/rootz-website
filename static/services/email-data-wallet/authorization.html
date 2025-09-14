@@ -574,35 +574,59 @@
                 showLoading(true);
                 disableButtons(true);
 
+                console.log('🔗 Connecting to smart contract for blockchain authorization...');
+                
+                // Contract address and ABI
+                const contractAddress = '0xcC2a65A8870289B1d33bA741069cC2CEEA219573';
+                const contractABI = [
+                    "function authorizeEmailWalletCreation(bytes32 requestId, bytes signature) returns (bytes32 authorizationTx)",
+                    "function getAuthorizationRequest(bytes32 requestId) view returns (address userWallet, string authToken, bytes32 emailHash, uint256 attachmentCount, uint256 creditCost, uint256 createdAt, uint256 expiresAt, uint8 status)"
+                ];
+                
+                // Create contract instance
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                
+                console.log(`📝 Creating signature for request: ${CONFIG.REQUEST_ID}`);
+                
+                // Sign the requestId (this is what the contract expects)
                 const message = CONFIG.REQUEST_ID;
-                console.log('Signing message:', message);
-
-                const signature = await signer.signMessage(message);
-                console.log('Signature received:', signature);
-
-                const authResponse = await fetch(`${CONFIG.API_BASE_URL}/authorize`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        requestId: CONFIG.REQUEST_ID,
-                        signature: signature,
-                        userAddress: userAddress
-                    })
-                });
-
-                if (authResponse.ok) {
-                    const result = await authResponse.json();
-                    showSuccess(result.transactionHash || 'Authorization completed');
-                } else {
-                    const error = await authResponse.json();
-                    throw new Error(error.message || 'Authorization failed');
-                }
+                const signature = await signer.signMessage(ethers.utils.arrayify(message));
+                console.log(`✍️ Signature created: ${signature}`);
+                
+                console.log('⛓️ Executing blockchain transaction via MetaMask...');
+                console.log('💰 User will pay gas fees for this transaction');
+                
+                // Execute the actual blockchain transaction
+                // MetaMask will prompt user to confirm and pay gas fees
+                const tx = await contract.authorizeEmailWalletCreation(CONFIG.REQUEST_ID, signature);
+                
+                console.log(`📤 Transaction submitted: ${tx.hash}`);
+                console.log('⏳ Waiting for blockchain confirmation...');
+                
+                // Wait for transaction confirmation
+                const receipt = await tx.wait();
+                
+                console.log(`✅ Transaction confirmed in block: ${receipt.blockNumber}`);
+                console.log(`🎯 Authorization completed on-chain!`);
+                
+                // Success! The blockchain event monitor will automatically detect this transaction
+                // and trigger DATA_WALLET minting. No backend notification needed.
+                showSuccess(tx.hash, `DATA_WALLET authorization completed! The service will automatically detect and mint your DATA_WALLET. Transaction: ${tx.hash}`);
 
             } catch (error) {
-                console.error('Authorization error:', error);
-                showError(error.message || 'Authorization failed');
+                console.error('❌ Blockchain authorization failed:', error);
+                
+                let errorMessage = 'Transaction failed';
+                
+                if (error.code === 4001) {
+                    errorMessage = 'Transaction cancelled by user';
+                } else if (error.code === -32603) {
+                    errorMessage = 'Transaction execution failed - please check your wallet balance and try again';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                showError(errorMessage);
             } finally {
                 showLoading(false);
                 disableButtons(false);
@@ -619,8 +643,15 @@
             document.getElementById('loadingDiv').style.display = show ? 'block' : 'none';
         }
 
-        function showSuccess(txHash) {
-            document.getElementById('txHash').textContent = txHash;
+        function showSuccess(txHash, message) {
+            document.getElementById('txHash').innerHTML = `
+                <a href="https://amoy.polygonscan.com/tx/${txHash}" target="_blank" style="color: var(--primary); text-decoration: none;">
+                    ${txHash}
+                </a>
+            `;
+            if (message) {
+                document.querySelector('#successDiv strong').innerHTML = message;
+            }
             document.getElementById('successDiv').style.display = 'block';
             document.getElementById('errorDiv').style.display = 'none';
         }

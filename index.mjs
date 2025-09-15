@@ -1,13 +1,24 @@
 import http from "http";
 import express from "express";
 import path from "path";
+import { createProxyMiddleware } from 'http-proxy-middleware';
+
 let app = express();
 const root = path.resolve('.');
 
+// ADDED: Proxy /.rootz/* requests to SKS Rootz Platform on port 8000
+app.use('/.rootz', createProxyMiddleware({
+    target: 'http://localhost:8000',
+    changeOrigin: true,
+    logLevel: 'debug',
+    onError: (err, req, res) => {
+        console.error('Proxy error:', err.message);
+        res.status(500).json({ error: 'Service temporarily unavailable' });
+    }
+}));
+
 app.use(express.static(path.join(root, 'static')));
-// app.get("/favicon.ico", (req, res) => {
-//     res.sendFile(root+'/favicon.ico');
-// })
+
 app.get('/',async (req,res)=>{
     res.sendFile(root+'/index.html');
 });

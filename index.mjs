@@ -10,14 +10,16 @@ const root = path.resolve('.');
 app.use('/.rootz', createProxyMiddleware({
     target: 'http://localhost:8000',
     changeOrigin: true,
-    logLevel: 'debug',
+    logLevel: 'info',
+    pathRewrite: {
+        '^/.rootz': '/.rootz'  // Preserve the full path
+    },
     onError: (err, req, res) => {
         console.error('Proxy error:', err.message);
         res.status(500).json({ error: 'Service temporarily unavailable' });
     },
     onProxyReq: (proxyReq, req, res) => {
-        console.log('Original URL:', req.originalUrl);
-        console.log('Proxy URL:', proxyReq.path);
+        console.log('Proxying:', req.originalUrl, '->', proxyReq.path);
     }
 }));
 

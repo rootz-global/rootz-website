@@ -320,9 +320,18 @@
     </main>
 
     <script>
-        // FIXED: Remove hardcoded port 8000
+        // FIXED: Use correct SKS Rootz Platform API endpoints
         const CONFIG = {
-            API_BASE_URL: `${window.location.origin}/.rootz`
+            API_BASE_URL: (() => {
+                const hostname = window.location.hostname;
+                if (hostname === 'rootz.global') {
+                    // Production: SKS Rootz Platform on port 8000
+                    return 'http://rootz.global:8000/.rootz';
+                } else {
+                    // Development: adjust as needed
+                    return 'http://localhost:8000/.rootz';
+                }
+            })()
         };
 
         let provider = null;

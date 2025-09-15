@@ -441,10 +441,20 @@
                     <span class="detail-label">Attachments:</span>
                     <span class="detail-value" id="attachmentCount">Loading...</span>
                 </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Request ID:</span>
+                    <span class="detail-value" id="requestId">Loading...</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value" id="requestStatus">Loading...</span>
+                </div>
             </div>
 
             <div class="cost-section">
-                <div class="cost-amount">4 CREDITS</div>
+                <div class="cost-amount" id="creditCost">Loading...</div>
                 <div class="cost-label">Cost for EMAIL_WALLET creation with blockchain provenance</div>
             </div>
 
@@ -459,13 +469,14 @@
 
             <div class="loading" id="loadingDiv">
                 <div class="spinner"></div>
-                <p>Processing authorization via MetaMask...</p>
+                <p>Processing authorization via Enhanced Authorization Service...</p>
             </div>
 
             <div class="success-message" id="successDiv">
                 <strong>✅ Authorization Successful!</strong><br>
-                Your EMAIL_WALLET has been created and will be available shortly with full blockchain provenance.
+                Your EMAIL_WALLET has been created successfully using the Enhanced Authorization Service.
                 <br><br>
+                <strong>Email Wallet ID:</strong> <span id="emailWalletId"></span><br>
                 <strong>Transaction Hash:</strong> <span id="txHash"></span><br>
                 <a href="/static/services/email-data-wallet/dashboard.html" style="color: var(--primary); text-decoration: none; font-weight: bold;">→ View Dashboard</a>
             </div>
@@ -478,15 +489,18 @@
     </main>
 
     <script>
-        // Configuration
+        // Configuration - Updated to use Enhanced Authorization Service on port 8000
         const CONFIG = {
-            API_BASE_URL: window.location.origin + ':8000/.rootz/email-processing',
-            REQUEST_ID: new URLSearchParams(window.location.search).get('request') || new URLSearchParams(window.location.search).get('requestId') || 'demo-request-123'
+            // Enhanced Authorization Service endpoints
+            API_BASE_URL: window.location.origin + ':8000/.rootz/authorization',
+            REQUEST_ID: new URLSearchParams(window.location.search).get('request') || new URLSearchParams(window.location.search).get('requestId'),
+            AUTH_TOKEN: new URLSearchParams(window.location.search).get('token')
         };
 
         let provider = null;
         let signer = null;
         let userAddress = null;
+        let authorizationData = null;
 
         // Mobile navigation
         function toggleMobileMenu() {
@@ -515,6 +529,10 @@
         // Initialize the page
         async function initializePage() {
             try {
+                console.log('🚀 Initializing authorization page...');
+                console.log('Request ID:', CONFIG.REQUEST_ID);
+                console.log('Auth Token:', CONFIG.AUTH_TOKEN);
+
                 if (typeof window.ethereum !== 'undefined') {
                     provider = new ethers.providers.Web3Provider(window.ethereum);
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -524,104 +542,178 @@
                     document.getElementById('walletAddress').textContent = 
                         userAddress.substring(0, 6) + '...' + userAddress.substring(38);
                     
+                    console.log('✅ Wallet connected:', userAddress);
+                    
                     await loadAuthorizationRequest();
                 } else {
                     showError('MetaMask is required for EMAIL_WALLET authorization');
                 }
             } catch (error) {
-                console.error('Initialization error:', error);
+                console.error('❌ Initialization error:', error);
                 showError('Failed to connect to wallet: ' + error.message);
             }
         }
 
         async function loadAuthorizationRequest() {
             try {
-                const response = await fetch(`${CONFIG.API_BASE_URL}/authorization-requests/${CONFIG.REQUEST_ID}`);
+                console.log('📡 Loading authorization request from Enhanced Authorization Service...');
                 
-                if (response.ok) {
-                    const requestData = await response.json();
-                    updateUIWithRequestData(requestData);
+                let response;
+                let url;
+
+                // Try to get request by ID first, then by token
+                if (CONFIG.REQUEST_ID) {
+                    url = `${CONFIG.API_BASE_URL}/request/${CONFIG.REQUEST_ID}`;
+                    console.log('🔍 Fetching by Request ID:', url);
+                } else if (CONFIG.AUTH_TOKEN) {
+                    url = `${CONFIG.API_BASE_URL}/token/${CONFIG.AUTH_TOKEN}`;
+                    console.log('🔍 Fetching by Auth Token:', url);
                 } else {
-                    console.warn('Could not load request details, using demo data');
-                    loadDemoData();
+                    throw new Error('No request ID or auth token provided in URL');
+                }
+
+                response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('📡 Response status:', response.status);
+
+                if (response.ok) {
+                    authorizationData = await response.json();
+                    console.log('✅ Authorization request loaded:', authorizationData);
+                    updateUIWithRequestData(authorizationData);
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Request failed:', response.status, errorText);
+                    
+                    if (response.status === 404) {
+                        showError('Authorization request not found. The request may have expired or been processed.');
+                    } else {
+                        showError(`Failed to load authorization request: ${response.status} ${errorText}`);
+                    }
                 }
             } catch (error) {
-                console.warn('Error loading request details:', error);
-                loadDemoData();
+                console.error('❌ Error loading request:', error);
+                showError('Failed to load authorization request: ' + error.message);
             }
         }
 
-        function loadDemoData() {
-            document.getElementById('emailFrom').textContent = 'demo@techcorp.com';
-            document.getElementById('emailSubject').textContent = 'Q3 Financial Report - Confidential';
-            document.getElementById('emailDate').textContent = new Date().toLocaleString();
-            document.getElementById('emailSize').textContent = '2.4 MB';
-            document.getElementById('attachmentCount').textContent = '2 files';
-        }
-
         function updateUIWithRequestData(data) {
-            if (data.emailFrom) document.getElementById('emailFrom').textContent = data.emailFrom;
-            if (data.emailSubject) document.getElementById('emailSubject').textContent = data.emailSubject;
-            if (data.emailDate) document.getElementById('emailDate').textContent = new Date(data.emailDate).toLocaleString();
-            if (data.emailSize) document.getElementById('emailSize').textContent = formatFileSize(data.emailSize);
-            if (data.attachments) {
-                document.getElementById('attachmentCount').textContent = `${data.attachments.length} files`;
+            try {
+                console.log('🔄 Updating UI with data:', data);
+
+                // Update email details
+                if (data.emailSubject) document.getElementById('emailSubject').textContent = data.emailSubject;
+                if (data.emailFrom) document.getElementById('emailFrom').textContent = data.emailFrom;
+                if (data.emailDate) document.getElementById('emailDate').textContent = new Date(data.emailDate).toLocaleString();
+                if (data.emailSize) document.getElementById('emailSize').textContent = formatFileSize(data.emailSize);
+                if (data.attachmentCount !== undefined) {
+                    document.getElementById('attachmentCount').textContent = `${data.attachmentCount} files`;
+                }
+
+                // Update request details
+                if (data.requestId) document.getElementById('requestId').textContent = data.requestId;
+                if (data.status) document.getElementById('requestStatus').textContent = data.status.toUpperCase();
+                if (data.creditCost !== undefined) {
+                    document.getElementById('creditCost').textContent = `${data.creditCost} CREDITS`;
+                }
+
+                // Validate user permissions
+                if (data.userAddress && data.userAddress.toLowerCase() !== userAddress.toLowerCase()) {
+                    showError('This authorization request belongs to a different wallet address.');
+                    document.getElementById('authorizeBtn').disabled = true;
+                    return;
+                }
+
+                // Check request status
+                if (data.status === 'authorized') {
+                    showError('This request has already been authorized.');
+                    document.getElementById('authorizeBtn').disabled = true;
+                } else if (data.status === 'rejected') {
+                    showError('This request has been rejected.');
+                    document.getElementById('authorizeBtn').disabled = true;
+                } else if (data.status === 'expired') {
+                    showError('This authorization request has expired.');
+                    document.getElementById('authorizeBtn').disabled = true;
+                } else if (data.status === 'pending') {
+                    console.log('✅ Request is ready for authorization');
+                }
+
+                console.log('✅ UI updated successfully');
+            } catch (error) {
+                console.error('❌ Error updating UI:', error);
+                showError('Failed to display request data: ' + error.message);
             }
         }
 
         async function authorizeWalletCreation() {
             try {
+                if (!authorizationData) {
+                    showError('No authorization data loaded');
+                    return;
+                }
+
                 showLoading(true);
                 disableButtons(true);
 
-                console.log('🔗 Connecting to smart contract for blockchain authorization...');
+                console.log('🔐 Starting Enhanced Authorization Service workflow...');
+                console.log('📝 Request ID:', authorizationData.requestId || CONFIG.REQUEST_ID);
+
+                // Create signature for the request ID
+                const requestId = authorizationData.requestId || CONFIG.REQUEST_ID;
+                console.log('✍️ Creating signature for request:', requestId);
                 
-                // Contract address and ABI
-                const contractAddress = '0xcC2a65A8870289B1d33bA741069cC2CEEA219573';
-                const contractABI = [
-                    "function authorizeEmailWalletCreation(bytes32 requestId, bytes signature) returns (bytes32 authorizationTx)",
-                    "function getAuthorizationRequest(bytes32 requestId) view returns (address userWallet, string authToken, bytes32 emailHash, uint256 attachmentCount, uint256 creditCost, uint256 createdAt, uint256 expiresAt, uint8 status)"
-                ];
-                
-                // Create contract instance
-                const contract = new ethers.Contract(contractAddress, contractABI, signer);
-                
-                console.log(`📝 Creating signature for request: ${CONFIG.REQUEST_ID}`);
-                
-                // Sign the requestId (this is what the contract expects)
-                const message = CONFIG.REQUEST_ID;
-                const signature = await signer.signMessage(ethers.utils.arrayify(message));
-                console.log(`✍️ Signature created: ${signature}`);
-                
-                console.log('⛓️ Executing blockchain transaction via MetaMask...');
-                console.log('💰 User will pay gas fees for this transaction');
-                
-                // Execute the actual blockchain transaction
-                // MetaMask will prompt user to confirm and pay gas fees
-                const tx = await contract.authorizeEmailWalletCreation(CONFIG.REQUEST_ID, signature);
-                
-                console.log(`📤 Transaction submitted: ${tx.hash}`);
-                console.log('⏳ Waiting for blockchain confirmation...');
-                
-                // Wait for transaction confirmation
-                const receipt = await tx.wait();
-                
-                console.log(`✅ Transaction confirmed in block: ${receipt.blockNumber}`);
-                console.log(`🎯 Authorization completed on-chain!`);
-                
-                // Success! The blockchain event monitor will automatically detect this transaction
-                // and trigger DATA_WALLET minting. No backend notification needed.
-                showSuccess(tx.hash, `DATA_WALLET authorization completed! The service will automatically detect and mint your DATA_WALLET. Transaction: ${tx.hash}`);
+                // Sign the request ID as bytes32 (this is what the Enhanced Authorization Service expects)
+                const signature = await signer.signMessage(ethers.utils.arrayify(requestId));
+                console.log('✅ Signature created:', signature.substring(0, 20) + '...');
+
+                console.log('📡 Sending authorization to Enhanced Authorization Service...');
+
+                // Call the Enhanced Authorization Service
+                const response = await fetch(`${CONFIG.API_BASE_URL}/authorize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        requestId: requestId,
+                        userAddress: userAddress,
+                        signature: signature
+                    })
+                });
+
+                console.log('📡 Authorization response status:', response.status);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('🎉 Enhanced Authorization successful:', result);
+                    
+                    showSuccess(result.transactionHash, result.emailWalletId, result.message);
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Authorization failed:', response.status, errorText);
+                    
+                    let errorMessage = 'Authorization failed';
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.error || errorData.message || errorText;
+                    } catch {
+                        errorMessage = errorText;
+                    }
+                    
+                    showError(errorMessage);
+                }
 
             } catch (error) {
-                console.error('❌ Blockchain authorization failed:', error);
+                console.error('❌ Authorization error:', error);
                 
-                let errorMessage = 'Transaction failed';
+                let errorMessage = 'Authorization failed';
                 
                 if (error.code === 4001) {
                     errorMessage = 'Transaction cancelled by user';
-                } else if (error.code === -32603) {
-                    errorMessage = 'Transaction execution failed - please check your wallet balance and try again';
                 } else if (error.message) {
                     errorMessage = error.message;
                 }
@@ -643,15 +735,23 @@
             document.getElementById('loadingDiv').style.display = show ? 'block' : 'none';
         }
 
-        function showSuccess(txHash, message) {
-            document.getElementById('txHash').innerHTML = `
-                <a href="https://amoy.polygonscan.com/tx/${txHash}" target="_blank" style="color: var(--primary); text-decoration: none;">
-                    ${txHash}
-                </a>
-            `;
+        function showSuccess(txHash, emailWalletId, message) {
+            if (emailWalletId) {
+                document.getElementById('emailWalletId').textContent = emailWalletId;
+            }
+            
+            if (txHash) {
+                document.getElementById('txHash').innerHTML = `
+                    <a href="https://amoy.polygonscan.com/tx/${txHash}" target="_blank" style="color: var(--primary); text-decoration: none;">
+                        ${txHash}
+                    </a>
+                `;
+            }
+            
             if (message) {
                 document.querySelector('#successDiv strong').innerHTML = message;
             }
+            
             document.getElementById('successDiv').style.display = 'block';
             document.getElementById('errorDiv').style.display = 'none';
         }

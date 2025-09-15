@@ -320,8 +320,9 @@
     </main>
 
     <script>
+        // FIXED: Remove hardcoded port 8000
         const CONFIG = {
-            API_BASE_URL: 'http://rootz.global:8000/.rootz'
+            API_BASE_URL: `${window.location.origin}/.rootz`
         };
 
         let provider = null;
@@ -392,12 +393,23 @@
                 const registerBtn = document.getElementById('registerBtn');
                 const originalText = registerBtn.textContent;
                 registerBtn.disabled = true;
-                registerBtn.textContent = '🔄 Registering...';
+                registerBtn.textContent = '🔄 Creating signature...';
 
+                // FIXED: Create the registration message for signing (required by backend)
+                const message = `Register wallet for EMAIL_WALLET service\nEmail: ${emailInput.value}\nName: ${nameInput.value}\nWallet: ${userAddress}`;
+                
+                registerBtn.textContent = '🔄 Please sign with MetaMask...';
+                
+                // FIXED: Get user signature (required by backend)
+                const signature = await signer.signMessage(message);
+                
+                registerBtn.textContent = '🔄 Registering with blockchain...';
+
+                // FIXED: Send registration with correct format (userAddress, signature, message)
                 const registrationData = {
-                    walletAddress: userAddress,
-                    emailAddress: emailInput.value,
-                    displayName: nameInput.value
+                    userAddress: userAddress,    // Backend expects 'userAddress' not 'walletAddress'
+                    signature: signature,
+                    message: message
                 };
 
                 const response = await fetch(`${CONFIG.API_BASE_URL}/email-wallet/register`, {
@@ -412,8 +424,8 @@
                     const result = await response.json();
                     showSuccess(`
                         🎉 Registration successful!<br><br>
-                        <strong>Email:</strong> ${registrationData.emailAddress}<br>
-                        <strong>Wallet:</strong> ${registrationData.walletAddress}<br>
+                        <strong>Email:</strong> ${emailInput.value}<br>
+                        <strong>Wallet:</strong> ${userAddress}<br>
                         <strong>Credits:</strong> 60 (enough for 15 EMAIL_WALLETs)<br>
                         <strong>Blockchain:</strong> Connected to Polygon Amoy<br><br>
                         You can now receive EMAIL_WALLETs with verifiable origin and blockchain ownership!<br><br>
@@ -423,8 +435,15 @@
                     // Hide the form after successful registration
                     document.getElementById('registrationForm').style.display = 'none';
                 } else {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Registration failed');
+                    const errorText = await response.text();
+                    let errorMessage = 'Registration failed';
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.error || errorData.message || errorText;
+                    } catch {
+                        errorMessage = errorText;
+                    }
+                    throw new Error(errorMessage);
                 }
 
             } catch (error) {

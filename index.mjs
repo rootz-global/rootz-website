@@ -7,16 +7,17 @@ let app = express();
 const root = path.resolve('.');
 
 // FIXED: Proxy /.rootz/* requests to SKS Rootz Platform on port 8000
-app.use('/.rootz', createProxyMiddleware({
+app.use('/.rootz/*', createProxyMiddleware({
     target: 'http://localhost:8000',
     changeOrigin: true,
-    pathRewrite: {
-        '^/.rootz': '/.rootz'  // Keep the full path
-    },
     logLevel: 'debug',
     onError: (err, req, res) => {
         console.error('Proxy error:', err.message);
         res.status(500).json({ error: 'Service temporarily unavailable' });
+    },
+    onProxyReq: (proxyReq, req, res) => {
+        console.log('Original URL:', req.originalUrl);
+        console.log('Proxy URL:', proxyReq.path);
     }
 }));
 

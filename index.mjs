@@ -7,7 +7,7 @@ let app = express();
 const root = path.resolve('.');
 
 // FIXED: Proxy /.rootz/* requests to SKS Rootz Platform on port 8000
-app.use('/.rootz/*', createProxyMiddleware({
+app.use('/.rootz', createProxyMiddleware({
     target: 'http://localhost:8000',
     changeOrigin: true,
     logLevel: 'debug',

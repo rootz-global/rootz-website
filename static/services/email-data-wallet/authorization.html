@@ -532,7 +532,19 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    const requests = data.success ? data.data : [];
+                    console.log('📊 API Response:', data);
+                    
+                    // FIXED: Handle correct API response format
+                    let requests = [];
+                    if (data.success && data.pendingRequests) {
+                        requests = data.pendingRequests;
+                    } else if (data.success && Array.isArray(data.data)) {
+                        requests = data.data;
+                    } else if (Array.isArray(data)) {
+                        requests = data;
+                    }
+                    
+                    console.log('📋 Processed requests:', requests);
                     displayPendingRequests(requests);
                 } else {
                     // API error - show empty state
@@ -550,6 +562,9 @@
         // Display pending requests list
         function displayPendingRequests(requests) {
             const pendingList = document.getElementById('pending-list');
+            
+            console.log('📋 displayPendingRequests called with:', requests);
+            console.log('🔍 Type check:', typeof requests, Array.isArray(requests));
 
             if (!userWallet) {
                 pendingList.innerHTML = `
@@ -571,7 +586,13 @@
                 return;
             }
 
-            if (!requests || requests.length === 0) {
+            // FIXED: Ensure requests is always an array
+            if (!Array.isArray(requests)) {
+                console.warn('⚠️ requests is not an array:', requests);
+                requests = [];
+            }
+
+            if (requests.length === 0) {
                 pendingList.innerHTML = `
                     <div style="text-align: center; padding: 30px; color: var(--gray);">
                         <h3>📭 No Pending Requests</h3>

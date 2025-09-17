@@ -844,7 +844,7 @@
             }
         }
 
-        // Update processing statistics  
+        // Update processing statistics - FIXED: No 404 API call
         async function updateProcessingStats() {
             if (!userWallet) {
                 resetDashboardData();
@@ -852,25 +852,20 @@
             }
 
             try {
-                // Try to get actual wallet statistics from API
-                const response = await fetch(`${API_BASE}/email-wallet/stats/${userWallet}`);
+                // For now, show clean default states since stats API endpoint doesn't exist yet
+                // TODO: Implement /.rootz/email-wallet/stats/${userWallet} endpoint on backend
+                console.log('📊 Processing stats: Using default values (stats API not implemented yet)');
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.data) {
-                        document.getElementById('email-wallets-count').textContent = data.data.emailWallets || '--';
-                        document.getElementById('total-credits-used').textContent = data.data.creditsUsed || '--';
-                        document.getElementById('last-activity').textContent = 
-                            data.data.lastActivity ? new Date(data.data.lastActivity).toLocaleDateString() : '--';
-                    } else {
-                        throw new Error('Invalid stats response');
-                    }
-                } else {
-                    throw new Error(`Stats API returned ${response.status}`);
-                }
+                // Show clean default states instead of trying non-existent API
+                document.getElementById('email-wallets-count').textContent = '0';
+                document.getElementById('total-credits-used').textContent = '0';
+                document.getElementById('last-activity').textContent = 'None';
+                
+                // No error - just clean default states
+                
             } catch (error) {
                 console.error('Processing stats error:', error);
-                // Show clean no-data states instead of fake data
+                // Show clean no-data states on any error
                 document.getElementById('email-wallets-count').textContent = '--';
                 document.getElementById('total-credits-used').textContent = '--';
                 document.getElementById('last-activity').textContent = '--';

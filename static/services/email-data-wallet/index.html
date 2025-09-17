@@ -471,20 +471,20 @@
                 
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <span class="stat-number" data-stat="credits">--</span>
+                        <span class="stat-number" data-stat="credits">Connect Wallet</span>
                         <span class="stat-label">Credits Available</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number" data-stat="balance">--</span>
+                        <span class="stat-number" data-stat="balance">Connect Wallet</span>
                         <span class="stat-label">POL Balance</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number" data-stat="status">⏳</span>
-                        <span class="stat-label">Blockchain Status</span>
+                        <span class="stat-number" data-stat="status">🔗</span>
+                        <span class="stat-label">Platform Status</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number" data-stat="wallets">--</span>
-                        <span class="stat-label">Wallets Ready</span>
+                        <span class="stat-number" data-stat="wallets">Ready</span>
+                        <span class="stat-label">System Status</span>
                     </div>
                 </div>
             </div>
@@ -717,31 +717,31 @@
                 navWalletInfo.textContent = 'Not Connected';
                 navWalletBtn.textContent = 'Connect';
                 
-                // Reset stats to clean no-data states
-                resetStatsDisplay();
+                // Reset stats to informative states (not "--")
+                setDefaultStatsDisplay();
             }
         }
 
-        // Reset stats to clean no-data states
-        function resetStatsDisplay() {
+        // Set default informative stats display (better than "--")
+        function setDefaultStatsDisplay() {
             const creditsElement = document.querySelector('[data-stat="credits"]');
             const balanceElement = document.querySelector('[data-stat="balance"]');
             const statusElement = document.querySelector('[data-stat="status"]');
             const walletsElement = document.querySelector('[data-stat="wallets"]');
 
-            if (creditsElement) creditsElement.textContent = '--';
-            if (balanceElement) balanceElement.textContent = '--';
+            if (creditsElement) creditsElement.textContent = 'Connect Wallet';
+            if (balanceElement) balanceElement.textContent = 'Connect Wallet';
             if (statusElement) {
-                statusElement.textContent = '⏳';
+                statusElement.textContent = '🔗';
                 statusElement.style.color = '#666';
             }
-            if (walletsElement) walletsElement.textContent = '--';
+            if (walletsElement) walletsElement.textContent = 'Ready';
         }
 
         // Load wallet data for connected wallet only
         async function loadWalletData() {
             if (!userWallet || typeof ethers === 'undefined') {
-                resetStatsDisplay();
+                setDefaultStatsDisplay();
                 return;
             }
 
@@ -781,7 +781,7 @@
             } catch (error) {
                 console.error('❌ Error loading wallet data:', error);
                 // Keep clean states on error
-                resetStatsDisplay();
+                setDefaultStatsDisplay();
                 const statusElement = document.querySelector('[data-stat="status"]');
                 if (statusElement) {
                     statusElement.textContent = '❌';
@@ -790,10 +790,52 @@
             }
         }
 
+        // Load general platform data on page load (no wallet required)
+        async function loadPlatformData() {
+            try {
+                // Get platform status
+                const response = await fetch(`${API_BASE}/status`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Platform Status:', data);
+                    
+                    // Update platform status indicator only if no wallet connected
+                    if (!userWallet) {
+                        const statusElement = document.querySelector('[data-stat="status"]');
+                        if (statusElement) {
+                            statusElement.textContent = data.isConnected ? '🟢' : '🔴';
+                            statusElement.style.color = data.isConnected ? '#4CAF50' : '#f44336';
+                        }
+                        
+                        // Update system status
+                        const walletsElement = document.querySelector('[data-stat="wallets"]');
+                        if (walletsElement) {
+                            walletsElement.textContent = data.isConnected ? 'Online' : 'Offline';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error loading platform data:', error);
+                // Show offline status if can't reach platform
+                if (!userWallet) {
+                    const statusElement = document.querySelector('[data-stat="status"]');
+                    const walletsElement = document.querySelector('[data-stat="wallets"]');
+                    
+                    if (statusElement) {
+                        statusElement.textContent = '🔴';
+                        statusElement.style.color = '#f44336';
+                    }
+                    if (walletsElement) walletsElement.textContent = 'Offline';
+                }
+            }
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Email Wallet homepage initializing...');
-            updateWalletDisplay(); // Start with clean no-data states
+            updateWalletDisplay(); // Start with default states
+            loadPlatformData(); // Load general platform data
         });
 
         // Handle account changes in MetaMask
@@ -805,6 +847,7 @@
                     provider = null;
                     signer = null;
                     updateWalletDisplay();
+                    loadPlatformData(); // Reload platform data
                 } else if (accounts[0] !== userWallet) {
                     // User switched accounts
                     window.location.reload();

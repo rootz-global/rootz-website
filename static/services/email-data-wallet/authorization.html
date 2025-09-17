@@ -330,6 +330,14 @@
             word-break: break-all;
         }
 
+        .wallet-status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(45, 80, 22, 0.05);
+            border-radius: 8px;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -372,6 +380,17 @@
     </div>
 
     <div class="container">
+        <!-- Wallet Status - ALWAYS VISIBLE -->
+        <div class="wallet-status" id="wallet-status">
+            <div id="wallet-info">
+                <h3>🦊 Wallet Connection</h3>
+                <div id="wallet-address">Not Connected</div>
+                <button class="btn btn-secondary" id="wallet-connect-btn" onclick="connectOrChangeWallet()">
+                    Connect MetaMask
+                </button>
+            </div>
+        </div>
+
         <!-- Pending Authorizations List -->
         <div class="authorization-card" id="pending-requests-card">
             <div class="card-header">
@@ -407,19 +426,19 @@
                     <h3>📧 Email Details</h3>
                     <div class="email-field">
                         <div class="field-label">From:</div>
-                        <div class="field-value" id="email-from">Loading...</div>
+                        <div class="field-value" id="email-from">--</div>
                     </div>
                     <div class="email-field">
                         <div class="field-label">Subject:</div>
-                        <div class="field-value" id="email-subject">Loading...</div>
+                        <div class="field-value" id="email-subject">--</div>
                     </div>
                     <div class="email-field">
                         <div class="field-label">Request ID:</div>
-                        <div class="field-value" id="request-id">Loading...</div>
+                        <div class="field-value" id="request-id">--</div>
                     </div>
                     <div class="email-field">
                         <div class="field-label">Auth Token:</div>
-                        <div class="field-value" id="auth-token">Loading...</div>
+                        <div class="field-value" id="auth-token">--</div>
                     </div>
                 </div>
 
@@ -442,16 +461,6 @@
                         <span>Total Cost:</span>
                         <span id="total-cost">4 credits</span>
                     </div>
-                </div>
-
-                <!-- Wallet Connection -->
-                <div class="wallet-connection">
-                    <h3>🔐 Wallet Connection</h3>
-                    <p>Connect your wallet to authorize requests</p>
-                    <div class="wallet-address" id="user-address">Not connected</div>
-                    <button class="btn btn-secondary" id="connect-wallet-btn" onclick="connectWallet()">
-                        Connect MetaMask
-                    </button>
                 </div>
 
                 <!-- Action Buttons -->
@@ -500,6 +509,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Authorization page loading...');
             
+            // Initialize wallet status display
+            updateWalletDisplay();
+            
             if (requestId || authToken) {
                 // Show specific request
                 showSingleRequest();
@@ -521,51 +533,156 @@
             document.getElementById('single-request-card').style.display = 'none';
         }
 
-        // Load pending authorization requests - ENHANCED with pending list
+        // ENHANCED: Wallet connection that always allows connect/disconnect
+        async function connectOrChangeWallet() {
+            if (!window.ethereum) {
+                showError('MetaMask not detected. Please install MetaMask to continue.');
+                return;
+            }
+
+            try {
+                const walletBtn = document.getElementById('wallet-connect-btn');
+                
+                // If already connected, disconnect first
+                if (userWallet) {
+                    userWallet = null;
+                    updateWalletDisplay();
+                    // Refresh display for the new state
+                    if (requestId || authToken) {
+                        // Single request view - disable authorization
+                        document.getElementById('authorize-btn').disabled = true;
+                        showSingleStatus('Wallet disconnected. Connect to authorize requests.', 'warning');
+                    } else {
+                        // Pending list view - show connection message
+                        loadPendingRequests();
+                    }
+                    return;
+                }
+
+                // Connect to MetaMask
+                walletBtn.innerHTML = '<div class="loading-spinner"></div>Connecting...';
+                walletBtn.disabled = true;
+
+                // Request account access
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                if (accounts.length === 0) {
+                    throw new Error('No accounts found');
+                }
+
+                // Initialize ethers provider and signer
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                userWallet = await signer.getAddress();
+
+                // Verify network (Polygon Amoy)
+                const network = await provider.getNetwork();
+                console.log('🌐 Connected to network:', network);
+                
+                if (network.chainId !== 80002) {
+                    showError('Please switch to Polygon Amoy testnet (Chain ID: 80002) in MetaMask.');
+                    userWallet = null;
+                    updateWalletDisplay();
+                    return;
+                }
+
+                // Update display
+                updateWalletDisplay();
+
+                // Verify user is the request owner (if we have the request)
+                if (authorizationRequest && authorizationRequest.userAddress) {
+                    if (authorizationRequest.userAddress.toLowerCase() !== userWallet.toLowerCase()) {
+                        showSingleError(`This authorization request is for wallet: ${authorizationRequest.userAddress}, but you connected: ${userWallet}`);
+                        document.getElementById('authorize-btn').disabled = true;
+                        return;
+                    }
+                }
+
+                showSuccess('Wallet connected successfully!');
+
+                // Enable authorization if we're in single request mode
+                if (requestId || authToken) {
+                    document.getElementById('authorize-btn').disabled = false;
+                    showSingleStatus('Wallet connected. Ready to authorize request.', 'success');
+                } else {
+                    // Refresh pending requests for this wallet
+                    loadPendingRequests();
+                }
+
+            } catch (error) {
+                console.error('❌ Wallet connection error:', error);
+                showError(`Failed to connect wallet: ${error.message}`);
+                userWallet = null;
+                updateWalletDisplay();
+            }
+        }
+
+        // Update wallet display based on connection status
+        function updateWalletDisplay() {
+            const walletInfo = document.getElementById('wallet-info');
+            const walletAddress = document.getElementById('wallet-address');
+            const walletBtn = document.getElementById('wallet-connect-btn');
+
+            if (userWallet) {
+                walletInfo.innerHTML = `
+                    <h3>🔗 Wallet Connected</h3>
+                    <div id="wallet-address" style="font-family: 'Courier New', monospace; background: var(--light); padding: 10px; border-radius: 4px; margin: 10px 0; border: 1px solid #dee2e6; word-break: break-all;">
+                        ${userWallet}
+                    </div>
+                    <button class="btn btn-secondary" id="wallet-connect-btn" onclick="connectOrChangeWallet()">
+                        Change Wallet
+                    </button>
+                `;
+            } else {
+                walletInfo.innerHTML = `
+                    <h3>🦊 Wallet Connection</h3>
+                    <div id="wallet-address" style="color: var(--gray); font-style: italic; margin: 10px 0;">Not Connected</div>
+                    <button class="btn btn-secondary" id="wallet-connect-btn" onclick="connectOrChangeWallet()">
+                        Connect MetaMask
+                    </button>
+                `;
+            }
+        }
+
+        // ENHANCED: connectWallet function (compatibility with existing code)
+        async function connectWallet() {
+            await connectOrChangeWallet();
+        }
+
+        // Load pending authorization requests - ENHANCED with no default data
         async function loadPendingRequests() {
             showStatus('Loading your pending authorization requests...', 'warning');
 
             try {
-                // Try to load pending requests for connected wallet
-                if (userWallet) {
-                    const response = await fetch(`${API_BASE}/authorization/pending/${userWallet}`);
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        pendingRequests = data.success ? data.data : [];
-                    } else {
-                        pendingRequests = [];
-                    }
-                } else {
-                    // If not connected, show demo data or connect wallet message
-                    pendingRequests = [];
+                if (!userWallet) {
+                    // Show connection message - no default test data
+                    displayPendingRequests([]);
+                    showStatus('Connect your MetaMask wallet to see your pending authorization requests.', 'warning');
+                    return;
                 }
 
-                displayPendingRequests(pendingRequests);
+                const response = await fetch(`${API_BASE}/authorization/pending/${userWallet}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const requests = data.success ? data.data : [];
+                    displayPendingRequests(requests);
+                } else {
+                    // API error - show empty state
+                    displayPendingRequests([]);
+                    showStatus(`API Error: ${response.status}. No pending requests found.`, 'error');
+                }
 
             } catch (error) {
                 console.error('❌ Error loading pending requests:', error);
-                
-                // Show demo/fallback content
-                showStatus('Connect your wallet to see pending authorization requests.', 'warning');
-                
-                const demoRequests = [
-                    {
-                        requestId: '0x1234...5678',
-                        emailSender: 'example@company.com',
-                        emailSubject: 'Important Project Update',
-                        attachmentCount: 0,
-                        creditCost: 4,
-                        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-                        status: 'pending'
-                    }
-                ];
-                
-                displayPendingRequests(demoRequests);
+                displayPendingRequests([]);
+                showStatus('Unable to load pending requests. Please check your connection.', 'error');
             }
         }
 
-        // Display pending requests list
+        // Display pending requests list - ENHANCED with clean no-data states
         function displayPendingRequests(requests) {
             const pendingList = document.getElementById('pending-list');
             const pendingLoading = document.getElementById('pending-loading');
@@ -574,11 +691,27 @@
                 pendingLoading.style.display = 'none';
             }
 
+            if (!userWallet) {
+                pendingList.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: var(--gray);">
+                        <h3>🦊 Connect Your Wallet</h3>
+                        <p>Connect your MetaMask wallet to see pending authorization requests for your emails.</p>
+                        <p style="margin-top: 15px;">
+                            <button class="btn btn-primary" onclick="connectOrChangeWallet()">
+                                Connect MetaMask
+                            </button>
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
             if (!requests || requests.length === 0) {
                 pendingList.innerHTML = `
                     <div style="text-align: center; padding: 30px; color: var(--gray);">
                         <h3>📭 No Pending Requests</h3>
                         <p>You don't have any pending email wallet authorization requests.</p>
+                        <p>Send an email to <strong>process@rivetz.com</strong> to create a request.</p>
                         <p style="margin-top: 15px;">
                             <a href="/static/services/email-data-wallet/dashboard.html" class="btn btn-primary">
                                 Go to Dashboard
@@ -622,10 +755,10 @@
                 </div>
             `;
 
-            showStatus(`Found ${requests.length} pending authorization request${requests.length === 1 ? '' : 's'}.`, 'success');
+            showStatus(`Found ${requests.length} pending authorization request${requests.length === 1 ? '' : 's'} for ${userWallet}.`, 'success');
         }
 
-        // Load specific authorization request details
+        // Load specific authorization request details - ENHANCED with no default test data
         async function loadAuthorizationRequest() {
             showSingleStatus('Loading authorization request...', 'warning');
 
@@ -637,6 +770,8 @@
                 } else if (authToken) {
                     apiUrl = `${API_BASE}/authorization/token/${authToken}`;
                     console.log('🔄 Fetching by auth token:', authToken);
+                } else {
+                    throw new Error('No request ID or auth token provided');
                 }
 
                 console.log('📡 API URL:', apiUrl);
@@ -661,35 +796,32 @@
             } catch (error) {
                 console.error('❌ Error loading request via API:', error);
                 
-                // Fallback: Create demo data structure for testing
-                console.log('🔄 Using fallback request data...');
-                authorizationRequest = {
-                    requestId: requestId || '0x3c3132e4ebcceb5cd469e69921ea50e1606aa3ef3e08f2511f6e52bbc160d719',
-                    authToken: authToken || '0x133d27b2a67558f4',
-                    emailSender: 'steven@sprague.com',
-                    emailSubject: '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b is my wallet please process',
-                    attachmentCount: 0,
-                    creditCost: 4,
-                    status: 'pending',
-                    userAddress: '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b',
-                    createdAt: new Date().toISOString(),
-                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-                };
+                // Show clean error state - no default test data
+                showSingleError(`Unable to load authorization request: ${error.message}`);
                 
-                displayAuthorizationRequest(authorizationRequest);
-                showSingleStatus('Request loaded (using fallback data). Ready for authorization.', 'warning');
+                // Show clean empty state
+                document.getElementById('email-from').textContent = '--';
+                document.getElementById('email-subject').textContent = '--';
+                document.getElementById('request-id').textContent = requestId || '--';
+                document.getElementById('auth-token').textContent = authToken || '--';
+                
+                document.getElementById('email-preview').style.display = 'block';
+                document.getElementById('cost-breakdown').style.display = 'block';
+                
+                // Disable authorization
+                document.getElementById('authorize-btn').disabled = true;
             }
         }
 
-        // Display authorization request details
+        // Display authorization request details - ENHANCED with clean states
         function displayAuthorizationRequest(request) {
             console.log('📝 Displaying request:', request);
 
             // Show email details
-            document.getElementById('email-from').textContent = request.emailSender || 'Unknown sender';
-            document.getElementById('email-subject').textContent = request.emailSubject || 'Unknown subject';
-            document.getElementById('request-id').textContent = request.requestId;
-            document.getElementById('auth-token').textContent = request.authToken || 'Not available';
+            document.getElementById('email-from').textContent = request.emailSender || '--';
+            document.getElementById('email-subject').textContent = request.emailSubject || '--';
+            document.getElementById('request-id').textContent = request.requestId || '--';
+            document.getElementById('auth-token').textContent = request.authToken || '--';
 
             // Show cost breakdown
             const attachmentCount = request.attachmentCount || 0;
@@ -708,7 +840,11 @@
 
             // Check request status
             if (request.status === 'pending') {
-                showSingleStatus('Ready for authorization. Please connect your wallet.', 'warning');
+                if (userWallet) {
+                    showSingleStatus('Ready for authorization.', 'success');
+                } else {
+                    showSingleStatus('Connect your wallet to authorize this request.', 'warning');
+                }
             } else if (request.status === 'authorized') {
                 showSingleSuccess('This request has already been authorized.');
                 disableAuthorizationButtons();
@@ -720,71 +856,10 @@
             }
         }
 
-        // Connect MetaMask wallet - ENHANCED with proper network checking
-        async function connectWallet() {
-            if (!window.ethereum) {
-                showSingleError('MetaMask not detected. Please install MetaMask to continue.');
-                return;
-            }
-
-            try {
-                showSingleStatus('Connecting to MetaMask...', 'warning');
-
-                // Request account access
-                const accounts = await window.ethereum.request({
-                    method: 'eth_requestAccounts'
-                });
-
-                if (accounts.length === 0) {
-                    throw new Error('No accounts found');
-                }
-
-                // Initialize ethers provider and signer
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const signer = provider.getSigner();
-                userWallet = await signer.getAddress();
-
-                // Verify network (Polygon Amoy)
-                const network = await provider.getNetwork();
-                console.log('🌐 Connected to network:', network);
-                
-                if (network.chainId !== 80002) {
-                    showSingleError('Please switch to Polygon Amoy testnet (Chain ID: 80002) in MetaMask.');
-                    return;
-                }
-
-                // Update UI
-                document.getElementById('user-address').textContent = userWallet;
-                document.getElementById('connect-wallet-btn').textContent = 'Wallet Connected ✅';
-                document.getElementById('connect-wallet-btn').disabled = true;
-                document.getElementById('authorize-btn').disabled = false;
-
-                // Verify user is the request owner (if we have the request)
-                if (authorizationRequest && authorizationRequest.userAddress) {
-                    if (authorizationRequest.userAddress.toLowerCase() !== userWallet.toLowerCase()) {
-                        showSingleError(`This authorization request is for wallet: ${authorizationRequest.userAddress}, but you connected: ${userWallet}`);
-                        document.getElementById('authorize-btn').disabled = true;
-                        return;
-                    }
-                }
-
-                showSingleStatus('Wallet connected. Ready to authorize request.', 'success');
-
-                // If we're showing pending requests, refresh them for this wallet
-                if (!requestId && !authToken) {
-                    loadPendingRequests();
-                }
-
-            } catch (error) {
-                console.error('❌ Wallet connection error:', error);
-                showSingleError(`Failed to connect wallet: ${error.message}`);
-            }
-        }
-
         // Authorize specific request from pending list
         async function authorizeSpecificRequest(requestId) {
             if (!userWallet) {
-                alert('Please connect your wallet first.');
+                showError('Please connect your wallet first.');
                 return;
             }
 

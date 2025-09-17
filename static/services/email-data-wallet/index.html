@@ -90,6 +90,34 @@
             background: var(--primary);
         }
 
+        /* Wallet Connection in Navigation */
+        .wallet-status {
+            background: rgba(45, 80, 22, 0.1);
+            border: 1px solid rgba(45, 80, 22, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-status:hover {
+            background: var(--primary);
+            color: var(--light);
+        }
+
+        .wallet-status.connected {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+
+        .wallet-status.connected:hover {
+            background: var(--success);
+            color: var(--light);
+        }
+
         /* Mobile Menu */
         .mobile-menu-toggle {
             display: none;
@@ -126,6 +154,11 @@
 
             .nav-menu a {
                 display: block;
+                text-align: center;
+            }
+
+            .wallet-status {
+                order: -1;
                 text-align: center;
             }
         }
@@ -351,6 +384,86 @@
             margin-bottom: 10px;
         }
 
+        /* Wallet Modal */
+        .wallet-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .wallet-modal-content {
+            background-color: var(--light);
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .wallet-modal h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .wallet-info {
+            background: var(--background);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid rgba(45, 80, 22, 0.2);
+        }
+
+        .wallet-address {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            word-break: break-all;
+            padding: 5px 0;
+        }
+
+        .modal-close {
+            color: var(--gray);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: -10px;
+        }
+
+        .modal-close:hover {
+            color: var(--primary);
+        }
+
+        .modal-btn {
+            background: var(--primary);
+            color: var(--light);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            background: var(--dark);
+        }
+
+        .modal-btn-secondary {
+            background: var(--gray);
+        }
+
+        .modal-btn-secondary:hover {
+            background: #555;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .hero h1 {
@@ -377,6 +490,11 @@
 
             .process-steps {
                 grid-template-columns: 1fr;
+            }
+
+            .wallet-modal-content {
+                margin: 20% auto;
+                width: 95%;
             }
         }
 
@@ -414,6 +532,7 @@
                 <li><a href="/static/services/email-data-wallet/admin.html">Admin</a></li>
                 <li><a href="/static/services/email-data-wallet/test-scripts.html">Testing</a></li>
                 <li><a href="/index.html">Main Site</a></li>
+                <li><div class="wallet-status" id="wallet-status" onclick="showWalletModal()">🔗 Connect Wallet</div></li>
             </ul>
         </nav>
     </header>
@@ -427,19 +546,19 @@
                 
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <span class="stat-number" data-stat="credits">Loading...</span>
+                        <span class="stat-number" data-stat="credits">--</span>
                         <span class="stat-label">Credits Available</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number" data-stat="balance">Loading...</span>
+                        <span class="stat-number" data-stat="balance">--</span>
                         <span class="stat-label">POL Balance</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number" data-stat="status">⏳</span>
+                        <span class="stat-number" data-stat="status">🔗</span>
                         <span class="stat-label">Blockchain Status</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number" data-stat="wallets">Loading...</span>
+                        <span class="stat-number" data-stat="wallets">--</span>
                         <span class="stat-label">Wallets Ready</span>
                     </div>
                 </div>
@@ -542,6 +661,36 @@
         </section>
     </main>
 
+    <!-- Wallet Modal -->
+    <div id="walletModal" class="wallet-modal">
+        <div class="wallet-modal-content">
+            <span class="modal-close" onclick="closeWalletModal()">&times;</span>
+            <h3>🔐 Wallet Connection</h3>
+            
+            <div class="wallet-info" id="wallet-info">
+                <div id="wallet-connection-status">
+                    <strong>Status:</strong> <span id="connection-status">Not Connected</span>
+                </div>
+                <div id="wallet-address-display" style="display: none;">
+                    <strong>Address:</strong>
+                    <div class="wallet-address" id="connected-address"></div>
+                </div>
+                <div id="wallet-balance-display" style="display: none;">
+                    <strong>Balance:</strong> <span id="connected-balance"></span>
+                </div>
+                <div id="wallet-network-display" style="display: none;">
+                    <strong>Network:</strong> <span id="connected-network"></span>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="modal-btn" id="connect-btn" onclick="connectWallet()">Connect MetaMask</button>
+                <button class="modal-btn modal-btn-secondary" id="disconnect-btn" onclick="disconnectWallet()" style="display: none;">Disconnect</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeWalletModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
             <p>&copy; 2025 Email DATA_WALLET Service - Powered by Rootz Innovation</p>
@@ -549,7 +698,13 @@
         </div>
     </footer>
 
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
     <script>
+        // Global state management - NO DEFAULT WALLET
+        let userWallet = null;
+        let walletConnected = false;
+        let walletProvider = null;
+
         function toggleMobileMenu() {
             const navMenu = document.getElementById('navMenu');
             navMenu.classList.toggle('active');
@@ -573,20 +728,164 @@
             }
         });
 
-        // Live API Integration - FIXED FOR PORT 8000 AND .rootz ENDPOINTS
+        // Wallet Modal Functions
+        function showWalletModal() {
+            document.getElementById('walletModal').style.display = 'block';
+            updateWalletModalDisplay();
+        }
+
+        function closeWalletModal() {
+            document.getElementById('walletModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('walletModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // MetaMask Wallet Connection
+        async function connectWallet() {
+            if (!window.ethereum) {
+                alert('MetaMask not detected. Please install MetaMask to continue.');
+                return;
+            }
+
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                if (accounts.length === 0) {
+                    throw new Error('No accounts found');
+                }
+
+                // Initialize ethers provider and get user address
+                walletProvider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = walletProvider.getSigner();
+                userWallet = await signer.getAddress();
+                walletConnected = true;
+
+                // Check network
+                const network = await walletProvider.getNetwork();
+                console.log('🌐 Connected to network:', network);
+
+                // Update UI
+                updateWalletStatus();
+                updateWalletModalDisplay();
+                
+                // Update live stats with connected wallet data
+                updateDashboardStatsForConnectedWallet();
+
+                console.log('✅ Wallet connected:', userWallet);
+
+            } catch (error) {
+                console.error('❌ Wallet connection error:', error);
+                alert(`Failed to connect wallet: ${error.message}`);
+            }
+        }
+
+        async function disconnectWallet() {
+            userWallet = null;
+            walletConnected = false;
+            walletProvider = null;
+            
+            updateWalletStatus();
+            updateWalletModalDisplay();
+            
+            // Reset stats to clean disconnected state
+            showDisconnectedWalletState();
+            
+            console.log('🔌 Wallet disconnected');
+        }
+
+        function updateWalletStatus() {
+            const walletStatus = document.getElementById('wallet-status');
+            
+            if (walletConnected && userWallet) {
+                walletStatus.textContent = `🔗 ${userWallet.substring(0, 6)}...${userWallet.substring(38)}`;
+                walletStatus.classList.add('connected');
+            } else {
+                walletStatus.textContent = '🔗 Connect Wallet';
+                walletStatus.classList.remove('connected');
+            }
+        }
+
+        async function updateWalletModalDisplay() {
+            const connectionStatus = document.getElementById('connection-status');
+            const addressDisplay = document.getElementById('wallet-address-display');
+            const balanceDisplay = document.getElementById('wallet-balance-display');
+            const networkDisplay = document.getElementById('wallet-network-display');
+            const connectedAddress = document.getElementById('connected-address');
+            const connectedBalance = document.getElementById('connected-balance');
+            const connectedNetwork = document.getElementById('connected-network');
+            const connectBtn = document.getElementById('connect-btn');
+            const disconnectBtn = document.getElementById('disconnect-btn');
+
+            if (walletConnected && userWallet && walletProvider) {
+                // Show connected state
+                connectionStatus.textContent = 'Connected ✅';
+                connectionStatus.style.color = 'var(--success)';
+                
+                connectedAddress.textContent = userWallet;
+                addressDisplay.style.display = 'block';
+                
+                try {
+                    // Get and display balance
+                    const balance = await walletProvider.getBalance(userWallet);
+                    const balancePOL = parseFloat(ethers.utils.formatEther(balance)).toFixed(6);
+                    connectedBalance.textContent = `${balancePOL} POL`;
+                    balanceDisplay.style.display = 'block';
+
+                    // Get and display network
+                    const network = await walletProvider.getNetwork();
+                    const networkName = network.chainId === 80002 ? 'Polygon Amoy ✅' : `Chain ID: ${network.chainId} ⚠️`;
+                    connectedNetwork.textContent = networkName;
+                    connectedNetwork.style.color = network.chainId === 80002 ? 'var(--success)' : 'var(--warning)';
+                    networkDisplay.style.display = 'block';
+                } catch (error) {
+                    console.error('Error getting wallet details:', error);
+                }
+                
+                connectBtn.style.display = 'none';
+                disconnectBtn.style.display = 'inline-block';
+            } else {
+                // Show disconnected state
+                connectionStatus.textContent = 'Not Connected';
+                connectionStatus.style.color = 'var(--gray)';
+                addressDisplay.style.display = 'none';
+                balanceDisplay.style.display = 'none';
+                networkDisplay.style.display = 'none';
+                connectBtn.style.display = 'inline-block';
+                disconnectBtn.style.display = 'none';
+            }
+        }
+
+        // Live API Integration - CLEAN NO-DATA STATES
         class EmailWalletAPI {
             constructor() {
-                this.API_BASE = 'http://rootz.global:8000/.rootz'; // CORRECT: SKS Platform on port 8000
+                const hostname = window.location.hostname;
+                if (hostname === 'rootz.global') {
+                    this.API_BASE = 'http://rootz.global:8000/.rootz';
+                } else {
+                    this.API_BASE = 'http://localhost:8000/.rootz';
+                }
                 this.updateInterval = 30000; // 30 seconds
                 this.retryAttempts = 3;
                 this.retryDelay = 5000;
             }
 
-            async getBlockchainStatus() {
+            async getWalletInfo(address) {
+                if (!address) {
+                    throw new Error('No wallet address provided');
+                }
+
                 for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
                     try {
-                        // CORRECT: Use working balance endpoint 
-                        const response = await fetch(`${this.API_BASE}/email-wallet/balance/0x107c5655ce50ab9744fc36a4e9935e30d4923d0b`, {
+                        const response = await fetch(`${this.API_BASE}/email-wallet/balance/${address}`, {
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -598,11 +897,11 @@
                         }
 
                         const data = await response.json();
-                        console.log(`✅ Blockchain data retrieved:`, data);
+                        console.log(`✅ Wallet data retrieved for ${address}:`, data);
                         return data;
 
                     } catch (error) {
-                        console.error(`❌ API call failed (attempt ${attempt}/${this.retryAttempts}):`, error);
+                        console.error(`❌ API call failed for ${address} (attempt ${attempt}/${this.retryAttempts}):`, error);
                         
                         if (attempt < this.retryAttempts) {
                             await this.delay(this.retryDelay);
@@ -613,28 +912,58 @@
                 }
             }
 
-            async updateDashboardStats() {
+            async updateDashboardStats(walletAddress = null) {
                 try {
-                    const balanceData = await this.getBlockchainStatus();
-                    console.log('Balance API Response:', balanceData);
+                    let balanceData = null;
+
+                    // Only get data if wallet is connected
+                    if (walletAddress && userWallet) {
+                        balanceData = await this.getWalletInfo(walletAddress);
+                    }
                     
-                    // Update stats using the correct response structure
+                    // Update stats elements
                     const creditsElement = document.querySelector('[data-stat="credits"]');
                     const balanceElement = document.querySelector('[data-stat="balance"]');
                     const statusElement = document.querySelector('[data-stat="status"]');
                     const walletsElement = document.querySelector('[data-stat="wallets"]');
 
-                    // CORRECT: Parse credits from API response: {success: true, data: {credits: 110}}
-                    if (creditsElement && balanceData.success && balanceData.data) {
+                    if (walletConnected && userWallet && balanceData && balanceData.success && balanceData.data) {
+                        // Connected wallet with data
                         creditsElement.textContent = balanceData.data.credits || '0';
+                        
+                        // Show actual connected wallet balance
+                        if (walletProvider) {
+                            try {
+                                const balance = await walletProvider.getBalance(userWallet);
+                                const balancePOL = parseFloat(ethers.utils.formatEther(balance)).toFixed(3);
+                                balanceElement.textContent = `${balancePOL} POL`;
+                            } catch (error) {
+                                balanceElement.textContent = 'Error';
+                            }
+                        } else {
+                            balanceElement.textContent = 'Error';
+                        }
+                        
+                        statusElement.textContent = '✅';
+                        statusElement.style.color = '#4CAF50';
+                        walletsElement.textContent = '1';
+                        
+                    } else if (walletConnected && userWallet) {
+                        // Connected wallet but no data (not registered or error)
+                        creditsElement.textContent = '0';
+                        balanceElement.textContent = 'Connected';
+                        statusElement.textContent = '⚠️';
+                        statusElement.style.color = '#f59e0b';
+                        walletsElement.textContent = '0';
+                        
+                    } else {
+                        // No wallet connected - show clean no-data state
+                        creditsElement.textContent = '--';
+                        balanceElement.textContent = '--';
+                        statusElement.textContent = '🔗';
+                        statusElement.style.color = '#666666';
+                        walletsElement.textContent = '--';
                     }
-                    if (balanceElement) balanceElement.textContent = '0.050';
-                    if (statusElement) {
-                        const isConnected = balanceData.success || false;
-                        statusElement.textContent = isConnected ? '✅' : '❌';
-                        statusElement.style.color = isConnected ? '#4CAF50' : '#f44336';
-                    }
-                    if (walletsElement) walletsElement.textContent = '1';
                     
                     console.log('📊 Dashboard stats updated successfully');
                     return true;
@@ -649,17 +978,33 @@
             showOfflineStatus() {
                 const statusElement = document.querySelector('[data-stat="status"]');
                 const creditsElement = document.querySelector('[data-stat="credits"]');
+                const balanceElement = document.querySelector('[data-stat="balance"]');
                 const walletsElement = document.querySelector('[data-stat="wallets"]');
                 
-                if (statusElement) {
-                    statusElement.textContent = '❌';
-                    statusElement.style.color = '#f44336';
-                }
-                if (creditsElement && creditsElement.textContent === 'Loading...') {
-                    creditsElement.textContent = 'Offline';
-                }
-                if (walletsElement && walletsElement.textContent === 'Loading...') {
-                    walletsElement.textContent = 'Offline';
+                if (!walletConnected) {
+                    // No wallet - show clean disconnected state
+                    if (creditsElement) creditsElement.textContent = '--';
+                    if (balanceElement) balanceElement.textContent = '--';
+                    if (statusElement) {
+                        statusElement.textContent = '🔗';
+                        statusElement.style.color = '#666666';
+                    }
+                    if (walletsElement) walletsElement.textContent = '--';
+                } else {
+                    // Wallet connected but API error
+                    if (statusElement) {
+                        statusElement.textContent = '❌';
+                        statusElement.style.color = '#f44336';
+                    }
+                    if (creditsElement && (creditsElement.textContent === 'Loading...' || creditsElement.textContent === '--')) {
+                        creditsElement.textContent = 'Error';
+                    }
+                    if (balanceElement && (balanceElement.textContent === 'Loading...' || balanceElement.textContent === '--')) {
+                        balanceElement.textContent = 'Error';
+                    }
+                    if (walletsElement && (walletsElement.textContent === 'Loading...' || walletsElement.textContent === '--')) {
+                        walletsElement.textContent = 'Error';
+                    }
                 }
             }
 
@@ -667,11 +1012,11 @@
                 console.log(`🔄 Starting auto-refresh every ${this.updateInterval/1000} seconds`);
                 
                 // Update immediately
-                this.updateDashboardStats();
+                this.updateDashboardStats(userWallet);
                 
                 // Set up interval
                 this.refreshInterval = setInterval(() => {
-                    this.updateDashboardStats();
+                    this.updateDashboardStats(userWallet);
                 }, this.updateInterval);
             }
 
@@ -695,9 +1040,116 @@
             }
         }
 
-        // Initialize API integration
+        // Check for existing wallet connection on page load - NO DEFAULT FALLBACK
+        async function checkExistingConnection() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        walletProvider = new ethers.providers.Web3Provider(window.ethereum);
+                        const signer = walletProvider.getSigner();
+                        userWallet = await signer.getAddress();
+                        walletConnected = true;
+                        
+                        updateWalletStatus();
+                        updateDashboardStatsForConnectedWallet();
+                        
+                        console.log('🔗 Found existing wallet connection:', userWallet);
+                    } else {
+                        // No wallet connected - show clean disconnected state
+                        showDisconnectedWalletState();
+                    }
+                } catch (error) {
+                    console.log('No existing wallet connection found');
+                    showDisconnectedWalletState();
+                }
+            } else {
+                // No MetaMask - show no wallet state
+                showNoMetaMaskState();
+            }
+        }
+
+        // Show clean disconnected wallet state
+        function showDisconnectedWalletState() {
+            userWallet = null;
+            walletConnected = false;
+            walletProvider = null;
+            
+            updateWalletStatus();
+            
+            // Update stats to show no data
+            const creditsElement = document.querySelector('[data-stat="credits"]');
+            const balanceElement = document.querySelector('[data-stat="balance"]');
+            const statusElement = document.querySelector('[data-stat="status"]');
+            const walletsElement = document.querySelector('[data-stat="wallets"]');
+            
+            if (creditsElement) creditsElement.textContent = '--';
+            if (balanceElement) balanceElement.textContent = '--';
+            if (statusElement) {
+                statusElement.textContent = '🔗';
+                statusElement.style.color = '#666666';
+            }
+            if (walletsElement) walletsElement.textContent = '--';
+            
+            console.log('📋 Showing clean disconnected state - no default data');
+        }
+
+        // Show no MetaMask state
+        function showNoMetaMaskState() {
+            userWallet = null;
+            walletConnected = false;
+            walletProvider = null;
+            
+            const walletStatus = document.getElementById('wallet-status');
+            if (walletStatus) {
+                walletStatus.textContent = '🔗 Install MetaMask';
+                walletStatus.classList.remove('connected');
+            }
+            
+            // Update stats to show MetaMask needed
+            const creditsElement = document.querySelector('[data-stat="credits"]');
+            const balanceElement = document.querySelector('[data-stat="balance"]');
+            const statusElement = document.querySelector('[data-stat="status"]');
+            const walletsElement = document.querySelector('[data-stat="wallets"]');
+            
+            if (creditsElement) creditsElement.textContent = '--';
+            if (balanceElement) balanceElement.textContent = '--';
+            if (statusElement) {
+                statusElement.textContent = '🚫';
+                statusElement.style.color = '#f44336';
+            }
+            if (walletsElement) walletsElement.textContent = '--';
+            
+            console.log('🚫 Showing no MetaMask state');
+        }
+
+        // Additional functions for connected wallet integration
+        function updateDashboardStats() {
+            if (emailWalletAPI) {
+                emailWalletAPI.updateDashboardStats(userWallet);
+            }
+        }
+
+        function updateDashboardStatsForConnectedWallet() {
+            if (emailWalletAPI && userWallet) {
+                emailWalletAPI.updateDashboardStats(userWallet);
+            }
+        }
+
+        // Initialize everything - START WITH CLEAN STATE
         const emailWalletAPI = new EmailWalletAPI();
-        emailWalletAPI.init();
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start with clean disconnected state
+            showDisconnectedWalletState();
+            
+            // Initialize API
+            emailWalletAPI.init();
+            
+            // Check for existing connection
+            checkExistingConnection();
+        });
     </script>
 </body>
 </html>

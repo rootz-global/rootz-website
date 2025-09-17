@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email DATA_WALLET Service - Rootz Innovation</title>
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" integrity="sha512-8H0V3ANDGbhM5bCONyIzPFCf6UdxhAKVsKGcP4EK2kPKRN2vSNZgDp8PlbzP3/DUeHFPY7LLqX9rz9I7vCFCcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         :root {
             --primary: #2d5016;
@@ -594,6 +594,13 @@
     </footer>
 
     <script>
+        // Check if ethers loaded properly
+        if (typeof ethers === 'undefined') {
+            console.error('❌ Ethers.js failed to load');
+        } else {
+            console.log('✅ Ethers.js loaded successfully');
+        }
+
         // Configuration - FIXED to use correct port 8000
         const API_BASE = (() => {
             const hostname = window.location.hostname;
@@ -635,6 +642,11 @@
         async function connectOrChangeWallet() {
             if (!window.ethereum) {
                 alert('MetaMask not detected. Please install MetaMask to continue.');
+                return;
+            }
+
+            if (typeof ethers === 'undefined') {
+                alert('Ethers.js library not loaded. Please refresh the page and try again.');
                 return;
             }
 
@@ -726,7 +738,7 @@
 
         // Load wallet data for connected wallet only
         async function loadWalletData() {
-            if (!userWallet) {
+            if (!userWallet || typeof ethers === 'undefined') {
                 resetStatsDisplay();
                 return;
             }

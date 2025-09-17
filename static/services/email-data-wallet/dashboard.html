@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email DATA_WALLET Dashboard</title>
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" integrity="sha512-8H0V3ANDGbhM5bCONyIzPFCf6UdxhAKVsKGcP4EK2kPKRN2vSNZgDp8PlbzP3/DUeHFPY7LLqX9rz9I7vCFCcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         :root {
             --primary: #2d5016;
@@ -567,6 +567,20 @@
     </div>
 
     <script>
+        // Check if ethers loaded properly
+        if (typeof ethers === 'undefined') {
+            console.error('❌ Ethers.js failed to load');
+            document.addEventListener('DOMContentLoaded', function() {
+                const container = document.querySelector('.container');
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-error';
+                alertDiv.innerHTML = '❌ Ethers.js library failed to load. Please refresh the page or check your internet connection.';
+                container.insertBefore(alertDiv, container.firstChild);
+            });
+        } else {
+            console.log('✅ Ethers.js loaded successfully');
+        }
+
         // Configuration - FIXED to use correct port 8000
         const API_BASE = (() => {
             const hostname = window.location.hostname;
@@ -615,6 +629,11 @@
         async function connectOrChangeWallet() {
             if (!window.ethereum) {
                 showAlert('MetaMask not detected. Please install MetaMask to continue.', 'error');
+                return;
+            }
+
+            if (typeof ethers === 'undefined') {
+                showAlert('Ethers.js library not loaded. Please refresh the page and try again.', 'error');
                 return;
             }
 

@@ -661,10 +661,8 @@
             try {
                 showStatus('Processing authorization...', 'warning');
 
-                // Create signature for the request ID
-                const requestIdBytes = requestId;
-                const messageHash = ethers.utils.keccak256(ethers.utils.solidityPack(['bytes32'], [requestIdBytes]));
-                const signature = await signer.signMessage(ethers.utils.arrayify(messageHash));
+                // Create signature for the request ID - FIXED to match backend
+                const signature = await signer.signMessage(requestId);
 
                 console.log('✅ Signature created for request:', requestId);
                 

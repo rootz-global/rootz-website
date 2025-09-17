@@ -144,7 +144,7 @@
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             padding: 40px;
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
             border: 1px solid rgba(45, 80, 22, 0.1);
         }
@@ -242,6 +242,24 @@
             margin-bottom: 20px;
         }
 
+        .warning-message {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            color: #d97706;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-message {
+            background: #dbeafe;
+            border: 1px solid #60a5fa;
+            color: #1e40af;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
         .connected-address {
             font-family: 'Courier New', monospace;
             background: var(--light);
@@ -250,6 +268,45 @@
             margin-top: 10px;
             border: 1px solid rgba(45, 80, 22, 0.2);
             word-break: break-all;
+        }
+
+        .pricing-info {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pricing-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .pricing-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Mobile Responsive */
@@ -298,6 +355,23 @@
             </div>
 
             <div id="registrationForm" style="display: none;">
+                <!-- Pricing Information -->
+                <div class="pricing-info">
+                    <h3 style="margin-bottom: 15px; color: var(--primary);">💰 Registration Cost</h3>
+                    <div class="pricing-item">
+                        <span>Registration Fee:</span>
+                        <span id="registration-fee">0.01 POL</span>
+                    </div>
+                    <div class="pricing-item">
+                        <span>Initial Credits Included:</span>
+                        <span>60 credits</span>
+                    </div>
+                    <div class="pricing-item">
+                        <span>Total Cost:</span>
+                        <span id="total-cost">0.01 POL (~$0.02)</span>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label" for="emailAddress">Email Address</label>
                     <input type="email" id="emailAddress" class="form-input" 
@@ -310,9 +384,23 @@
                            placeholder="John Doe" required>
                 </div>
 
+                <!-- Balance Information -->
+                <div id="balanceInfo" class="wallet-status" style="display: none;">
+                    <h3>💳 Wallet Balance</h3>
+                    <p>Current POL Balance: <span id="currentBalance">Loading...</span></p>
+                    <p style="margin-top: 10px;">
+                        <small>You need at least 0.02 POL (registration fee + gas) to complete registration.</small>
+                    </p>
+                </div>
+
                 <button class="btn" onclick="completeRegistration()" id="registerBtn">
-                    🚀 Complete Registration & Get 60 Credits
+                    <span id="registerBtnText">🚀 Complete Registration (Pay 0.01 POL)</span>
                 </button>
+
+                <div class="warning-message" style="display: none;" id="lowBalanceWarning">
+                    ⚠️ <strong>Insufficient POL Balance</strong><br>
+                    You need at least 0.02 POL to complete registration. Please add POL to your wallet first.
+                </div>
             </div>
 
             <div id="messageDiv"></div>
@@ -331,12 +419,16 @@
                     // Development: adjust as needed
                     return 'http://localhost:8000/.rootz';
                 }
-            })()
+            })(),
+            // Registration fee in POL (0.01 POL = 10^16 wei)
+            REGISTRATION_FEE_POL: '0.01',
+            REGISTRATION_FEE_WEI: ethers.utils.parseEther('0.01')
         };
 
         let provider = null;
         let signer = null;
         let userAddress = null;
+        let userBalance = null;
 
         // Mobile navigation
         function toggleMobileMenu() {
@@ -369,23 +461,87 @@
                     return;
                 }
 
+                showInfo('Connecting to MetaMask...');
+
                 await window.ethereum.request({ method: 'eth_requestAccounts' });
                 
                 provider = new ethers.providers.Web3Provider(window.ethereum);
                 signer = provider.getSigner();
                 userAddress = await signer.getAddress();
 
+                // Verify network (Polygon Amoy)
+                const network = await provider.getNetwork();
+                console.log('🌐 Connected to network:', network);
+                
+                if (network.chainId !== 80002) {
+                    showError('Please switch to Polygon Amoy testnet (Chain ID: 80002) in MetaMask.');
+                    return;
+                }
+
+                // Get user balance
+                const balance = await provider.getBalance(userAddress);
+                userBalance = parseFloat(ethers.utils.formatEther(balance));
+
+                // Update UI
                 document.getElementById('walletStatus').innerHTML = `
                     <h3 style="color: var(--success);">✅ Wallet Connected</h3>
-                    <p style="margin-bottom: 10px;">Ready to create EMAIL_WALLETs with blockchain provenance</p>
+                    <p style="margin-bottom: 10px;">Ready to register for EMAIL_WALLET service</p>
                     <div class="connected-address">${userAddress}</div>
                 `;
 
+                // Show balance information
+                document.getElementById('currentBalance').textContent = `${userBalance.toFixed(6)} POL`;
+                document.getElementById('balanceInfo').style.display = 'block';
+
+                // Check if user has sufficient balance
+                const minRequired = 0.02; // Registration fee + gas estimate
+                const lowBalanceWarning = document.getElementById('lowBalanceWarning');
+                const registerBtn = document.getElementById('registerBtn');
+
+                if (userBalance < minRequired) {
+                    lowBalanceWarning.style.display = 'block';
+                    registerBtn.disabled = true;
+                    showWarning(`Insufficient POL balance. You have ${userBalance.toFixed(6)} POL but need at least ${minRequired} POL.`);
+                } else {
+                    lowBalanceWarning.style.display = 'none';
+                    registerBtn.disabled = false;
+                    showSuccess(`Wallet connected successfully! Balance: ${userBalance.toFixed(6)} POL`);
+                }
+
                 document.getElementById('registrationForm').style.display = 'block';
+
+                // Check if already registered
+                await checkExistingRegistration();
 
             } catch (error) {
                 console.error('Wallet connection error:', error);
                 showError('Failed to connect wallet: ' + error.message);
+            }
+        }
+
+        async function checkExistingRegistration() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/email-wallet/balance/${userAddress}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.success && data.data && data.data.isRegistered) {
+                        showWarning(`
+                            ⚠️ <strong>Already Registered</strong><br><br>
+                            This wallet is already registered for the EMAIL_WALLET service.<br>
+                            <strong>Credits:</strong> ${data.data.credits}<br>
+                            <strong>Wallet:</strong> ${userAddress}<br><br>
+                            <a href="/static/services/email-data-wallet/dashboard.html" style="color: var(--primary); text-decoration: none; font-weight: bold;">→ Go to Dashboard</a>
+                        `);
+                        
+                        document.getElementById('registerBtn').disabled = true;
+                        document.getElementById('registerBtnText').textContent = 'Already Registered ✅';
+                    }
+                }
+            } catch (error) {
+                console.error('Registration check error:', error);
+                // Continue with registration if check fails
             }
         }
 
@@ -400,26 +556,35 @@
                 }
 
                 const registerBtn = document.getElementById('registerBtn');
-                const originalText = registerBtn.textContent;
+                const registerBtnText = document.getElementById('registerBtnText');
+                const originalText = registerBtnText.textContent;
+                
                 registerBtn.disabled = true;
-                registerBtn.textContent = '🔄 Creating signature...';
+                registerBtnText.innerHTML = '<div class="loading-spinner"></div>Creating signature...';
 
                 // FIXED: Create the registration message for signing (required by backend)
                 const message = `Register wallet for EMAIL_WALLET service\nEmail: ${emailInput.value}\nName: ${nameInput.value}\nWallet: ${userAddress}`;
                 
-                registerBtn.textContent = '🔄 Please sign with MetaMask...';
+                registerBtnText.innerHTML = '<div class="loading-spinner"></div>Please sign with MetaMask...';
+                showInfo('Please sign the registration message in MetaMask...');
                 
                 // FIXED: Get user signature (required by backend)
                 const signature = await signer.signMessage(message);
                 
-                registerBtn.textContent = '🔄 Registering with blockchain...';
+                registerBtnText.innerHTML = '<div class="loading-spinner"></div>Processing payment...';
+                showInfo('Processing registration fee payment...');
 
-                // FIXED: Send registration with correct format (userAddress, signature, message)
+                // FIXED: Send registration with POL payment using the correct format
                 const registrationData = {
                     userAddress: userAddress,    // Backend expects 'userAddress' not 'walletAddress'
                     signature: signature,
-                    message: message
+                    message: message,
+                    paymentAmount: CONFIG.REGISTRATION_FEE_POL,  // Include payment amount for verification
+                    feeInWei: CONFIG.REGISTRATION_FEE_WEI.toString() // Include fee for contract call
                 };
+
+                registerBtnText.innerHTML = '<div class="loading-spinner"></div>Submitting to blockchain...';
+                showInfo('Submitting registration to blockchain...');
 
                 const response = await fetch(`${CONFIG.API_BASE_URL}/email-wallet/register`, {
                     method: 'POST',
@@ -431,18 +596,30 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    showSuccess(`
-                        🎉 Registration successful!<br><br>
-                        <strong>Email:</strong> ${emailInput.value}<br>
-                        <strong>Wallet:</strong> ${userAddress}<br>
-                        <strong>Credits:</strong> 60 (enough for 15 EMAIL_WALLETs)<br>
-                        <strong>Blockchain:</strong> Connected to Polygon Amoy<br><br>
-                        You can now receive EMAIL_WALLETs with verifiable origin and blockchain ownership!<br><br>
-                        <a href="/static/services/email-data-wallet/dashboard.html" style="color: var(--primary); text-decoration: none; font-weight: bold;">→ Go to Dashboard</a>
-                    `);
                     
-                    // Hide the form after successful registration
-                    document.getElementById('registrationForm').style.display = 'none';
+                    if (result.success) {
+                        const txHash = result.data?.transactionHash || result.transactionHash;
+                        
+                        showSuccess(`
+                            🎉 Registration successful!<br><br>
+                            <strong>Email:</strong> ${emailInput.value}<br>
+                            <strong>Wallet:</strong> ${userAddress}<br>
+                            <strong>Payment:</strong> ${CONFIG.REGISTRATION_FEE_POL} POL<br>
+                            <strong>Credits Allocated:</strong> 60 (enough for 15 EMAIL_WALLETs)<br>
+                            <strong>Blockchain:</strong> Connected to Polygon Amoy<br>
+                            ${txHash ? `<strong>Transaction:</strong> <a href="https://amoy.polygonscan.com/tx/${txHash}" target="_blank" style="color: var(--primary);">${txHash.substring(0, 10)}...${txHash.substring(58)}</a><br>` : ''}
+                            <br>
+                            You can now receive EMAIL_WALLETs with verifiable origin and blockchain ownership!<br><br>
+                            <a href="/static/services/email-data-wallet/dashboard.html" style="color: var(--primary); text-decoration: none; font-weight: bold;">→ Go to Dashboard</a>
+                        `);
+                        
+                        // Hide the form after successful registration
+                        document.getElementById('registrationForm').style.display = 'none';
+                        
+                        registerBtnText.textContent = 'Registration Complete ✅';
+                    } else {
+                        throw new Error(result.error || 'Registration failed');
+                    }
                 } else {
                     const errorText = await response.text();
                     let errorMessage = 'Registration failed';
@@ -457,11 +634,24 @@
 
             } catch (error) {
                 console.error('Registration error:', error);
-                showError('Registration failed: ' + error.message);
+                
+                let errorMessage = error.message;
+                
+                // Handle specific error types
+                if (error.message.includes('insufficient funds')) {
+                    errorMessage = `Insufficient POL balance. You need at least ${CONFIG.REGISTRATION_FEE_POL} POL plus gas fees.`;
+                } else if (error.message.includes('user rejected')) {
+                    errorMessage = 'Transaction was cancelled by user.';
+                } else if (error.message.includes('already registered')) {
+                    errorMessage = 'This wallet is already registered.';
+                }
+                
+                showError('Registration failed: ' + errorMessage);
             } finally {
                 const registerBtn = document.getElementById('registerBtn');
+                const registerBtnText = document.getElementById('registerBtnText');
                 registerBtn.disabled = false;
-                registerBtn.textContent = '🚀 Complete Registration & Get 60 Credits';
+                registerBtnText.innerHTML = '🚀 Complete Registration (Pay 0.01 POL)';
             }
         }
 
@@ -473,6 +663,16 @@
         function showError(message) {
             const messageDiv = document.getElementById('messageDiv');
             messageDiv.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+
+        function showWarning(message) {
+            const messageDiv = document.getElementById('messageDiv');
+            messageDiv.innerHTML = `<div class="warning-message">${message}</div>`;
+        }
+
+        function showInfo(message) {
+            const messageDiv = document.getElementById('messageDiv');
+            messageDiv.innerHTML = `<div class="info-message">${message}</div>`;
         }
     </script>
 </body>

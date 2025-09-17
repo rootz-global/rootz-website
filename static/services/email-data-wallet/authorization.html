@@ -300,6 +300,15 @@
                     <div style="text-align: center; padding: 30px; color: var(--gray);">
                         <h3>🦊 Connect Your Wallet</h3>
                         <p>Connect your MetaMask wallet to see pending authorization requests for your emails.</p>
+                        <p style="margin-top: 15px;">
+                            <button id="main-connect-btn" style="background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background 0.3s ease;" onclick="connectOrChangeWallet()">
+                                🦊 Connect MetaMask
+                            </button>
+                        </p>
+                        <div style="margin-top: 10px; font-size: 0.9rem;">
+                            <strong>Debug Info:</strong><br>
+                            <span id="debug-info">Checking MetaMask...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -307,14 +316,35 @@
     </div>
 
     <script>
+        // Add debug information immediately
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDebugInfo();
+        });
+
+        function updateDebugInfo() {
+            const debugInfo = document.getElementById('debug-info');
+            
+            let info = [];
+            info.push(`MetaMask: ${window.ethereum ? 'Detected' : 'Not Detected'}`);
+            info.push(`Ethers: ${typeof ethers !== 'undefined' ? 'Loaded' : 'Loading...'}`);
+            info.push(`User Wallet: ${userWallet || 'Not Connected'}`);
+            
+            if (debugInfo) {
+                debugInfo.innerHTML = info.join('<br>');
+            }
+        }
+
         // Check if ethers loaded properly - wait a moment for it to load
         setTimeout(function() {
             if (typeof ethers === 'undefined') {
                 console.error('❌ Ethers.js failed to load');
+                const debugInfo = document.getElementById('debug-info');
+                if (debugInfo) debugInfo.innerHTML += '<br><span style="color: red;">❌ Ethers.js failed to load</span>';
             } else {
                 console.log('✅ Ethers.js loaded successfully');
+                updateDebugInfo();
             }
-        }, 1000);
+        }, 2000);
 
         // Configuration - FIXED to use correct SKS Rootz Platform API
         const API_BASE = (() => {
@@ -361,42 +391,66 @@
             loadPendingRequests();
         });
 
-        // FIXED: Single wallet connection function that matches dashboard
+        // ENHANCED: Single wallet connection function with debug info
         async function connectOrChangeWallet() {
+            console.log('🔄 connectOrChangeWallet() called');
+            updateDebugInfo();
+
             if (!window.ethereum) {
-                showStatus('MetaMask not detected. Please install MetaMask to continue.', 'error');
+                const message = 'MetaMask not detected. Please install MetaMask to continue.';
+                console.error('❌', message);
+                showStatus(message, 'error');
+                updateDebugInfo();
                 return;
             }
 
             if (typeof ethers === 'undefined') {
-                showStatus('Ethers.js library not loaded. Please refresh the page and try again.', 'error');
+                const message = 'Ethers.js library not loaded. Please refresh the page and try again.';
+                console.error('❌', message);
+                showStatus(message, 'error');
+                updateDebugInfo();
                 return;
             }
 
             try {
-                // If already connected, disconnect first
+                // Update button to show loading
+                const mainBtn = document.getElementById('main-connect-btn');
+                const navBtn = document.getElementById('nav-wallet-btn');
+                
                 if (userWallet) {
+                    // Disconnect
+                    console.log('🔄 Disconnecting wallet...');
                     userWallet = null;
                     provider = null;
                     signer = null;
                     updateWalletDisplay();
+                    updateDebugInfo();
                     loadPendingRequests();
                     return;
                 }
 
-                // Connect to MetaMask
+                // Connect
+                console.log('🔄 Requesting MetaMask connection...');
+                if (mainBtn) mainBtn.textContent = '⏳ Connecting...';
+                if (navBtn) navBtn.textContent = 'Connecting...';
+
                 const accounts = await window.ethereum.request({
                     method: 'eth_requestAccounts'
                 });
+
+                console.log('📋 Accounts received:', accounts);
 
                 if (accounts.length === 0) {
                     throw new Error('No accounts found');
                 }
 
                 // Initialize ethers provider and signer
+                console.log('🔗 Initializing ethers provider...');
                 provider = new ethers.providers.Web3Provider(window.ethereum);
                 signer = provider.getSigner();
                 userWallet = await signer.getAddress();
+
+                console.log('✅ User wallet:', userWallet);
 
                 // Verify network (Polygon Amoy)
                 const network = await provider.getNetwork();
@@ -408,11 +462,13 @@
                     provider = null;
                     signer = null;
                     updateWalletDisplay();
+                    updateDebugInfo();
                     return;
                 }
 
-                console.log('✅ Wallet connected:', userWallet);
+                console.log('✅ Wallet connected successfully:', userWallet);
                 updateWalletDisplay();
+                updateDebugInfo();
                 loadPendingRequests();
                 showStatus('Wallet connected successfully!', 'success');
 
@@ -423,6 +479,13 @@
                 provider = null;
                 signer = null;
                 updateWalletDisplay();
+                updateDebugInfo();
+                
+                // Reset button text
+                const mainBtn = document.getElementById('main-connect-btn');
+                const navBtn = document.getElementById('nav-wallet-btn');
+                if (mainBtn) mainBtn.textContent = '🦊 Connect MetaMask';
+                if (navBtn) navBtn.textContent = 'Connect';
             }
         }
 
@@ -430,15 +493,26 @@
         function updateWalletDisplay() {
             const navWalletInfo = document.getElementById('nav-wallet-info');
             const navWalletBtn = document.getElementById('nav-wallet-btn');
+            const mainBtn = document.getElementById('main-connect-btn');
 
             if (userWallet) {
                 // Update navigation
                 navWalletInfo.textContent = userWallet.substring(0, 6) + '...' + userWallet.substring(38);
                 navWalletBtn.textContent = 'Change';
+                
+                // Update main button
+                if (mainBtn) {
+                    mainBtn.textContent = 'Change Wallet';
+                }
             } else {
                 // Update navigation
                 navWalletInfo.textContent = 'Not Connected';
                 navWalletBtn.textContent = 'Connect';
+                
+                // Update main button
+                if (mainBtn) {
+                    mainBtn.textContent = '🦊 Connect MetaMask';
+                }
             }
         }
 
@@ -482,8 +556,18 @@
                     <div style="text-align: center; padding: 30px; color: var(--gray);">
                         <h3>🦊 Connect Your Wallet</h3>
                         <p>Connect your MetaMask wallet to see pending authorization requests for your emails.</p>
+                        <p style="margin-top: 15px;">
+                            <button id="main-connect-btn" style="background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background 0.3s ease;" onclick="connectOrChangeWallet()">
+                                🦊 Connect MetaMask
+                            </button>
+                        </p>
+                        <div style="margin-top: 10px; font-size: 0.9rem;">
+                            <strong>Debug Info:</strong><br>
+                            <span id="debug-info">Checking MetaMask...</span>
+                        </div>
                     </div>
                 `;
+                updateDebugInfo();
                 return;
             }
 
@@ -498,6 +582,11 @@
                                 Go to Dashboard
                             </a>
                         </p>
+                        <div style="margin-top: 15px;">
+                            <button id="main-connect-btn" style="background: var(--secondary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;" onclick="connectOrChangeWallet()">
+                                Change Wallet
+                            </button>
+                        </div>
                     </div>
                 `;
                 return;
@@ -637,6 +726,7 @@
                     provider = null;
                     signer = null;
                     updateWalletDisplay();
+                    updateDebugInfo();
                     loadPendingRequests();
                 } else if (accounts[0] !== userWallet) {
                     // User switched accounts

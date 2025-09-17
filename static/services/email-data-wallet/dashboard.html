@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email DATA_WALLET Dashboard</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
     <style>
         :root {
             --primary: #2d5016;
@@ -94,6 +95,36 @@
             background: var(--primary);
         }
 
+        .wallet-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .wallet-info-nav {
+            font-size: 0.9rem;
+            color: var(--gray);
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .wallet-connect-nav {
+            background: var(--primary);
+            color: var(--light);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .wallet-connect-nav:hover {
+            background: var(--dark);
+        }
+
         /* Mobile Menu */
         .mobile-menu-toggle {
             display: none;
@@ -132,6 +163,15 @@
                 display: block;
                 text-align: center;
             }
+
+            .wallet-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .wallet-info-nav {
+                max-width: none;
+            }
         }
 
         /* Page Header */
@@ -151,6 +191,56 @@
         .page-header p {
             font-size: 1.1rem;
             opacity: 0.9;
+        }
+
+        /* Wallet Status Section */
+        .wallet-status-section {
+            background: var(--light);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .wallet-status-section h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .wallet-connect-button {
+            background: var(--primary);
+            color: var(--light);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-connect-button:hover {
+            background: var(--dark);
+            transform: translateY(-2px);
+        }
+
+        .connected-wallet-info {
+            background: rgba(45, 80, 22, 0.05);
+            border: 1px solid rgba(45, 80, 22, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .wallet-address-display {
+            font-family: 'Courier New', monospace;
+            background: var(--light);
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+            word-break: break-all;
+            font-size: 14px;
         }
 
         /* Status Grid */
@@ -229,6 +319,10 @@
             background-color: var(--error);
         }
 
+        .status-offline {
+            background-color: var(--gray);
+        }
+
         /* Email Processing Section */
         .email-processing-section {
             background: var(--light);
@@ -264,140 +358,15 @@
             background: var(--dark);
         }
 
-        .email-form {
-            background: var(--background);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(45, 80, 22, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: var(--primary);
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .submit-btn {
-            background: var(--success);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            background: var(--primary);
-        }
-
-        .submit-btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        .email-queue {
-            margin-top: 20px;
-        }
-
-        .email-item {
-            background: var(--background);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .email-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .email-subject {
-            font-weight: bold;
-            color: var(--dark);
-        }
-
-        .email-status {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-processing {
-            background: rgba(45, 80, 22, 0.1);
-            color: var(--primary);
-        }
-
-        .status-completed {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-failed {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .email-details {
-            font-size: 14px;
+        .no-wallet-message {
+            text-align: center;
+            padding: 40px 20px;
             color: var(--gray);
         }
 
-        .wallet-info {
-            background: rgba(45, 80, 22, 0.05);
-            border: 1px solid rgba(45, 80, 22, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-
-        .wallet-address {
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            word-break: break-all;
-            background: var(--light);
-            padding: 8px;
-            border-radius: 4px;
-            margin-top: 5px;
-            border: 1px solid rgba(45, 80, 22, 0.1);
+        .no-wallet-message h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
         }
 
         .loading {
@@ -431,6 +400,12 @@
             background: #fee2e2;
             color: #991b1b;
             border: 1px solid #fca5a5;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
         }
 
         /* Mobile Responsive */
@@ -476,6 +451,10 @@
                 <li><a href="/static/services/email-data-wallet/admin.html">Admin</a></li>
                 <li><a href="/static/services/email-data-wallet/test-scripts.html">Testing</a></li>
                 <li><a href="/index.html">Main Site</a></li>
+                <li><div class="wallet-nav">
+                    <span class="wallet-info-nav" id="nav-wallet-info">Not Connected</span>
+                    <button class="wallet-connect-nav" id="nav-wallet-btn" onclick="connectOrChangeWallet()">Connect</button>
+                </div></li>
             </ul>
         </nav>
     </header>
@@ -487,130 +466,125 @@
     </div>
 
     <div class="container">
-        <!-- Status Overview -->
-        <div class="status-grid">
-            <div class="status-card">
-                <h3><span class="icon">🔗</span>Blockchain Status</h3>
-                <div class="metric">
-                    <span class="metric-label">Connection</span>
-                    <span class="metric-value">
-                        <span class="status-indicator status-connected"></span>
-                        <span id="blockchain-status">Connected</span>
-                    </span>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">Last Updated</span>
-                    <span class="metric-value" id="blockchain-timestamp">Loading...</span>
-                </div>
-            </div>
-
-            <div class="status-card">
-                <h3><span class="icon">👤</span>Wallet Info</h3>
-                <div class="metric">
-                    <span class="metric-label">Registration</span>
-                    <span class="metric-value">
-                        <span class="status-indicator status-connected"></span>
-                        <span id="wallet-status">Registered</span>
-                    </span>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">Credits Available</span>
-                    <span class="metric-value" id="wallet-credits">60</span>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">MATIC Balance</span>
-                    <span class="metric-value" id="matic-balance">0.029 POL</span>
-                </div>
-            </div>
-
-            <div class="status-card">
-                <h3><span class="icon">📊</span>Processing Stats</h3>
-                <div class="metric">
-                    <span class="metric-label">Emails Processed</span>
-                    <span class="metric-value" id="emails-processed">0</span>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">DATA_WALLETs Created</span>
-                    <span class="metric-value" id="wallets-created">0</span>
-                </div>
-                <div class="metric">
-                    <span class="metric-label">Credits Used</span>
-                    <span class="metric-value" id="credits-used">0</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Email Processing Section -->
-        <div class="email-processing-section">
-            <div class="section-header">
-                <h2 class="section-title">📬 Email Processing</h2>
-                <button class="refresh-btn" onclick="refreshStatus()">
-                    <span id="refresh-icon">🔄</span> Refresh
+        <!-- Wallet Connection Section -->
+        <div class="wallet-status-section" id="wallet-connection-section">
+            <div id="wallet-connect-area">
+                <h2>🦊 Connect Your Wallet</h2>
+                <p style="color: var(--gray); margin-bottom: 20px;">
+                    Connect your MetaMask wallet to view your DATA_WALLET dashboard and processing statistics.
+                </p>
+                <button class="wallet-connect-button" onclick="connectOrChangeWallet()">
+                    Connect MetaMask Wallet
                 </button>
             </div>
-
-            <!-- Test Email Form -->
-            <div class="email-form">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">🧪 Test Email Processing</h3>
-                <form id="email-form">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group">
-                            <label for="from-email">From Email:</label>
-                            <input type="email" id="from-email" name="from" value="demo@techcorp.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="to-email">To Email:</label>
-                            <input type="email" id="to-email" name="to" value="test@example.com" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="subject">Subject:</label>
-                        <input type="text" id="subject" name="subject" value="Test Email for DATA_WALLET Creation" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="body">Email Body:</label>
-                        <textarea id="body" name="body" placeholder="Enter email content..." required>This is a test email to verify the DATA_WALLET creation process. It should trigger the email processing pipeline and create a new blockchain wallet for this email data.</textarea>
-                    </div>
-                    <button type="submit" class="submit-btn" id="submit-btn">
-                        📧 Process Test Email (Cost: 4 credits)
+            <div id="wallet-connected-area" style="display: none;">
+                <h2>🔗 Wallet Connected</h2>
+                <div class="connected-wallet-info">
+                    <div><strong>Connected Wallet:</strong></div>
+                    <div class="wallet-address-display" id="connected-wallet-address">Not Connected</div>
+                    <button class="wallet-connect-button" onclick="connectOrChangeWallet()" style="margin-top: 15px;">
+                        Change Wallet
                     </button>
-                </form>
-            </div>
-
-            <!-- Processing Queue -->
-            <div class="email-queue">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">📋 Processing Queue</h3>
-                <div id="email-queue-list">
-                    <p style="color: var(--gray); text-align: center; padding: 20px;">No emails in queue. Submit a test email above to start processing.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Wallet Information -->
-        <div class="wallet-info">
-            <strong>🔐 Your Wallet Address:</strong>
-            <div class="wallet-address" id="wallet-address">0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b</div>
+        <!-- Status Overview - Only shows when wallet connected -->
+        <div id="dashboard-content" style="display: none;">
+            <div class="status-grid">
+                <div class="status-card">
+                    <h3><span class="icon">🔗</span>Blockchain Status</h3>
+                    <div class="metric">
+                        <span class="metric-label">Connection</span>
+                        <span class="metric-value">
+                            <span class="status-indicator" id="blockchain-status-indicator"></span>
+                            <span id="blockchain-status">--</span>
+                        </span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Network</span>
+                        <span class="metric-value" id="blockchain-network">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Last Updated</span>
+                        <span class="metric-value" id="blockchain-timestamp">--</span>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <h3><span class="icon">👤</span>Wallet Info</h3>
+                    <div class="metric">
+                        <span class="metric-label">Registration</span>
+                        <span class="metric-value">
+                            <span class="status-indicator" id="wallet-status-indicator"></span>
+                            <span id="wallet-status">--</span>
+                        </span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Credits Available</span>
+                        <span class="metric-value" id="wallet-credits">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">POL Balance</span>
+                        <span class="metric-value" id="pol-balance">--</span>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <h3><span class="icon">📊</span>Processing Stats</h3>
+                    <div class="metric">
+                        <span class="metric-label">Email Wallets</span>
+                        <span class="metric-value" id="email-wallets-count">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Total Credits Used</span>
+                        <span class="metric-value" id="total-credits-used">--</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Last Activity</span>
+                        <span class="metric-value" id="last-activity">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Processing Section -->
+            <div class="email-processing-section">
+                <div class="section-header">
+                    <h2 class="section-title">📬 Email Processing Status</h2>
+                    <button class="refresh-btn" onclick="refreshDashboard()">
+                        <span id="refresh-icon">🔄</span> Refresh
+                    </button>
+                </div>
+
+                <div id="processing-info">
+                    <div class="alert alert-warning">
+                        <strong>📧 Email Processing:</strong> Send emails to <strong>process@rivetz.com</strong> to create DATA_WALLETs. 
+                        You'll receive authorization requests that you can approve from the Authorization page.
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
         // Configuration - FIXED to use correct port 8000
-        const API_BASE = 'http://rootz.global:8000/.rootz'; // Use SKS Rootz Platform API
-        const WALLET_ADDRESS = '0x107C5655ce50AB9744Fc36A4e9935E30d4923d0b';
+        const API_BASE = (() => {
+            const hostname = window.location.hostname;
+            if (hostname === 'rootz.global') {
+                return 'http://rootz.global:8000/.rootz';
+            } else {
+                return 'http://localhost:8000/.rootz';
+            }
+        })();
 
-        // State management
-        let emailQueue = [];
-        let processingStats = {
-            emailsProcessed: 0,
-            walletsCreated: 0,
-            creditsUsed: 0
-        };
+        let userWallet = null;
+        let provider = null;
+        let signer = null;
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            refreshStatus();
-            setupEmailForm();
-            updateWalletAddress();
+            console.log('🚀 Dashboard initializing...');
+            updateWalletDisplay();
         });
 
         // Mobile navigation
@@ -637,10 +611,127 @@
             }
         });
 
-        // Refresh all status information
-        async function refreshStatus() {
-            const refreshIcon = document.getElementById('refresh-icon');
-            refreshIcon.innerHTML = '<span class="loading"></span>';
+        // ENHANCED: Connect or change wallet function
+        async function connectOrChangeWallet() {
+            if (!window.ethereum) {
+                showAlert('MetaMask not detected. Please install MetaMask to continue.', 'error');
+                return;
+            }
+
+            try {
+                // If already connected, disconnect first
+                if (userWallet) {
+                    userWallet = null;
+                    provider = null;
+                    signer = null;
+                    updateWalletDisplay();
+                    return;
+                }
+
+                // Connect to MetaMask
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                if (accounts.length === 0) {
+                    throw new Error('No accounts found');
+                }
+
+                // Initialize ethers provider and signer
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                userWallet = await signer.getAddress();
+
+                // Verify network (Polygon Amoy)
+                const network = await provider.getNetwork();
+                console.log('🌐 Connected to network:', network);
+                
+                if (network.chainId !== 80002) {
+                    showAlert('Please switch to Polygon Amoy testnet (Chain ID: 80002) in MetaMask.', 'error');
+                    userWallet = null;
+                    provider = null;
+                    signer = null;
+                    updateWalletDisplay();
+                    return;
+                }
+
+                console.log('✅ Wallet connected:', userWallet);
+                updateWalletDisplay();
+                await loadDashboardData();
+
+            } catch (error) {
+                console.error('❌ Wallet connection error:', error);
+                showAlert(`Failed to connect wallet: ${error.message}`, 'error');
+                userWallet = null;
+                provider = null;
+                signer = null;
+                updateWalletDisplay();
+            }
+        }
+
+        // Update wallet display based on connection status
+        function updateWalletDisplay() {
+            const navWalletInfo = document.getElementById('nav-wallet-info');
+            const navWalletBtn = document.getElementById('nav-wallet-btn');
+            const walletConnectArea = document.getElementById('wallet-connect-area');
+            const walletConnectedArea = document.getElementById('wallet-connected-area');
+            const dashboardContent = document.getElementById('dashboard-content');
+
+            if (userWallet) {
+                // Update navigation
+                navWalletInfo.textContent = userWallet.substring(0, 6) + '...' + userWallet.substring(38);
+                navWalletBtn.textContent = 'Change';
+
+                // Update main wallet section
+                walletConnectArea.style.display = 'none';
+                walletConnectedArea.style.display = 'block';
+                document.getElementById('connected-wallet-address').textContent = userWallet;
+
+                // Show dashboard content
+                dashboardContent.style.display = 'block';
+            } else {
+                // Update navigation
+                navWalletInfo.textContent = 'Not Connected';
+                navWalletBtn.textContent = 'Connect';
+
+                // Update main wallet section
+                walletConnectArea.style.display = 'block';
+                walletConnectedArea.style.display = 'none';
+
+                // Hide dashboard content and show clean states
+                dashboardContent.style.display = 'none';
+                resetDashboardData();
+            }
+        }
+
+        // Reset dashboard to clean no-data states
+        function resetDashboardData() {
+            // Blockchain status
+            document.getElementById('blockchain-status').textContent = '--';
+            document.getElementById('blockchain-network').textContent = '--';
+            document.getElementById('blockchain-timestamp').textContent = '--';
+            document.getElementById('blockchain-status-indicator').className = 'status-indicator status-offline';
+
+            // Wallet info
+            document.getElementById('wallet-status').textContent = '--';
+            document.getElementById('wallet-credits').textContent = '--';
+            document.getElementById('pol-balance').textContent = '--';
+            document.getElementById('wallet-status-indicator').className = 'status-indicator status-offline';
+
+            // Processing stats
+            document.getElementById('email-wallets-count').textContent = '--';
+            document.getElementById('total-credits-used').textContent = '--';
+            document.getElementById('last-activity').textContent = '--';
+        }
+
+        // Load dashboard data for connected wallet
+        async function loadDashboardData() {
+            if (!userWallet) {
+                resetDashboardData();
+                return;
+            }
+
+            showAlert('Loading dashboard data...', 'warning');
 
             try {
                 await Promise.all([
@@ -648,11 +739,11 @@
                     updateWalletInfo(),
                     updateProcessingStats()
                 ]);
+
+                showAlert('Dashboard data loaded successfully!', 'success');
             } catch (error) {
-                console.error('Error refreshing status:', error);
-                showAlert('Failed to refresh status. Please check your connection.', 'error');
-            } finally {
-                refreshIcon.innerHTML = '🔄';
+                console.error('❌ Error loading dashboard data:', error);
+                showAlert('Some data may be unavailable. Please check your connection.', 'error');
             }
         }
 
@@ -668,197 +759,160 @@
                     const data = await response.json();
                     document.getElementById('blockchain-status').textContent = 
                         data.isConnected ? 'Connected' : 'Disconnected';
+                    document.getElementById('blockchain-status-indicator').className = 
+                        'status-indicator ' + (data.isConnected ? 'status-connected' : 'status-error');
+                    document.getElementById('blockchain-network').textContent = 'Polygon Amoy';
                     document.getElementById('blockchain-timestamp').textContent = 
-                        new Date(data.timestamp).toLocaleString();
+                        new Date().toLocaleString();
                 } else {
                     throw new Error('Failed to get blockchain status');
                 }
             } catch (error) {
                 console.error('Blockchain status error:', error);
                 document.getElementById('blockchain-status').textContent = 'Error';
+                document.getElementById('blockchain-status-indicator').className = 'status-indicator status-error';
+                document.getElementById('blockchain-network').textContent = '--';
+                document.getElementById('blockchain-timestamp').textContent = '--';
             }
         }
 
         // Update wallet information
         async function updateWalletInfo() {
+            if (!userWallet) {
+                resetDashboardData();
+                return;
+            }
+
             try {
-                // Use the working API endpoint that returns all wallet info
-                const response = await fetch(`${API_BASE}/email-wallet/balance/${WALLET_ADDRESS}`);
+                const response = await fetch(`${API_BASE}/email-wallet/balance/${userWallet}`);
                 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('API Response:', data); // Debug logging
+                    console.log('API Response:', data);
                     
-                    // FIXED: API returns { "success": true, "data": { "credits": 110, "isRegistered": true, "address": "..." } }
                     if (data.success && data.data) {
                         // Update registration status
                         document.getElementById('wallet-status').textContent = 
                             data.data.isRegistered ? 'Registered' : 'Not Registered';
+                        document.getElementById('wallet-status-indicator').className = 
+                            'status-indicator ' + (data.data.isRegistered ? 'status-connected' : 'status-warning');
                         
                         // Update credits
-                        document.getElementById('wallet-credits').textContent = data.data.credits;
+                        document.getElementById('wallet-credits').textContent = data.data.credits || '--';
                         
-                        // Update POL balance if available
-                        if (data.data.nativeBalance !== undefined) {
-                            document.getElementById('matic-balance').textContent = 
-                                `${data.data.nativeBalance.toFixed(6)} POL`;
+                        // Get POL balance from MetaMask if available
+                        if (provider) {
+                            const balance = await provider.getBalance(userWallet);
+                            document.getElementById('pol-balance').textContent = 
+                                `${parseFloat(ethers.utils.formatEther(balance)).toFixed(4)} POL`;
+                        } else {
+                            document.getElementById('pol-balance').textContent = '--';
                         }
                     } else {
-                        console.error('Invalid API response structure:', data);
+                        throw new Error('Invalid API response structure');
                     }
                 } else {
                     throw new Error(`HTTP ${response.status}`);
                 }
             } catch (error) {
                 console.error('Wallet info error:', error);
+                document.getElementById('wallet-status').textContent = '--';
+                document.getElementById('wallet-credits').textContent = '--';
+                document.getElementById('pol-balance').textContent = '--';
+                document.getElementById('wallet-status-indicator').className = 'status-indicator status-error';
             }
         }
 
-        // Update processing statistics
-        function updateProcessingStats() {
-            document.getElementById('emails-processed').textContent = processingStats.emailsProcessed;
-            document.getElementById('wallets-created').textContent = processingStats.walletsCreated;
-            document.getElementById('credits-used').textContent = processingStats.creditsUsed;
-        }
-
-        // Setup email form submission
-        function setupEmailForm() {
-            const form = document.getElementById('email-form');
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await processTestEmail();
-            });
-        }
-
-        // Process test email
-        async function processTestEmail() {
-            const submitBtn = document.getElementById('submit-btn');
-            const originalText = submitBtn.textContent;
-            
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="loading"></span> Processing...';
-
-            try {
-                const formData = new FormData(document.getElementById('email-form'));
-                const emailData = {
-                    from: formData.get('from'),
-                    to: formData.get('to'),
-                    subject: formData.get('subject'),
-                    body: formData.get('body'),
-                    receivedDate: new Date().toISOString(),
-                    attachments: []
-                };
-
-                // Add to processing queue
-                const emailId = `email-${Date.now()}`;
-                const queueItem = {
-                    id: emailId,
-                    ...emailData,
-                    status: 'processing',
-                    timestamp: new Date()
-                };
-
-                emailQueue.unshift(queueItem);
-                updateEmailQueue();
-
-                // TODO: Replace with actual API call when email processing endpoint exists
-                // const response = await fetch(`${API_BASE}/emailprocessing/process`, {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify(emailData)
-                // });
-
-                // For now, simulate processing
-                await simulateEmailProcessing(emailId);
-
-                showAlert('Email submitted for processing! Check the queue below for status updates.', 'success');
-                
-                // Update stats
-                processingStats.emailsProcessed++;
-                processingStats.creditsUsed += 4;
-                updateProcessingStats();
-
-            } catch (error) {
-                console.error('Email processing error:', error);
-                showAlert('Failed to process email. Please try again.', 'error');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            }
-        }
-
-        // Simulate email processing (replace with real API calls)
-        async function simulateEmailProcessing(emailId) {
-            const item = emailQueue.find(e => e.id === emailId);
-            if (!item) return;
-
-            // Simulate processing steps
-            const steps = [
-                { status: 'processing', message: 'Validating email...', delay: 1000 },
-                { status: 'processing', message: 'Creating authorization request...', delay: 2000 },
-                { status: 'processing', message: 'Waiting for user authorization...', delay: 1500 },
-                { status: 'processing', message: 'Creating DATA_WALLET on blockchain...', delay: 3000 },
-                { status: 'completed', message: 'DATA_WALLET created successfully!', delay: 500 }
-            ];
-
-            for (const step of steps) {
-                await new Promise(resolve => setTimeout(resolve, step.delay));
-                item.status = step.status;
-                item.message = step.message;
-                updateEmailQueue();
-            }
-
-            if (item.status === 'completed') {
-                processingStats.walletsCreated++;
-                updateProcessingStats();
-            }
-        }
-
-        // Update email queue display
-        function updateEmailQueue() {
-            const queueList = document.getElementById('email-queue-list');
-            
-            if (emailQueue.length === 0) {
-                queueList.innerHTML = '<p style="color: var(--gray); text-align: center; padding: 20px;">No emails in queue. Submit a test email above to start processing.</p>';
+        // Update processing statistics  
+        async function updateProcessingStats() {
+            if (!userWallet) {
+                resetDashboardData();
                 return;
             }
 
-            queueList.innerHTML = emailQueue.map(email => `
-                <div class="email-item">
-                    <div class="email-item-header">
-                        <span class="email-subject">${email.subject}</span>
-                        <span class="email-status status-${email.status}">${email.status.toUpperCase()}</span>
-                    </div>
-                    <div class="email-details">
-                        <strong>From:</strong> ${email.from} → <strong>To:</strong> ${email.to}<br>
-                        <strong>Time:</strong> ${email.timestamp.toLocaleString()}
-                        ${email.message ? `<br><strong>Status:</strong> ${email.message}` : ''}
-                    </div>
-                </div>
-            `).join('');
+            try {
+                // Try to get actual wallet statistics from API
+                const response = await fetch(`${API_BASE}/email-wallet/stats/${userWallet}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data) {
+                        document.getElementById('email-wallets-count').textContent = data.data.emailWallets || '--';
+                        document.getElementById('total-credits-used').textContent = data.data.creditsUsed || '--';
+                        document.getElementById('last-activity').textContent = 
+                            data.data.lastActivity ? new Date(data.data.lastActivity).toLocaleDateString() : '--';
+                    } else {
+                        throw new Error('Invalid stats response');
+                    }
+                } else {
+                    throw new Error(`Stats API returned ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Processing stats error:', error);
+                // Show clean no-data states instead of fake data
+                document.getElementById('email-wallets-count').textContent = '--';
+                document.getElementById('total-credits-used').textContent = '--';
+                document.getElementById('last-activity').textContent = '--';
+            }
         }
 
-        // Update wallet address display
-        function updateWalletAddress() {
-            document.getElementById('wallet-address').textContent = WALLET_ADDRESS;
+        // Refresh dashboard data
+        async function refreshDashboard() {
+            const refreshIcon = document.getElementById('refresh-icon');
+            refreshIcon.innerHTML = '<span class="loading"></span>';
+
+            try {
+                if (userWallet) {
+                    await loadDashboardData();
+                } else {
+                    showAlert('Connect your wallet to refresh dashboard data.', 'warning');
+                }
+            } finally {
+                refreshIcon.innerHTML = '🔄';
+            }
         }
 
         // Show alert messages
         function showAlert(message, type) {
+            // Remove any existing alerts
+            const existingAlerts = document.querySelectorAll('.alert');
+            existingAlerts.forEach(alert => alert.remove());
+
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type}`;
-            alertDiv.textContent = message;
+            alertDiv.innerHTML = message;
             
-            const form = document.querySelector('.email-form');
-            form.insertBefore(alertDiv, form.firstChild);
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
             
+            // Auto-remove after 5 seconds
             setTimeout(() => {
-                alertDiv.remove();
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
             }, 5000);
         }
 
-        // Auto-refresh every 30 seconds
-        setInterval(refreshStatus, 30000);
+        // Handle account changes in MetaMask
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', function (accounts) {
+                if (accounts.length === 0) {
+                    // User disconnected
+                    userWallet = null;
+                    provider = null;
+                    signer = null;
+                    updateWalletDisplay();
+                } else if (accounts[0] !== userWallet) {
+                    // User switched accounts
+                    window.location.reload();
+                }
+            });
+
+            window.ethereum.on('chainChanged', function (chainId) {
+                // Reload on network change
+                window.location.reload();
+            });
+        }
     </script>
 </body>
 </html>

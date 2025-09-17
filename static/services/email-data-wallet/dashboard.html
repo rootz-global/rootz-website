@@ -1144,9 +1144,30 @@
                     <div style="margin-bottom: 20px;">
                         <h3 style="color: var(--primary); margin-bottom: 10px;">📄 Email Content</h3>
                         ${ipfsData.rawContent ? `
-                            <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px; white-space: pre-wrap;">
-                                ${escapeHtml(emailData.parsedEmail?.body || ipfsData.rawContent.substring(0, 2000) + (ipfsData.rawContent.length > 2000 ? '...' : ''))}
-                            </div>
+                            ${emailData.parsedEmail?.rawEmail ? `
+                                <!-- Show both parsed and raw content when available -->
+                                <div style="margin-bottom: 15px;">
+                                    <h4 style="margin: 0 0 8px 0; color: var(--secondary);">📧 Parsed Email Content</h4>
+                                    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                                        <div style="font-size: 13px; color: var(--gray); margin-bottom: 10px;">Subject: ${emailData.parsedEmail.subject}</div>
+                                        <div style="max-height: 200px; overflow-y: auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.4;">
+                                            ${escapeHtml(emailData.parsedEmail.body || 'No content available')}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0 0 8px 0; color: var(--secondary);">📄 Raw Original Email (Legal Proof)</h4>
+                                    <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; max-height: 300px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 11px; white-space: pre-wrap; color: #495057;">
+                                        ${escapeHtml(emailData.parsedEmail.rawEmail.content.substring(0, 3000) + (emailData.parsedEmail.rawEmail.content.length > 3000 ? '\n\n... [Content truncated for display - full content preserved in IPFS]' : ''))}
+                                    </div>
+                                    <div style="font-size: 11px; color: var(--gray); margin-top: 5px;">Original email size: ${emailData.parsedEmail.rawEmail.contentLength} bytes | Hash: ${emailData.parsedEmail.rawEmail.contentHash.substring(0, 16)}...</div>
+                                </div>
+                            ` : `
+                                <!-- Legacy format - parsed content only -->
+                                <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px; white-space: pre-wrap;">
+                                    ${escapeHtml(emailData.parsedEmail?.body || ipfsData.rawContent.substring(0, 2000) + (ipfsData.rawContent.length > 2000 ? '...' : ''))}
+                                </div>
+                            `}
                         ` : `
                             <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 15px; color: #92400e;">
                                 ⚠️ Email content not available from IPFS. Hash: ${ipfsData.ipfsHash}

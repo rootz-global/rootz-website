@@ -536,7 +536,9 @@
                     
                     // FIXED: Handle correct API response format
                     let requests = [];
-                    if (data.success && data.pendingRequests) {
+                    if (data.success && data.data && data.data.pendingRequests) {
+                        requests = data.data.pendingRequests;  // CORRECT: data.data.pendingRequests
+                    } else if (data.success && data.pendingRequests) {
                         requests = data.pendingRequests;
                     } else if (data.success && Array.isArray(data.data)) {
                         requests = data.data;

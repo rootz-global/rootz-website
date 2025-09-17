@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email DATA_WALLET Service - Rootz Innovation</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" integrity="sha512-8H0V3ANDGbhM5bCONyIzPFCf6UdxhAKVsKGcP4EK2kPKRN2vSNZgDp8PlbzP3/DUeHFPY7LLqX9rz9I7vCFCcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
         :root {
             --primary: #2d5016;
@@ -594,12 +594,14 @@
     </footer>
 
     <script>
-        // Check if ethers loaded properly
-        if (typeof ethers === 'undefined') {
-            console.error('❌ Ethers.js failed to load');
-        } else {
-            console.log('✅ Ethers.js loaded successfully');
-        }
+        // Check if ethers loaded properly - wait for page load
+        setTimeout(function() {
+            if (typeof ethers === 'undefined') {
+                console.error('❌ Ethers.js failed to load');
+            } else {
+                console.log('✅ Ethers.js loaded successfully');
+            }
+        }, 1000);
 
         // Configuration - FIXED to use correct port 8000
         const API_BASE = (() => {

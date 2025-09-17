@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email DATA_WALLET Dashboard</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" integrity="sha512-8H0V3ANDGbhM5bCONyIzPFCf6UdxhAKVsKGcP4EK2kPKRN2vSNZgDp8PlbzP3/DUeHFPY7LLqX9rz9I7vCFCcw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <style>
         :root {
             --primary: #2d5016;
@@ -567,19 +567,21 @@
     </div>
 
     <script>
-        // Check if ethers loaded properly
-        if (typeof ethers === 'undefined') {
-            console.error('❌ Ethers.js failed to load');
-            document.addEventListener('DOMContentLoaded', function() {
-                const container = document.querySelector('.container');
-                const alertDiv = document.createElement('div');
-                alertDiv.className = 'alert alert-error';
-                alertDiv.innerHTML = '❌ Ethers.js library failed to load. Please refresh the page or check your internet connection.';
-                container.insertBefore(alertDiv, container.firstChild);
-            });
-        } else {
-            console.log('✅ Ethers.js loaded successfully');
-        }
+        // Check if ethers loaded properly - wait a moment for it to load
+        setTimeout(function() {
+            if (typeof ethers === 'undefined') {
+                console.error('❌ Ethers.js failed to load');
+                document.addEventListener('DOMContentLoaded', function() {
+                    const container = document.querySelector('.container');
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-error';
+                    alertDiv.innerHTML = '❌ Ethers.js library failed to load. Please refresh the page or check your internet connection.';
+                    container.insertBefore(alertDiv, container.firstChild);
+                });
+            } else {
+                console.log('✅ Ethers.js loaded successfully');
+            }
+        }, 1000); // Give it 1 second to load
 
         // Configuration - FIXED to use correct port 8000
         const API_BASE = (() => {
@@ -820,7 +822,7 @@
                         document.getElementById('wallet-credits').textContent = data.data.credits || '--';
                         
                         // Get POL balance from MetaMask if available
-                        if (provider) {
+                        if (provider && typeof ethers !== 'undefined') {
                             const balance = await provider.getBalance(userWallet);
                             document.getElementById('pol-balance').textContent = 
                                 `${parseFloat(ethers.utils.formatEther(balance)).toFixed(4)} POL`;

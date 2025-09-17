@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Wallet Registration - Test Page</title>
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <!-- FIXED: Working ethers.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -74,33 +75,50 @@
         
         .status.warning {
             background: #fef3c7;
-            color: #92400e;
+            color: #d97706;
             border: 2px solid #fbbf24;
+        }
+        
+        .wallet-info {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #4f46e5;
+        }
+        
+        .wallet-info h3 {
+            margin: 0 0 10px 0;
+            color: #374151;
+        }
+        
+        .wallet-info p {
+            margin: 5px 0;
+            color: #6b7280;
         }
         
         .form-group {
             margin-bottom: 25px;
         }
         
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
             color: #374151;
-            font-size: 1.1em;
         }
         
-        input[type="email"], input[type="text"] {
+        .form-group input {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            font-size: 1.1em;
+            border-radius: 8px;
+            font-size: 16px;
             transition: all 0.3s ease;
             box-sizing: border-box;
         }
         
-        input[type="email"]:focus, input[type="text"]:focus {
+        .form-group input:focus {
             outline: none;
             border-color: #4f46e5;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
@@ -111,395 +129,29 @@
             color: white;
             border: none;
             padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 1.1em;
+            font-size: 16px;
             font-weight: 600;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
-            margin-top: 10px;
+            margin: 10px 0;
         }
         
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
         }
         
         .btn:disabled {
-            opacity: 0.6;
+            background: #9ca3af;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
         
-        .wallet-info {
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
+        .btn.secondary {
+            background: #6b7280;
         }
         
-        .wallet-info h3 {
-            margin: 0 0 15px 0;
-            color: #374151;
-        }
-        
-        .wallet-address {
-            font-family: 'Courier New', monospace;
-            background: #1f2937;
-            color: #10b981;
-            padding: 12px;
-            border-radius: 8px;
-            word-break: break-all;
-            font-size: 0.9em;
-        }
-        
-        .tx-hash {
-            font-family: 'Courier New', monospace;
-            background: #1f2937;
-            color: #fbbf24;
-            padding: 12px;
-            border-radius: 8px;
-            word-break: break-all;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-        
-        .tx-link {
-            color: #60a5fa;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .tx-link:hover {
-            text-decoration: underline;
-        }
-        
-        .contract-info {
-            background: #f0f9ff;
-            border: 2px solid #0ea5e9;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-            font-size: 0.95em;
-        }
-        
-        .contract-info h4 {
-            margin: 0 0 10px 0;
-            color: #0c4a6e;
-        }
-        
-        .small-text {
-            font-size: 0.9em;
-            color: #6b7280;
-            margin-top: 10px;
-        }
-        
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .back-link:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-1px);
-        }
-    </style>
-</head>
-<body>
-    <a href="/" class="back-link">← Back to Rootz.Global</a>
-    
-    <div class="container">
-        <div class="header">
-            <h1>📧 Email Wallet Registration</h1>
-            <p>Test Direct User Registration</p>
-        </div>
-        
-        <div class="content">
-            <div id="status" class="status info">
-                Connect your wallet to begin registration
-            </div>
-            
-            <div class="contract-info">
-                <h4>Contract Information</h4>
-                <strong>EmailWalletRegistration:</strong> 0x71C1d6a0DAB73b25dE970E032bafD42a29dC010F<br>
-                <strong>Network:</strong> Polygon Amoy Testnet<br>
-                <strong>Registration Fee:</strong> 0.01 POL<br>
-                <strong>Chain ID:</strong> 80002
-            </div>
-            
-            <div id="walletInfo" class="wallet-info" style="display: none;">
-                <h3>Connected Wallet</h3>
-                <div id="walletAddress" class="wallet-address"></div>
-                <div class="small-text">Balance: <span id="walletBalance">Loading...</span> POL</div>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Primary Email Address</label>
-                <input type="email" id="email" placeholder="your.email@example.com" required>
-                <div class="small-text">This email will be linked to your wallet for email processing</div>
-            </div>
-            
-            <div class="form-group">
-                <label for="name">Full Name (for signature message)</label>
-                <input type="text" id="name" placeholder="Your Full Name" required>
-                <div class="small-text">Used in the signature message to verify ownership</div>
-            </div>
-            
-            <button id="connectBtn" class="btn" onclick="connectWallet()">
-                Connect MetaMask Wallet
-            </button>
-            
-            <button id="checkBtn" class="btn" onclick="checkRegistration()" style="display: none;">
-                Check Registration Status
-            </button>
-            
-            <button id="registerBtn" class="btn" onclick="registerUser()" style="display: none;">
-                Register Email Wallet (0.01 POL)
-            </button>
-            
-            <div id="transactionInfo" style="display: none; margin-top: 25px;">
-                <h3>Transaction Details</h3>
-                <div class="tx-hash" id="transactionHash"></div>
-                <div class="small-text">
-                    <a id="explorerLink" class="tx-link" target="_blank">View on Polygon Scan</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Contract configuration
-        const CONTRACT_ADDRESS = "0x71C1d6a0DAB73b25dE970E032bafD42a29dC010F";
-        const CHAIN_ID = 80002; // Polygon Amoy
-        const RPC_URL = "https://rpc-amoy.polygon.technology/";
-        const EXPLORER_URL = "https://amoy.polygonscan.com";
-        
-        // Contract ABI - Only the functions we need
-        const CONTRACT_ABI = [
-            "function registerEmailWallet(string primaryEmail, string[] additionalEmails, address parentCorporateWallet, bytes32[] authorizationTxs, string[] whitelistedDomains, bool autoProcessCC) external payable returns (bytes32 registrationId)",
-            "function isRegistered(address wallet) external view returns (bool)",
-            "function getCreditBalance(address wallet) external view returns (uint256)",
-            "function getRegistration(address wallet) external view returns (bytes32 registrationId, string primaryEmail, address parentCorporateWallet, bool autoProcessCC, uint256 registeredAt, bool isActive, uint256 creditBalance)",
-            "function registrationFee() external view returns (uint256)"
-        ];
-        
-        let provider;
-        let signer;
-        let contract;
-        let userAddress;
-        
-        // Update status message
-        function updateStatus(message, type = 'info') {
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = message;
-            statusEl.className = `status ${type}`;
-        }
-        
-        // Connect to MetaMask wallet
-        async function connectWallet() {
-            try {
-                if (typeof window.ethereum === 'undefined') {
-                    updateStatus('MetaMask not detected. Please install MetaMask.', 'error');
-                    return;
-                }
-                
-                updateStatus('Connecting to MetaMask...', 'info');
-                
-                // Request account access
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                
-                // Create provider and signer
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                signer = provider.getSigner();
-                userAddress = await signer.getAddress();
-                
-                // Check if we're on the right network
-                const network = await provider.getNetwork();
-                if (network.chainId !== CHAIN_ID) {
-                    updateStatus('Please switch to Polygon Amoy Testnet (Chain ID: 80002)', 'warning');
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: '0x13882' }], // 80002 in hex
-                        });
-                    } catch (switchError) {
-                        updateStatus('Failed to switch network. Please switch manually.', 'error');
-                        return;
-                    }
-                }
-                
-                // Create contract instance
-                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                
-                // Update UI
-                document.getElementById('walletAddress').textContent = userAddress;
-                document.getElementById('walletInfo').style.display = 'block';
-                document.getElementById('connectBtn').style.display = 'none';
-                document.getElementById('checkBtn').style.display = 'block';
-                document.getElementById('registerBtn').style.display = 'block';
-                
-                // Get wallet balance
-                const balance = await provider.getBalance(userAddress);
-                document.getElementById('walletBalance').textContent = ethers.utils.formatEther(balance);
-                
-                updateStatus('Wallet connected successfully! Check your registration status below.', 'success');
-                
-                // Auto-check registration status
-                await checkRegistration();
-                
-            } catch (error) {
-                console.error('Error connecting wallet:', error);
-                updateStatus(`Connection failed: ${error.message}`, 'error');
-            }
-        }
-        
-        // Check if user is already registered
-        async function checkRegistration() {
-            try {
-                updateStatus('Checking registration status...', 'info');
-                
-                const isRegistered = await contract.isRegistered(userAddress);
-                
-                if (isRegistered) {
-                    updateStatus('✅ Wallet is already registered! You can use the email processing service.', 'success');
-                    
-                    // Get registration details
-                    const registration = await contract.getRegistration(userAddress);
-                    console.log('Registration details:', {
-                        registrationId: registration.registrationId,
-                        primaryEmail: registration.primaryEmail,
-                        registeredAt: new Date(registration.registeredAt.toNumber() * 1000),
-                        creditBalance: registration.creditBalance.toNumber()
-                    });
-                    
-                    document.getElementById('registerBtn').textContent = 'Already Registered ✅';
-                    document.getElementById('registerBtn').disabled = true;
-                } else {
-                    updateStatus('❌ Wallet not registered. You can register below.', 'warning');
-                    document.getElementById('registerBtn').textContent = 'Register Email Wallet (0.01 POL)';
-                    document.getElementById('registerBtn').disabled = false;
-                }
-                
-            } catch (error) {
-                console.error('Error checking registration:', error);
-                updateStatus(`Failed to check registration: ${error.message}`, 'error');
-            }
-        }
-        
-        // Register user
-        async function registerUser() {
-            try {
-                const email = document.getElementById('email').value.trim();
-                const name = document.getElementById('name').value.trim();
-                
-                if (!email || !name) {
-                    updateStatus('Please fill in both email and name fields.', 'error');
-                    return;
-                }
-                
-                // Email validation
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    updateStatus('Please enter a valid email address.', 'error');
-                    return;
-                }
-                
-                updateStatus('Starting registration process...', 'info');
-                
-                // Get registration fee
-                const registrationFee = await contract.registrationFee();
-                console.log('Registration fee:', ethers.utils.formatEther(registrationFee), 'POL');
-                
-                // Prepare transaction
-                const tx = await contract.registerEmailWallet(
-                    email,                               // primaryEmail
-                    [],                                  // additionalEmails (empty array)
-                    ethers.constants.AddressZero,        // parentCorporateWallet (zero address)
-                    [],                                  // authorizationTxs (empty array)
-                    [],                                  // whitelistedDomains (empty array)
-                    false,                               // autoProcessCC
-                    {
-                        value: registrationFee,          // Pay registration fee
-                        gasLimit: ethers.BigNumber.from(600000) // Set gas limit
-                    }
-                );
-                
-                updateStatus('Transaction submitted. Waiting for confirmation...', 'info');
-                
-                // Show transaction info
-                document.getElementById('transactionHash').textContent = tx.hash;
-                document.getElementById('explorerLink').href = `${EXPLORER_URL}/tx/${tx.hash}`;
-                document.getElementById('transactionInfo').style.display = 'block';
-                
-                // Wait for confirmation
-                const receipt = await tx.wait();
-                
-                if (receipt.status === 1) {
-                    updateStatus('🎉 Registration successful! You can now use the email processing service.', 'success');
-                    document.getElementById('registerBtn').textContent = 'Registered Successfully ✅';
-                    document.getElementById('registerBtn').disabled = true;
-                    
-                    // Refresh registration status
-                    setTimeout(checkRegistration, 2000);
-                } else {
-                    updateStatus('Registration transaction failed. Please try again.', 'error');
-                }
-                
-            } catch (error) {
-                console.error('Registration error:', error);
-                
-                let errorMessage = 'Registration failed: ';
-                if (error.message.includes('User already registered')) {
-                    errorMessage += 'Wallet is already registered.';
-                } else if (error.message.includes('Insufficient registration fee')) {
-                    errorMessage += 'Insufficient registration fee. Please ensure you have at least 0.01 POL.';
-                } else if (error.message.includes('user rejected')) {
-                    errorMessage += 'Transaction was cancelled by user.';
-                } else {
-                    errorMessage += error.message;
-                }
-                
-                updateStatus(errorMessage, 'error');
-            }
-        }
-        
-        // Auto-connect if previously connected
-        window.addEventListener('load', async () => {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-                    if (accounts.length > 0) {
-                        await connectWallet();
-                    }
-                } catch (error) {
-                    console.log('No previously connected account');
-                }
-            }
-        });
-        
-        // Handle account changes
-        if (typeof window.ethereum !== 'undefined') {
-            window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length === 0) {
-                    location.reload();
-                } else {
-                    connectWallet();
-                }
-            });
-            
-            window.ethereum.on('chainChanged', (chainId) => {
-                location.reload();
-            });
-        }
-    </script>
-</body>
-</html>
+        .btn.secondary:hover:not(:disabled)

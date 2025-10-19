@@ -3,17 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Manufacturing - Creating data with origin - Rivetz</title>
+    <title>Data Manufacturing - Electrons to Knowledge to Wealth - Rootz</title>
+
+    <!-- Mermaid.js for diagrams -->
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#e0e7ff',
+          primaryTextColor: '#1e1b4b',
+          primaryBorderColor: '#4f46e5',
+          lineColor: '#6366f1',
+          secondaryColor: '#ddd6fe',
+          tertiaryColor: '#cffafe',
+          fontSize: '16px',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        }
+      });
+    </script>
+
     <style>
         :root {
-            --primary: #2d5016;
-            --secondary: #4a7c59;
-            --accent: #5d8a66;
-            --light-green: #76a56f;
-            --dark: #1a2f0a;
+            --primary-blue: #4f46e5;
+            --primary-purple: #7c3aed;
+            --secondary-blue: #6366f1;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --dark: #1e1b4b;
             --light: #ffffff;
-            --background: #f8fdf6;
-            --gray: #666666;
+            --background: #f8fafc;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-900: #111827;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -74,7 +100,7 @@
         .nav-menu.mobile-active a:hover { border-bottom-color: var(--primary); }
         
         .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
             color: var(--light); padding: 100px 20px; text-align: center;
         }
         .hero h1 { font-size: 48px; margin-bottom: 20px; }
@@ -82,8 +108,8 @@
         
         .content-section { padding: 80px 20px; }
         .content-section:nth-child(even) { background: var(--light); }
-        .content-section h2 { font-size: 36px; text-align: center; margin-bottom: 40px; color: var(--primary); }
-        .content-section h3 { font-size: 24px; margin-bottom: 20px; color: var(--secondary); }
+        .content-section h2 { font-size: 36px; text-align: center; margin-bottom: 40px; color: var(--primary-blue); }
+        .content-section h3 { font-size: 24px; margin-bottom: 20px; color: var(--primary-purple); }
         .content-section p { font-size: 18px; margin-bottom: 20px; line-height: 1.8; }
         
         .features-grid {
@@ -102,11 +128,32 @@
             display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px;
         }
         
-        .feature-card h3 { font-size: 22px; margin-bottom: 15px; color: var(--primary); }
-        .feature-card p { font-size: 16px; color: var(--gray); }
-        
+        .feature-card h3 { font-size: 22px; margin-bottom: 15px; color: var(--primary-blue); }
+        .feature-card p { font-size: 16px; color: var(--gray-600); }
+
+        .diagram-container {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .diagram-container h3 {
+            text-align: center;
+            color: var(--primary-blue);
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .diagram-container pre {
+            background: transparent;
+            border: none;
+            text-align: center;
+        }
+
         .btn {
-            display: inline-block; background-color: var(--primary); color: var(--light);
+            display: inline-block; background-color: var(--primary-blue); color: var(--light);
             padding: 14px 32px; border-radius: 6px; text-decoration: none; font-weight: 600;
         }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
@@ -146,38 +193,75 @@
     <main>
         <section class="hero">
             <div class="container">
-                <h1>Data Manufacturing: Creating data with origin</h1>
-                <p>The revolutionary process of manufacturing data objects with immutable origin tracking and ownership binding</p>
+                <h1>Data Manufacturing: From Electrons to Knowledge</h1>
+                <p>The revolutionary process of transforming physical substrates into Knowledge assets through Origin² - manufacturing data with immutable provenance and authentic ownership that creates measurable Wealth</p>
             </div>
         </section>
 
         <section class="content-section">
             <div class="container">
-                <p>Rootz pioneered Data Manufacturing - the revolutionary process of creating data objects with built-in origin tracking, ownership binding, and immutable provenance chains. What is core to our model is that when a wallet is created, genesis data is recorded in the first blocks on the chain. The first genesis block will always record the ownership of the product or data. In addition, the system that created the data is also recorded as a genesis block. This innovation solves the fundamental challenge of data authenticity in the digital age.</p>
-                
-                <h3>The Data Manufacturing Revolution</h3>
-                <p>Traditional data lacks verifiable origin - you cannot prove where it came from, who created it, or whether it has been tampered with. Rootz's Data Manufacturing process creates data objects that carry immutable proof of origin through genesis blocks. From this innovation, the owner can dynamically update any of the information on the chain while maintaining immutable proof of authentic creation:</p>
-                
+                <h2>The Complete Transformation: Electrons → Data → Knowledge → Wealth</h2>
+                <p>Rootz pioneered Data Manufacturing as the critical second stage in the transformation from physical substrate to digital wealth. Our revolutionary process begins with electrons in silicon (ASIC manufacturing) and transforms them into data objects with Origin² - the foundation that enables Knowledge creation and Wealth generation.</p>
+
+                <div class="diagram-container">
+                    <h3>The Four-Stage Transformation</h3>
+                    <pre class="mermaid">
+graph LR
+    A["⚡ Electrons<br/><small>Physical substrate</small>"] -->|"ASIC<br/>Manufacturing"| B["📍 Data<br/><small>with Origin²</small>"]
+    B -->|"Learning<br/>Captured"| C["💡 Knowledge<br/><small>Verifiable asset</small>"]
+    C -->|"Sovereign<br/>Control"| D["💰 Wealth<br/><small>Measurable value</small>"]
+
+    style A fill:#4f46e5,stroke:#1e40af,stroke-width:3px,color:#fff
+    style B fill:#7c3aed,stroke:#6d28d9,stroke-width:3px,color:#fff
+    style C fill:#06b6d4,stroke:#0891b2,stroke-width:3px,color:#fff
+    style D fill:#f59e0b,stroke:#d97706,stroke-width:3px,color:#fff
+                    </pre>
+                </div>
+
+                <h3>Genesis Blocks: The Foundation of Origin²</h3>
+                <p>What is core to our Data Manufacturing model is that when a wallet is created, genesis data is recorded in the first blocks on the chain. These genesis blocks establish Origin² - both WHO created the data and WHO owns it:</p>
+
                 <div class="features-grid">
                     <div class="feature-card">
-                        <div class="feature-icon">🏭</div>
-                        <h3>Manufacturing Origin</h3>
-                        <p>Every data object includes cryptographic proof of when, where, and by whom it was manufactured, creating an immutable creation record.</p>
+                        <div class="feature-icon">📍</div>
+                        <h3>Origin Genesis Block</h3>
+                        <p>The first genesis block permanently records WHAT system created the data, WHEN it was created, and WHERE it originated. This immutable Origin proof is the prerequisite for Knowledge - you can't trust what you can't verify.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">🔐</div>
-                        <h3>Ownership Binding</h3>
-                        <p>The Owners digital roots are cryptographically bound to every data object, creating mathematically provable dynamic control that travels with the data.</p>
+                        <div class="feature-icon">👑</div>
+                        <h3>Ownership Genesis Block</h3>
+                        <p>The second genesis block cryptographically binds WHO owns the data. This Ownership proof enables Knowledge creation - you can't learn from data you don't control. Owners maintain dynamic control while genesis blocks preserve immutable proof.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">⛓️</div>
-                        <h3>Provenance Chains</h3>
-                        <p>Complete audit trails track every access, modification, and authorization, creating immutable chains of data provenance.</p>
+                        <div class="feature-icon">💡</div>
+                        <h3>Knowledge Through Origin²</h3>
+                        <p>Origin + Ownership (Origin²) transforms raw data into Knowledge assets. Complete audit trails track every access and modification while maintaining verifiable provenance chains. Knowledge with Origin² creates measurable Wealth.</p>
+                    </div>
+                </div>
+
+                <h3>From Data to Wealth: Real Economic Impact</h3>
+                <p>Data Manufacturing with Origin² creates Knowledge assets that generate measurable economic value:</p>
+
+                <div class="features-grid" style="margin-top: 2rem;">
+                    <div class="feature-card" style="background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 50%);">
+                        <div class="feature-icon">🐴</div>
+                        <h3>Equestrian: 15-30% Premium</h3>
+                        <p>Horse data manufactured with Origin² creates Knowledge assets worth $15,000-$30,000 more than horses without verifiable provenance. Genesis blocks transform breeding records into Wealth.</p>
+                    </div>
+                    <div class="feature-card" style="background: linear-gradient(135deg, #ddd6fe 0%, #e0e7ff 50%);">
+                        <div class="feature-icon">🐄</div>
+                        <h3>Cattle: 10,000%+ ROI</h3>
+                        <p>$263 investment in Data Manufacturing creates cattle Knowledge assets worth up to $27,000. Origin² transforms genetics records into premium market value through verifiable provenance.</p>
+                    </div>
+                    <div class="feature-card" style="background: linear-gradient(135deg, #cffafe 0%, #e0f2fe 50%);">
+                        <div class="feature-icon">🏢</div>
+                        <h3>Buildings: 12-15% Premium + 25% Cost Savings</h3>
+                        <p>Construction data manufactured with Origin² enables AI-optimized operations and verified green certifications, creating both premium valuations and operational efficiency through Knowledge.</p>
                     </div>
                 </div>
 
                 <div style="text-align: center; margin-top: 40px;">
-                    <a href="#" class="btn">Start Manufacturing Data</a>
+                    <a href="contact.html" class="btn">Start Manufacturing Knowledge Assets</a>
                 </div>
             </div>
         </section>
@@ -185,8 +269,8 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names</p>
-            <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Everything Has a Wallet</p>
+            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names | Knowledge Starts at Origin</p>
+            <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Origin² Creates Value</p>
         </div>
     </footer>
     <script>document.addEventListener('DOMContentLoaded', function() { const hamburger = document.getElementById('hamburger'); const navMenu = document.getElementById('nav-menu'); hamburger.addEventListener('click', function() { hamburger.classList.toggle('active'); if (navMenu.classList.contains('mobile-active')) { navMenu.classList.remove('show'); setTimeout(() => { navMenu.classList.remove('mobile-active'); }, 300); } else { navMenu.classList.add('mobile-active'); setTimeout(() => { navMenu.classList.add('show'); }, 10); } }); const navLinks = navMenu.querySelectorAll('a'); navLinks.forEach(link => { link.addEventListener('click', function() { if (window.innerWidth <= 768) { hamburger.classList.remove('active'); navMenu.classList.remove('show'); setTimeout(() => { navMenu.classList.remove('mobile-active'); }, 300); } }); }); window.addEventListener('resize', function() { if (window.innerWidth > 768) { hamburger.classList.remove('active'); navMenu.classList.remove('mobile-active', 'show'); } }); });</script>

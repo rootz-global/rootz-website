@@ -3,17 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rootz - In the Future Everything has a Wallet</title>
+    <title>Rootz - Knowledge Starts at Origin</title>
+
+    <!-- Mermaid.js for diagrams -->
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#e0e7ff',
+          primaryTextColor: '#1e1b4b',
+          primaryBorderColor: '#4f46e5',
+          lineColor: '#6366f1',
+          secondaryColor: '#ddd6fe',
+          tertiaryColor: '#cffafe',
+          fontSize: '16px',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        }
+      });
+    </script>
+
     <style>
         :root {
-            --primary: #2d5016;
-            --secondary: #4a7c59;
-            --accent: #5d8a66;
-            --light-green: #76a56f;
-            --dark: #1a2f0a;
+            --primary-blue: #4f46e5;
+            --primary-purple: #7c3aed;
+            --secondary-blue: #6366f1;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --dark: #1e1b4b;
             --light: #ffffff;
-            --background: #f8fdf6;
-            --gray: #666666;
+            --background: #f8fafc;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-900: #111827;
         }
 
         * {
@@ -155,7 +181,7 @@
         }
         
         .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
             color: var(--light);
             padding: 100px 20px;
             text-align: center;
@@ -204,7 +230,7 @@
         }
         
         .innovation-banner {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-blue) 100%);
             color: var(--light);
             padding: 60px 20px;
             text-align: center;
@@ -253,7 +279,7 @@
             font-size: 36px;
             text-align: center;
             margin-bottom: 40px;
-            color: var(--primary);
+            color: var(--primary-blue);
         }
         
         .content-section h3 {
@@ -353,6 +379,27 @@
             opacity: 0.9;
         }
 
+        .diagram-container {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .diagram-container h3 {
+            text-align: center;
+            color: var(--primary-blue);
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .diagram-container pre {
+            background: transparent;
+            border: none;
+            text-align: center;
+        }
+
         @media (max-width: 768px) {
             .hamburger {
                 display: flex !important;
@@ -436,9 +483,9 @@
     <main>
         <section class="hero">
             <div class="container">
-                <h1>In the Future Everything has a Wallet</h1>
-                <p class="hero-subtitle">Not an Identity but the foundations for Ownership, Origin, Access, and Reliability</p>
-                <p>Pioneering Digital Names and Data Manufacturing for a world where every device, every piece of data, and every digital interaction carries verifiable proof of authenticity and ownership</p>
+                <h1>Knowledge Starts at Origin</h1>
+                <p class="hero-subtitle">Transforming Electrons into Data into Knowledge into Wealth</p>
+                <p>In the Future Everything has a Wallet. Pioneering the Digital Names and Data Manufacturing infrastructure where Origin and Ownership create measurable Knowledge and verifiable Wealth for every device, every piece of data, and every digital interaction</p>
                 <a href="digital-names.html" class="btn">Discover Digital Names</a>
                 <a href="data-manufacturing.html" class="btn btn-secondary">Explore Data Manufacturing</a>
             </div>
@@ -446,9 +493,9 @@
 
         <section class="innovation-banner">
         <div class="container">
-        <h2>World's First Data Wallet Platform</h2>
-        <p>Rootz originated the revolutionary concept that everything in the digital world should have its own wallet - from social media posts to IoT devices, from data objects to digital identities. We're creating the infrastructure for a future where ownership, origin, access, and reliability are built into everything digital.</p>
-        
+        <h2>Knowledge is Wealth</h2>
+        <p>Rootz originated the revolutionary concept that everything in the digital world should have its own wallet. By establishing verifiable Origin and authentic Ownership at the moment of creation, we transform raw data into Knowledge assets that create measurable Wealth. From social media posts to IoT devices, from data objects to digital identities - Knowledge starts at Origin.</p>
+
         <div class="dba-display">
         <h4>Rootz Corporate Digital Name</h4>
         <div class="dba-address">0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664</div>
@@ -458,71 +505,86 @@
 
         <section class="content-section">
             <div class="container">
-                <h2>The Four Pillars of Digital Ownership</h2>
-                <p>Moving beyond traditional identity verification, Rootz established the fundamental principles that enable everything to have its own wallet and prove its authenticity in the digital world.</p>
-                
+                <h2>Origin² Creates Value: The Transformation Journey</h2>
+                <p>Moving beyond traditional identity verification, Rootz established the fundamental transformation from physical substrate to digital wealth. Origin and Ownership (Origin²) are the foundational prerequisites that transform raw data into Knowledge and Knowledge into measurable Wealth.</p>
+
                 <div class="features-grid">
                     <div class="feature-card">
-                        <div class="feature-icon">👑</div>
-                        <h3>Ownership</h3>
-                        <p>True digital ownership through cryptographic wallets that enable individuals, organizations, and devices to maintain sovereign control over their digital assets and interactions.</p>
+                        <div class="feature-icon">⚡</div>
+                        <h3>Electrons: Physical Substrate</h3>
+                        <p>The journey begins with electrons in silicon - ASIC manufacturing creates the physical foundation where data originates with cryptographic proof built into hardware.</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">📍</div>
-                        <h3>Origin</h3>
-                        <p>Immutable proof of where data, instructions, or digital assets originated, creating verifiable chains of authenticity that can be trusted globally.</p>
+                        <h3>Data: Origin Established</h3>
+                        <p>Data Manufacturing creates data objects with immutable Origin proof. Genesis blocks record WHO created it, WHAT system generated it, and WHEN it was made - establishing verifiable authenticity.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">🔑</div>
-                        <h3>Access</h3>
-                        <p>Granular, wallet-based access controls that enable precise permission management without requiring centralized authorities or intermediaries.</p>
+                        <div class="feature-icon">💡</div>
+                        <h3>Knowledge: Ownership Enables Learning</h3>
+                        <p>When data has verifiable Origin and authentic Ownership, it becomes a Knowledge asset. Owners can share, combine, and learn from data while maintaining control - transforming information into intelligence.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">⚡</div>
-                        <h3>Reliability</h3>
-                        <p>Mathematical certainty through blockchain verification, ensuring that digital interactions and data can be trusted with cryptographic proof rather than institutional promises.</p>
+                        <div class="feature-icon">💰</div>
+                        <h3>Wealth: Value Creation</h3>
+                        <p>Knowledge with sovereign Ownership creates measurable Wealth. From 15-150% premiums in verified assets to new data marketplaces - Origin² transforms digital interactions into economic value.</p>
                     </div>
                 </div>
-                
-                <h3>Beyond Identity: The Wallet-First Future</h3>
-                <p>Traditional systems focus on "who you are" - Rootz focuses on "what you can prove you own and control." Our Digital Names and Data Manufacturing processes create a foundation where everything digital carries its own verifiable wallet, enabling new models of interaction, command and control, and digital commerce that work for individuals, businesses, social media, and IoT devices alike.</p>
+
+                <div class="diagram-container">
+                    <h3>The Transformation Flow: Electrons → Data → Knowledge → Wealth</h3>
+                    <pre class="mermaid">
+graph LR
+    A["⚡ Electrons<br/><small>Physical substrate</small>"] -->|"ASIC<br/>Manufacturing"| B["📍 Data<br/><small>with Origin</small>"]
+    B -->|"Learning<br/>Captured"| C["💡 Knowledge<br/><small>Verifiable asset</small>"]
+    C -->|"Sovereign<br/>Control"| D["💰 Wealth<br/><small>Measurable value</small>"]
+
+    style A fill:#4f46e5,stroke:#1e40af,stroke-width:3px,color:#fff
+    style B fill:#7c3aed,stroke:#6d28d9,stroke-width:3px,color:#fff
+    style C fill:#06b6d4,stroke:#0891b2,stroke-width:3px,color:#fff
+    style D fill:#f59e0b,stroke:#d97706,stroke-width:3px,color:#fff
+                    </pre>
+                </div>
+
+                <h3>Beyond Identity: The Knowledge Framework</h3>
+                <p>Traditional systems focus on "who you are" - Rootz focuses on "what Knowledge you can prove you own and control." Our Digital Names and Data Manufacturing processes establish Origin² at the moment of creation, enabling the complete transformation from electrons to wealth. This is the infrastructure for a future where Knowledge, not just identity, drives digital commerce and creates measurable value for individuals, businesses, and devices alike.</p>
             </div>
         </section>
 
         <section class="use-case-preview">
             <div class="container">
-                <h2>Everything Gets a Wallet</h2>
-                <p>From social media posts to IoT sensors, from business documents to personal data - the future is built on data wallets with verifiable origin through wallets.</p>
-                
+                <h2>Knowledge Creates Measurable Wealth</h2>
+                <p>From social media posts to IoT sensors, from business documents to personal data - Origin² transforms data into Knowledge assets that generate measurable economic value.</p>
+
                 <div class="use-case-grid">
                     <div class="use-case-card">
-                        <h4>Social Media</h4>
-                        <p>Every post, message, and interaction has its own wallet with verifiable origin, enabling authentic social connections without platform dependency.</p>
+                        <h4>Equestrian Knowledge: 15-30% Value Premium</h4>
+                        <p>Complete horse data wallets with verifiable origin create Knowledge assets worth $15,000-$30,000 more than horses without documented provenance. Origin² transforms breeding records into Wealth.</p>
                     </div>
-                    
+
                     <div class="use-case-card">
-                        <h4>IoT Command & Control</h4>
-                        <p>Devices with wallets can receive authenticated instructions, execute commands securely, and maintain immutable records of all interactions.</p>
+                        <h4>Building Knowledge: 12-15% Premium + 25% Cost Reduction</h4>
+                        <p>Construction data wallets with Origin proof enable AI-optimized operations and verified green certifications, creating both premium valuations and operational savings.</p>
                     </div>
-                    
+
                     <div class="use-case-card">
-                        <h4>Business Operations</h4>
-                        <p>Companies establish Digital Names that create verifiable foundations for all business data, communications, and digital transactions.</p>
+                        <h4>Evidence Chain Knowledge: Trust Through Origin</h4>
+                        <p>Police body camera data with immutable Origin proof creates Knowledge that's admissible in court, transforming raw footage into reliable legal evidence.</p>
                     </div>
-                    
+
                     <div class="use-case-card">
-                        <h4>Personal Data</h4>
-                        <p>Individual data objects with their own wallets enable true data ownership, granular sharing controls, and monetization opportunities.</p>
+                        <h4>Cattle Ranching: 15-150% Premiums</h4>
+                        <p>$263 investment in verified cattle data creates Knowledge assets worth up to $27,000 - a 10,000%+ return through proven genetics and health records with Origin².</p>
                     </div>
-                    
+
                     <div class="use-case-card">
-                        <h4>Digital Assets</h4>
-                        <p>Every piece of manufactured data carries proof of creation, ownership history, and access permissions, creating new models of digital commerce.</p>
+                        <h4>IoT Command & Control: Reliable Operations</h4>
+                        <p>Devices with wallets and verifiable Origin can receive authenticated instructions, creating Knowledge-based automation that transforms operational reliability into cost savings.</p>
                     </div>
-                    
+
                     <div class="use-case-card">
-                        <h4>Global Infrastructure</h4>
-                        <p>A universal system where wallets enable trust, verification, and authentic interactions across all digital platforms and devices worldwide.</p>
+                        <h4>AI Training Knowledge: Provenance = Reliability</h4>
+                        <p>Training data with Origin² creates Knowledge that enables reliable AI. Verifiable provenance transforms raw data into trustworthy AI training assets worth premium prices.</p>
                     </div>
                 </div>
             </div>
@@ -531,8 +593,8 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names</p>
-            <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Everything Has a Wallet</p>
+            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names | Knowledge Starts at Origin</p>
+            <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Origin² Creates Value</p>
         </div>
     </footer>
     

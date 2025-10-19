@@ -3,17 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Names - how everything gets a wallet - Rivetz</title>
+    <title>Digital Names - Origin² Establishes Knowledge - Rootz</title>
+
+    <!-- Mermaid.js for diagrams -->
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#e0e7ff',
+          primaryTextColor: '#1e1b4b',
+          primaryBorderColor: '#4f46e5',
+          lineColor: '#6366f1',
+          secondaryColor: '#ddd6fe',
+          tertiaryColor: '#cffafe',
+          fontSize: '16px',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        }
+      });
+    </script>
+
     <style>
         :root {
-            --primary: #2d5016;
-            --secondary: #4a7c59;
-            --accent: #5d8a66;
-            --light-green: #76a56f;
-            --dark: #1a2f0a;
+            --primary-blue: #4f46e5;
+            --primary-purple: #7c3aed;
+            --secondary-blue: #6366f1;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --dark: #1e1b4b;
             --light: #ffffff;
-            --background: #f8fdf6;
-            --gray: #666666;
+            --background: #f8fafc;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-900: #111827;
         }
 
         * {
@@ -153,7 +179,7 @@
         }
         
         .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-purple) 100%);
             color: var(--light);
             padding: 100px 20px;
             text-align: center;
@@ -196,13 +222,13 @@
             font-size: 36px;
             text-align: center;
             margin-bottom: 40px;
-            color: var(--primary);
+            color: var(--primary-blue);
         }
-        
+
         .content-section h3 {
             font-size: 24px;
             margin-bottom: 20px;
-            color: var(--secondary);
+            color: var(--primary-purple);
         }
         
         .content-section p {
@@ -246,29 +272,50 @@
         .feature-card h3 {
             font-size: 22px;
             margin-bottom: 15px;
-            color: var(--primary);
+            color: var(--primary-blue);
         }
-        
+
         .feature-card p {
             font-size: 16px;
-            color: var(--gray);
+            color: var(--gray-600);
         }
-        
+
         .process-section {
             background: var(--light);
             padding: 80px 20px;
         }
-        
+
         .process-step {
             margin-bottom: 30px;
             padding: 20px;
-            border-left: 4px solid var(--primary);
-            background: rgba(45, 80, 22, 0.05);
+            border-left: 4px solid var(--primary-blue);
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
         }
-        
+
         .process-step strong {
-            color: var(--primary);
+            color: var(--primary-blue);
             font-size: 18px;
+        }
+
+        .diagram-container {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .diagram-container h3 {
+            text-align: center;
+            color: var(--primary-blue);
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .diagram-container pre {
+            background: transparent;
+            border: none;
+            text-align: center;
         }
         
         footer {
@@ -352,48 +399,48 @@
     <main>
         <section class="hero">
             <div class="container">
-                <h1>Digital Names - how everything gets a wallet</h1>
-                <p>The genesis of for Ownership, Origin, Access, and Reliability for all data, systems and things.</p>
+                <h1>Digital Names: Origin² Begins Here</h1>
+                <p>The genesis of Origin and Ownership - establishing the foundation that transforms data into Knowledge and Knowledge into Wealth for all systems, products, and things.</p>
             </div>
         </section>
 
         <section class="content-section">
             <div class="container">
-                <h2>The creation of Origin and Ownership</h2>
-                <p>Rootz pioneered Digital Names as the genesis of how everything gets a wallet. Unlike traditional identity systems, Digital Names establish the foundational framework that enables all data, systems, and things to have their own cryptographic wallets, providing universal foundations for ownership, origin tracking, access control, and reliability verification.</p>
-                
-                <p>Digital Names represent the foundational breakthrough that enables universal wallet assignment. From the smallest data object to the largest system, from individual things to global infrastructure - everything can now have its own cryptographic wallet with a Digital Name. This genesis innovation creates the bedrock for a world where ownership, origin, access, and reliability are built into everything digital by design.</p>
+                <h2>Origin² is the Foundation of Knowledge</h2>
+                <p>Rootz pioneered Digital Names as the genesis of Origin and Ownership (Origin²). Unlike traditional identity systems that only answer "who you are," Digital Names establish both WHO created something and WHO owns it - the two prerequisites that transform raw data into Knowledge assets. This foundational framework enables all data, systems, and things to carry verifiable provenance and authentic ownership, creating the bedrock for Knowledge creation.</p>
+
+                <p>Digital Names represent the foundational breakthrough that enables the transformation from electrons to wealth. From the smallest data object to the largest system, from individual things to global infrastructure - everything can now have cryptographic proof of both Origin and Ownership. This Origin² innovation creates the bedrock for a world where Knowledge and Wealth are built into everything digital by design, not bolted on afterward.</p>
                 
                 <div class="features-grid">
                     <div class="feature-card">
-                        <div class="feature-icon">⚡</div>
+                        <div class="feature-icon">👑</div>
                         <h3>Genesis of Ownership</h3>
-                        <p>Every data object, system, and thing gets its own wallet and Digital Name, establishing the foundational ownership framework that works universally across all platforms and technologies.</p>
+                        <p>Every data object, system, and thing gets its own wallet and Digital Name, establishing WHO owns it. Ownership enables Knowledge creation - you can't learn from data you don't control.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">🛡️</div>
+                        <div class="feature-icon">📍</div>
                         <h3>Genesis of Origin</h3>
-                        <p>The foundational blockchain recording permanently captures what person, device, or system created each wallet, providing the genesis proof of authentic origin for all things.</p>
+                        <p>The foundational blockchain recording permanently captures WHO created each wallet, WHAT system generated it, and WHEN. Origin proof is the prerequisite for Knowledge - you can't trust what you can't verify.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">🌐</div>
-                        <h3>Ledger of access</h3>
-                        <p>Permissions and rights recorded by owners on the data's chain create the dynamic access control framework that governs how data, systems, and things interact across all platforms and applications.</p>
+                        <div class="feature-icon">💡</div>
+                        <h3>Knowledge Through Control</h3>
+                        <p>Origin² (Origin + Ownership) enables Knowledge creation. Owners can share data while maintaining control, combine datasets while preserving provenance, and learn from information while protecting sovereignty.</p>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon">📋</div>
-                        <h3>Universal Foundation</h3>
-                        <p>Digital Names provide the genesis infrastructure that works across everything - the same foundational framework supports data authenticity, system verification, and thing identification universally.</p>
+                        <div class="feature-icon">💰</div>
+                        <h3>Wealth From Knowledge</h3>
+                        <p>Knowledge with verified Origin² creates measurable Wealth. From 15-30% premiums for horses with complete data wallets to 10,000%+ ROI in verified cattle genetics - Origin² transforms data into value.</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🔗</div>
-                        <h3>Quality and reliability</h3>
-                        <p>Cryptographic proof embedded in every wallet creates the foundational trust layer, ensuring all data, systems, and things can be verified as authentic across any context.</p>
+                        <h3>Reliability Through Provenance</h3>
+                        <p>Cryptographic proof of Origin² creates reliable Knowledge. AI trained on data with verified provenance, evidence chains with immutable origin, buildings with proven green certifications - reliability creates premium value.</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🔮</div>
-                        <h3>Safe infrastructure</h3>
-                        <p>Built with quantum-resistant cryptography, Digital Names provide the foundational wallet infrastructure for a future where all data, systems, and things have privacy built in.</p>
+                        <h3>Future-Proof Infrastructure</h3>
+                        <p>Built with quantum-resistant cryptography, Digital Names provide the foundational Origin² infrastructure for a future where Knowledge and Wealth flow from verifiable provenance, not institutional trust.</p>
                     </div>
                 </div>
             </div>
@@ -474,8 +521,8 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names</p>
-            <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Everything Has a Wallet</p>
+            <p>&copy; 2025 Rootz - Originators of Data Wallets & Digital Names | Knowledge Starts at Origin</p>
+            <p>Corporate Digital Name: 0xD36AAf65a91bB7dc69942cF6B6d1dBa4Ef171664 | Origin² Creates Value</p>
         </div>
     </footer>
     
